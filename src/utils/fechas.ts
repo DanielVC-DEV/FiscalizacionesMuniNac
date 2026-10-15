@@ -55,3 +55,20 @@ export function esFechaPasada(texto: string): boolean {
   hoy.setHours(0, 0, 0, 0);
   return fecha.getTime() < hoy.getTime();
 }
+
+// Fecha de hoy como "dd/mm/aaaa", para el botón "Usar fecha actual".
+export function hoyComoTexto(): string {
+  const hoy = new Date();
+  return formatearDDMMAAAA(hoy.getDate(), hoy.getMonth() + 1, hoy.getFullYear());
+}
+
+// Diferencia en días de calendario entre dos fechas (se asume que "hasta"
+// es posterior a "desde"). Se usa para calcular el "día de respuesta a
+// ticket" del contrato automáticamente a partir de la fecha de inicio y
+// de término, en vez de que la persona lo cuente a mano.
+export function diferenciaEnDias(desde: Date, hasta: Date): number {
+  const unDiaMs = 24 * 60 * 60 * 1000;
+  const a = new Date(desde.getFullYear(), desde.getMonth(), desde.getDate());
+  const b = new Date(hasta.getFullYear(), hasta.getMonth(), hasta.getDate());
+  return Math.round((b.getTime() - a.getTime()) / unDiaMs);
+}

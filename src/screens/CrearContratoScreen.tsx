@@ -11,7 +11,7 @@ import { COLORS, RADIOS } from '../theme/colors';
 import { OrdenCompra } from '../types';
 import { addContrato } from '../data/store';
 import { EMPRESAS_EJEMPLO } from '../data/datosTemporales';
-import { parsearFecha } from '../utils/fechas';
+import { parsearFecha, diferenciaEnDias, hoyComoTexto } from '../utils/fechas';
 
 // EMPRESAS_EJEMPLO es data de ejemplo temporal (ver src/data/datosTemporales.ts):
 // todavía no existe una administración real de empresas.
@@ -26,7 +26,41 @@ export default function CrearContratoScreen({ navigation }: any) {
   const [ordenesCompra, setOrdenesCompra] = useState<OrdenCompra[]>([]);
   const [errores, setErrores] = useState<Record<string, string>>({});
 
+  // Sirve para forzar que el campo "Fecha de inicio" se vuelva a montar
+  // cuando se usa el botón "Usar fecha de hoy": DateField guarda su propio
+  // día/mes/año como estado interno (ver el comentario en DateField.tsx),
+  // así que cambiar solo la prop `value` desde acá no lo actualiza visualmente.
+  const [fechaInicioResetId, setFechaInicioResetId] = useState(0);
+
   const empresaSeleccionada = EMPRESAS.find((e) => e.nombre === empresaNombre) ?? null;
+
+  // Si ambas fechas quedan completas y coherentes, el día de respuesta a
+  // ticket se calcula solo como la cantidad de días entre inicio y
+  // término, en vez de que la persona lo tenga que contar a mano.
+  function recalcularDiasRespuesta(inicioTexto: string, terminoTexto: string) {
+    const inicio = parsearFecha(inicioTexto);
+    const termino = parsearFecha(terminoTexto);
+    if (inicio && termino && termino > inicio) {
+      setDiasRespuesta(String(diferenciaEnDias(inicio, termino)));
+    }
+  }
+
+  function manejarFechaInicio(valor: string) {
+    setFechaInicio(valor);
+    recalcularDiasRespuesta(valor, fechaTermino);
+  }
+
+  function manejarFechaTermino(valor: string) {
+    setFechaTermino(valor);
+    recalcularDiasRespuesta(fechaInicio, valor);
+  }
+
+  function usarFechaActual() {
+    const hoy = hoyComoTexto();
+    setFechaInicio(hoy);
+    setFechaInicioResetId((n) => n + 1);
+    recalcularDiasRespuesta(hoy, fechaTermino);
+  }
 
   function agregarOrdenCompra() {
     setOrdenesCompra((prev) => [...prev, { id: `${Date.now()}`, codigo: '', monto: '', fecha: '' }]);
@@ -137,12 +171,26 @@ export default function CrearContratoScreen({ navigation }: any) {
           </Text>
         </View>
 
-        <DateField label="Fecha de inicio" requerido value={fechaInicio} onChange={setFechaInicio} error={errores.fechaInicio} />
+        <DateField
+          key={`fecha-inicio-${fechaInicioResetId}`}
+          label="Fecha de inicio"
+          requerido
+          value={fechaInicio}
+          onChange={manejarFechaInicio}
+          error={errores.fechaInicio}
+        />
+        <Button
+          label="Usar fecha de hoy"
+          variante="suave"
+          onPress={usarFechaActual}
+          style={styles.botonFechaActual}
+        />
+
         <DateField
           label="Fecha de término"
           requerido
           value={fechaTermino}
-          onChange={setFechaTermino}
+          onChange={manejarFechaTermino}
           error={errores.fechaTermino}
         />
 
@@ -150,6 +198,7 @@ export default function CrearContratoScreen({ navigation }: any) {
           Día de respuesta a ticket
           <Text style={styles.req}> *</Text>
         </Text>
+        <Text style={styles.ayuda}>Se calcula solo según la fecha de inicio y de término, pero puedes cambiarlo a mano.</Text>
         <TextInput
           style={styles.input}
           placeholder="Días hábiles, ej: 5"
@@ -241,6 +290,8 @@ const styles = StyleSheet.create({
   valorTexto: { color: COLORS.textoPrimario, fontSize: 13 },
   placeholderTexto: { color: COLORS.textoTenue, fontSize: 13 },
   error: { color: COLORS.rojo, fontSize: 11, marginTop: -4, marginBottom: 6 },
+  ayuda: { color: COLORS.textoSecundario, fontSize: 11, marginTop: -2, marginBottom: 6, fontStyle: 'italic' },
+  botonFechaActual: { alignSelf: 'flex-start', minHeight: 36, paddingHorizontal: 12, marginTop: -4, marginBottom: 10 },
   ocBloque: { marginBottom: 10 },
   ocCerrar: { position: 'absolute', top: 10, right: 12, zIndex: 1 },
   ocCerrarTexto: { fontSize: 16, color: COLORS.textoTenue, fontWeight: '700' },
