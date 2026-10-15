@@ -13,7 +13,10 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/Header';
+import TopBar from '../components/TopBar';
 import SelectField from '../components/SelectField';
+import Button from '../components/Button';
+import { COLORS, RADIOS } from '../theme/colors';
 import { PRIORIDADES, DIAS_PLAZO_POR_PRIORIDAD, Prioridad } from '../types';
 import { sumarDiasHabiles, formatearFecha } from '../utils/businessDays';
 import { useContratos, contratoLabel, addTicket } from '../data/store';
@@ -159,16 +162,9 @@ export default function CrearTicketScreen({ navigation }: any) {
   return (
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
       <Header />
-      <View style={styles.linea} />
+      <TopBar title="Nuevo ticket" onBack={() => navigation.goBack()} />
 
       <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
-        <View style={styles.tituloFila}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.back}>←</Text>
-          </TouchableOpacity>
-          <Text style={styles.titulo}>Nuevo ticket</Text>
-        </View>
-
         <Text style={styles.seccion}>DATOS</Text>
 
         <SelectField
@@ -228,7 +224,7 @@ export default function CrearTicketScreen({ navigation }: any) {
         <TextInput
           style={styles.textarea}
           placeholder="Describe lo observado…"
-          placeholderTextColor="#8b93a0"
+          placeholderTextColor={COLORS.textoTenue}
           multiline
           numberOfLines={4}
           value={descripcion}
@@ -238,12 +234,8 @@ export default function CrearTicketScreen({ navigation }: any) {
 
         <Text style={[styles.label, { marginTop: 10 }]}>Fotografías</Text>
         <View style={styles.fila}>
-          <TouchableOpacity style={styles.botonOscuro} onPress={tomarFoto}>
-            <Text style={styles.botonOscuroTexto}>Tomar foto</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.botonOscuro} onPress={elegirImagen}>
-            <Text style={styles.botonOscuroTexto}>Elegir desde el dispositivo</Text>
-          </TouchableOpacity>
+          <Button label="Tomar foto" variante="suave" onPress={tomarFoto} style={{ flex: 1 }} />
+          <Button label="Elegir desde el dispositivo" variante="suave" onPress={elegirImagen} style={{ flex: 1 }} />
         </View>
         {fotos.length > 0 && (
           <View style={styles.miniaturas}>
@@ -251,7 +243,7 @@ export default function CrearTicketScreen({ navigation }: any) {
               <View key={f.id} style={styles.miniaturaBox}>
                 <Image source={{ uri: f.uri }} style={styles.miniatura} />
                 <TouchableOpacity style={styles.miniaturaQuitar} onPress={() => quitarFoto(f.id)}>
-                  <Text style={styles.miniaturaQuitarTexto}>X</Text>
+                  <Text style={styles.miniaturaQuitarTexto}>×</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -259,15 +251,14 @@ export default function CrearTicketScreen({ navigation }: any) {
         )}
 
         <Text style={styles.seccion}>UBICACIÓN (GEOLOCALIZACIÓN)</Text>
-        <TouchableOpacity
-          style={styles.botonOscuroFull}
+        <Button
+          label={buscandoUbicacion ? 'Buscando ubicación…' : 'Ubicación actual'}
+          variante="primario"
           onPress={usarUbicacionActual}
           disabled={buscandoUbicacion}
-        >
-          <Text style={styles.botonOscuroTexto}>
-            {buscandoUbicacion ? 'Buscando ubicación…' : 'Ubicación actual'}
-          </Text>
-        </TouchableOpacity>
+          cargando={buscandoUbicacion}
+          style={styles.botonUbicacion}
+        />
         {!!ubicacionError && <Text style={styles.error}>{ubicacionError}</Text>}
 
         <Text style={styles.seccion}>UBICACIÓN MANUAL</Text>
@@ -275,7 +266,7 @@ export default function CrearTicketScreen({ navigation }: any) {
         <TextInput
           style={styles.input}
           placeholder="Seleccionar dirección"
-          placeholderTextColor="#8b93a0"
+          placeholderTextColor={COLORS.textoTenue}
           value={direccion}
           onChangeText={setDireccion}
         />
@@ -283,7 +274,7 @@ export default function CrearTicketScreen({ navigation }: any) {
         <TextInput
           style={styles.input}
           placeholder="sector, plaza, recinto…"
-          placeholderTextColor="#8b93a0"
+          placeholderTextColor={COLORS.textoTenue}
           value={sector}
           onChangeText={setSector}
         />
@@ -291,7 +282,7 @@ export default function CrearTicketScreen({ navigation }: any) {
         <TextInput
           style={styles.input}
           placeholder="Ej: frente de un negocio"
-          placeholderTextColor="#8b93a0"
+          placeholderTextColor={COLORS.textoTenue}
           value={referencia}
           onChangeText={setReferencia}
         />
@@ -299,7 +290,7 @@ export default function CrearTicketScreen({ navigation }: any) {
         <TextInput
           style={styles.input}
           placeholder="Se completa con la ubicación"
-          placeholderTextColor="#8b93a0"
+          placeholderTextColor={COLORS.textoTenue}
           value={coordenadas}
           onChangeText={setCoordenadas}
         />
@@ -332,87 +323,62 @@ export default function CrearTicketScreen({ navigation }: any) {
       </ScrollView>
 
       <View style={styles.barraInferior}>
-        <TouchableOpacity style={styles.botonClaro} onPress={() => navigation.goBack()}>
-          <Text style={styles.botonClaroTexto}>Cancelar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.botonOscuroFull, { flex: 1, marginTop: 0 }]} onPress={crear}>
-          <Text style={styles.botonOscuroTexto}>Crear</Text>
-        </TouchableOpacity>
+        <Button label="Cancelar" variante="secundario" onPress={() => navigation.goBack()} style={{ flex: 1 }} />
+        <Button label="Crear" variante="primario" onPress={crear} style={{ flex: 1 }} />
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  pantalla: { flex: 1, backgroundColor: '#d9d9d9' },
-  linea: { height: 1, backgroundColor: '#111', marginHorizontal: 4 },
+  pantalla: { flex: 1, backgroundColor: COLORS.fondo },
   contenido: { padding: 16, paddingBottom: 24 },
-  tituloFila: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
-  back: { fontSize: 18, color: '#1c2126' },
-  titulo: { fontSize: 16, fontWeight: '700', color: '#1c2126' },
   seccion: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#1c2126',
+    color: COLORS.azulOscuro,
     marginTop: 18,
     marginBottom: 8,
+    letterSpacing: 0.3,
   },
-  label: { fontSize: 12, color: '#1c2126', marginBottom: 4, marginTop: 6 },
-  req: { color: '#7c0101' },
+  label: { fontSize: 12, color: COLORS.textoPrimario, marginBottom: 4, marginTop: 6, fontWeight: '600' },
+  req: { color: COLORS.rojo },
   input: {
-    height: 44,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#d7dbe0',
-    backgroundColor: '#fff',
+    height: 46,
+    borderRadius: RADIOS.md,
+    borderWidth: 1.5,
+    borderColor: COLORS.borde,
+    backgroundColor: COLORS.superficie,
     paddingHorizontal: 12,
     fontSize: 13,
-    color: '#1c2126',
+    color: COLORS.textoPrimario,
     marginBottom: 8,
   },
   textarea: {
     minHeight: 90,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#d7dbe0',
-    backgroundColor: '#fff',
+    borderRadius: RADIOS.md,
+    borderWidth: 1.5,
+    borderColor: COLORS.borde,
+    backgroundColor: COLORS.superficie,
     padding: 12,
     fontSize: 13,
-    color: '#1c2126',
+    color: COLORS.textoPrimario,
     textAlignVertical: 'top',
   },
-  error: { color: '#7c0101', fontSize: 11, marginTop: 4 },
-  avisoVacio: { color: '#5b6570', fontSize: 11.5, marginBottom: 6 },
+  error: { color: COLORS.rojo, fontSize: 11, marginTop: 4 },
+  avisoVacio: { color: COLORS.textoSecundario, fontSize: 11.5, marginBottom: 6 },
   auto: {
-    backgroundColor: '#686462',
-    borderRadius: 8,
+    backgroundColor: COLORS.azulSuave,
+    borderRadius: RADIOS.md,
     padding: 10,
     marginBottom: 8,
   },
-  autoTexto: { fontSize: 11, color: '#fff', lineHeight: 16, textAlign: 'center' },
+  autoTexto: { fontSize: 11, color: COLORS.azulOscuro, lineHeight: 16, textAlign: 'center' },
   fila: { flexDirection: 'row', gap: 8, marginTop: 4 },
-  botonOscuro: {
-    flex: 1,
-    minHeight: 40,
-    borderRadius: 8,
-    backgroundColor: '#686462',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 6,
-  },
-  botonOscuroFull: {
-    minHeight: 44,
-    borderRadius: 8,
-    backgroundColor: '#686462',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 6,
-    marginBottom: 4,
-  },
-  botonOscuroTexto: { color: '#fff', fontSize: 12.5, fontWeight: '600', textAlign: 'center' },
+  botonUbicacion: { marginTop: 6, marginBottom: 4 },
   miniaturas: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
   miniaturaBox: { width: 64, height: 64 },
-  miniatura: { width: 64, height: 64, borderRadius: 6, backgroundColor: '#d7dbe0' },
+  miniatura: { width: 64, height: 64, borderRadius: RADIOS.sm, backgroundColor: COLORS.borde },
   miniaturaQuitar: {
     position: 'absolute',
     top: -6,
@@ -420,38 +386,29 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#7c0101',
+    backgroundColor: COLORS.rojo,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  miniaturaQuitarTexto: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  miniaturaQuitarTexto: { color: COLORS.textoClaro, fontSize: 11, fontWeight: '700' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4, marginBottom: 8 },
   chip: {
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#d7dbe0',
-    backgroundColor: '#fff',
+    borderRadius: RADIOS.pill,
+    borderWidth: 1.5,
+    borderColor: COLORS.borde,
+    backgroundColor: COLORS.superficie,
     paddingVertical: 6,
     paddingHorizontal: 12,
   },
-  chipActivo: { backgroundColor: '#01497c', borderColor: '#01497c' },
-  chipTexto: { fontSize: 11.5, color: '#1c2126' },
-  chipTextoActivo: { color: '#fff', fontWeight: '600' },
+  chipActivo: { backgroundColor: COLORS.azul, borderColor: COLORS.azul },
+  chipTexto: { fontSize: 11.5, color: COLORS.textoPrimario },
+  chipTextoActivo: { color: COLORS.textoClaro, fontWeight: '600' },
   barraInferior: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#00000022',
-    backgroundColor: '#d9d9d9',
+    borderTopColor: COLORS.bordeSuave,
+    backgroundColor: COLORS.superficie,
   },
-  botonClaro: {
-    flex: 1,
-    height: 44,
-    borderRadius: 8,
-    backgroundColor: '#1c2126',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  botonClaroTexto: { color: '#fff', fontSize: 13, fontWeight: '600' },
 });

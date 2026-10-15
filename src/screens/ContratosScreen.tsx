@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/Header';
+import TopBar from '../components/TopBar';
+import Card from '../components/Card';
+import Button from '../components/Button';
+import { COLORS, RADIOS } from '../theme/colors';
 import { useContratos } from '../data/store';
 
 export default function ContratosScreen({ navigation }: any) {
@@ -24,28 +28,19 @@ export default function ContratosScreen({ navigation }: any) {
   return (
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
       <Header />
-      <View style={styles.linea} />
+      <TopBar title="Contratos" onBack={() => navigation.goBack()} />
 
       <View style={styles.contenido}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>← Volver</Text>
-        </TouchableOpacity>
-
-        <View style={styles.barraTitulo}>
-          <Text style={styles.barraTitulotexto}>Contratos</Text>
-        </View>
-
-        <TouchableOpacity
-          style={styles.botonNuevo}
+        <Button
+          label="+ Nuevo contrato"
           onPress={() => navigation.navigate('CrearContrato')}
-        >
-          <Text style={styles.botonNuevoTexto}>+ Nuevo contrato</Text>
-        </TouchableOpacity>
+          style={styles.botonNuevo}
+        />
 
         <TextInput
           style={styles.buscador}
           placeholder="Buscar por nombre o RUT de empresa"
-          placeholderTextColor="#8b93a0"
+          placeholderTextColor={COLORS.textoTenue}
           value={busqueda}
           onChangeText={setBusqueda}
         />
@@ -61,20 +56,22 @@ export default function ContratosScreen({ navigation }: any) {
             {filtrados.map((c) => (
               <TouchableOpacity
                 key={c.id}
-                style={styles.card}
+                activeOpacity={0.75}
                 onPress={() => navigation.navigate('ContratoDetalle', { contrato: c })}
               >
-                <Text style={styles.cardNombre}>{c.nombre}</Text>
-                <Text style={styles.cardEmpresa}>
-                  {c.nombreEmpresa} · RUT {c.rutEmpresa}
-                </Text>
-                <View style={styles.cardFila}>
-                  <Text style={styles.cardDato}>Inicio: {c.fechaInicio}</Text>
-                  <Text style={styles.cardDato}>Término: {c.fechaTermino}</Text>
-                </View>
-                <Text style={styles.cardDato}>
-                  Día de respuesta a ticket: {c.diasRespuestaTicket} día(s)
-                </Text>
+                <Card style={styles.card}>
+                  <Text style={styles.cardNombre}>{c.nombre}</Text>
+                  <Text style={styles.cardEmpresa}>
+                    {c.nombreEmpresa} · RUT {c.rutEmpresa}
+                  </Text>
+                  <View style={styles.cardFila}>
+                    <Text style={styles.cardDato}>Inicio: {c.fechaInicio}</Text>
+                    <Text style={styles.cardDato}>Término: {c.fechaTermino}</Text>
+                  </View>
+                  <Text style={styles.cardDato}>
+                    Día de respuesta a ticket: {c.diasRespuestaTicket} día(s)
+                  </Text>
+                </Card>
               </TouchableOpacity>
             ))}
           </View>
@@ -85,57 +82,31 @@ export default function ContratosScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  pantalla: { flex: 1, backgroundColor: '#d9d9d9' },
-  linea: { height: 1, backgroundColor: '#111', marginHorizontal: 4 },
+  pantalla: { flex: 1, backgroundColor: COLORS.fondo },
   contenido: { padding: 16, flex: 1 },
-  back: { fontSize: 13, color: '#1c2126', marginBottom: 10 },
-  barraTitulo: {
-    backgroundColor: '#686462',
-    borderRadius: 6,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 14,
-  },
-  barraTitulotexto: { color: '#fff', fontSize: 14, fontWeight: '700' },
-  botonNuevo: {
-    backgroundColor: '#1c2126',
-    borderRadius: 6,
-    height: 42,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 14,
-  },
-  botonNuevoTexto: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  botonNuevo: { marginBottom: 14 },
   buscador: {
-    height: 40,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#d7dbe0',
-    backgroundColor: '#fff',
+    height: 44,
+    borderRadius: RADIOS.md,
+    borderWidth: 1.5,
+    borderColor: COLORS.borde,
+    backgroundColor: COLORS.superficie,
     paddingHorizontal: 12,
     fontSize: 13,
-    color: '#1c2126',
+    color: COLORS.textoPrimario,
     marginBottom: 16,
   },
   sinContratos: {
-    color: '#5b6570',
+    color: COLORS.textoSecundario,
     fontSize: 12.5,
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: 20,
   },
   lista: { gap: 10 },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e3e6ea',
-    padding: 12,
-    marginBottom: 10,
-  },
-  cardNombre: { fontSize: 13.5, fontWeight: '700', color: '#1c2126', marginBottom: 4 },
-  cardEmpresa: { fontSize: 12, color: '#3a4048', marginBottom: 6 },
+  card: { marginBottom: 10 },
+  cardNombre: { fontSize: 13.5, fontWeight: '700', color: COLORS.textoPrimario, marginBottom: 4 },
+  cardEmpresa: { fontSize: 12, color: COLORS.textoSecundario, marginBottom: 6 },
   cardFila: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  cardDato: { fontSize: 11, color: '#5b6570' },
+  cardDato: { fontSize: 11, color: COLORS.textoSecundario },
 });

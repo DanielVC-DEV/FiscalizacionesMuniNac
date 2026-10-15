@@ -16,7 +16,7 @@ export default function App() {
     <SafeAreaProvider>
       <NavigationContainer>
         <Stack.Navigator>
-          <Stack.Screen name="Menu" component={MenuScreen} />
+          <Stack.Screen name="Menu" component={MenuScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Resumen" component={ResumenScreen} options={{ headerShown: false }} />
           <Stack.Screen name="CrearTicket" component={CrearTicketScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Contratos" component={ContratosScreen} options={{ headerShown: false }} />

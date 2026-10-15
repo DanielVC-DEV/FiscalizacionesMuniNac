@@ -3,6 +3,10 @@ import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Header from '../components/Header';
+import TopBar from '../components/TopBar';
+import Card from '../components/Card';
+import EstadoBadge from '../components/EstadoBadge';
+import { COLORS, COLOR_ESTADO, RADIOS } from '../theme/colors';
 import { useTickets } from '../data/store';
 import { Ticket, EstadoTicket } from '../types';
 import { esFechaPasada } from '../utils/fechas';
@@ -59,74 +63,106 @@ export default function ResumenScreen({ navigation }: any) {
   return (
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
       <Header />
-      <View style={styles.linea} />
+      <TopBar title="Resumen de tickets" onBack={() => navigation.goBack()} />
 
       <View style={styles.contenido}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>← Volver</Text>
-        </TouchableOpacity>
-
-        <View style={styles.barraTitulo}>
-          <Text style={styles.barraTitulotexto}>Resumen de tickets</Text>
-        </View>
-
         <View style={styles.filaAtencion}>
-          <View style={[styles.barra, { flex: 1 }]}>
-            <Text style={styles.barraTexto}>Requiere atención</Text>
-          </View>
+          <Text style={styles.tituloSeccion}>Requiere atención</Text>
           <TouchableOpacity style={styles.periodo} onPress={siguientePeriodo}>
-            <Text style={styles.periodoTexto}>Periodo: {periodo} ▾</Text>
+            <Text style={styles.periodoTexto}>{periodo} ▾</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.filaStats}>
-          <View style={styles.stat}>
-            <Text style={styles.statTexto}>Pendientes{'\n'}de revisión</Text>
-            <Text style={styles.statNumero}>{pendientesRevision}</Text>
-          </View>
-          <View style={styles.stat}>
-            <Text style={styles.statTexto}>Vencidos</Text>
-            <Text style={styles.statNumero}>{vencidos}</Text>
-          </View>
-          <View style={styles.stat}>
-            <Text style={styles.statTexto}>Requieren nueva{'\n'}subsanación</Text>
-            <Text style={styles.statNumero}>{requierenNuevaSubsanacion}</Text>
-          </View>
+          <Stat
+            etiqueta={'Pendientes\nde revisión'}
+            numero={pendientesRevision}
+            color={COLOR_ESTADO.RESPONDIDO.color}
+            suave={COLOR_ESTADO.RESPONDIDO.suave}
+            oscuro={COLOR_ESTADO.RESPONDIDO.oscuro}
+          />
+          <Stat
+            etiqueta="Vencidos"
+            numero={vencidos}
+            color={COLOR_ESTADO.VENCIDO.color}
+            suave={COLOR_ESTADO.VENCIDO.suave}
+            oscuro={COLOR_ESTADO.VENCIDO.oscuro}
+          />
+          <Stat
+            etiqueta={'Requieren nueva\nsubsanación'}
+            numero={requierenNuevaSubsanacion}
+            color={COLOR_ESTADO.REQUIERE_NUEVA_SUBSANACION.color}
+            suave={COLOR_ESTADO.REQUIERE_NUEVA_SUBSANACION.suave}
+            oscuro={COLOR_ESTADO.REQUIERE_NUEVA_SUBSANACION.oscuro}
+          />
         </View>
 
-        <View style={styles.barra}>
-          <Text style={styles.barraTexto}>Estado general</Text>
-        </View>
+        <Text style={styles.tituloSeccion}>Estado general</Text>
 
         <TextInput
           style={styles.buscador}
           placeholder="Buscar por contrato o descripción"
-          placeholderTextColor="#8b93a0"
+          placeholderTextColor={COLORS.textoTenue}
           value={busqueda}
           onChangeText={setBusqueda}
         />
 
-        <FilaEstado etiqueta="Abiertos" tickets={porEstado('ABIERTO')} />
-        <FilaEstado etiqueta="Respondidos" tickets={porEstado('RESPONDIDO')} />
-        <FilaEstado etiqueta="Subsanados" tickets={porEstado('SUBSANADO_CONFORME')} />
-        <FilaEstado etiqueta="Cerrados" tickets={porEstado('CERRADO')} />
+        <FilaEstado etiqueta="Abiertos" estadoClave="ABIERTO" tickets={porEstado('ABIERTO')} />
+        <FilaEstado etiqueta="Respondidos" estadoClave="RESPONDIDO" tickets={porEstado('RESPONDIDO')} />
+        <FilaEstado etiqueta="Subsanados" estadoClave="SUBSANADO_CONFORME" tickets={porEstado('SUBSANADO_CONFORME')} />
+        <FilaEstado etiqueta="Cerrados" estadoClave="CERRADO" tickets={porEstado('CERRADO')} />
         <FilaEstado etiqueta="Total" tickets={filtrados} />
       </View>
     </SafeAreaView>
   );
 }
 
+function Stat({
+  etiqueta,
+  numero,
+  color,
+  suave,
+  oscuro,
+}: {
+  etiqueta: string;
+  numero: number;
+  color: string;
+  suave: string;
+  oscuro: string;
+}) {
+  return (
+    <View style={[styles.stat, { backgroundColor: suave, borderColor: color }]}>
+      <Text style={[styles.statTexto, { color: oscuro }]}>{etiqueta}</Text>
+      <Text style={[styles.statNumero, { color }]}>{numero}</Text>
+    </View>
+  );
+}
+
 // Cada fila es un acordeón: muestra el nombre del estado y el total, y al
 // tocarla se despliega la lista de tickets de ese estado.
-function FilaEstado({ etiqueta, tickets }: { etiqueta: string; tickets: Ticket[] }) {
+function FilaEstado({
+  etiqueta,
+  estadoClave,
+  tickets,
+}: {
+  etiqueta: string;
+  estadoClave?: EstadoTicket;
+  tickets: Ticket[];
+}) {
   const [abierto, setAbierto] = useState(false);
+  const color = estadoClave ? COLOR_ESTADO[estadoClave].color : COLORS.azul;
 
   return (
     <View style={{ marginBottom: 10 }}>
-      <TouchableOpacity style={styles.barra} onPress={() => setAbierto((v) => !v)}>
-        <Text style={styles.barraTexto}>
-          {etiqueta}: {tickets.length} {abierto ? '▴' : '▾'}
-        </Text>
+      <TouchableOpacity style={styles.barra} onPress={() => setAbierto((v) => !v)} activeOpacity={0.75}>
+        <View style={styles.barraIzquierda}>
+          <View style={[styles.barraMarca, { backgroundColor: color }]} />
+          <Text style={styles.barraTexto}>{etiqueta}</Text>
+        </View>
+        <View style={styles.barraDerecha}>
+          <Text style={styles.barraNumero}>{tickets.length}</Text>
+          <Text style={styles.barraChevron}>{abierto ? '▴' : '▾'}</Text>
+        </View>
       </TouchableOpacity>
       {abierto && (
         <View style={styles.desplegable}>
@@ -137,15 +173,15 @@ function FilaEstado({ etiqueta, tickets }: { etiqueta: string; tickets: Ticket[]
               const vencido =
                 esFechaPasada(t.fechaVencimiento) && t.estado !== 'SUBSANADO_CONFORME' && t.estado !== 'CERRADO';
               return (
-                <View key={t.id} style={[styles.ticketBox, vencido && styles.ticketBoxVencido]}>
+                <Card key={t.id} style={[styles.ticketBox, vencido && styles.ticketBoxVencido]}>
                   <View style={styles.ticketFila}>
                     <Text style={styles.ticketTexto} numberOfLines={1}>
                       {t.contrato}
                     </Text>
-                    {vencido && (
-                      <View style={styles.tagVencido}>
-                        <Text style={styles.tagVencidoTexto}>VENCIDO</Text>
-                      </View>
+                    {vencido ? (
+                      <EstadoBadge estado="VENCIDO" tamano="sm" />
+                    ) : (
+                      <EstadoBadge estado={t.estado} tamano="sm" />
                     )}
                   </View>
                   <Text style={styles.ticketSubtexto} numberOfLines={2}>
@@ -154,7 +190,7 @@ function FilaEstado({ etiqueta, tickets }: { etiqueta: string; tickets: Ticket[]
                   <Text style={styles.ticketSubtexto}>
                     Creado: {t.fechaCreacion} · Vence: {t.fechaVencimiento}
                   </Text>
-                </View>
+                </Card>
               );
             })
           )}
@@ -165,83 +201,67 @@ function FilaEstado({ etiqueta, tickets }: { etiqueta: string; tickets: Ticket[]
 }
 
 const styles = StyleSheet.create({
-  pantalla: { flex: 1, backgroundColor: '#d9d9d9' },
-  linea: { height: 1, backgroundColor: '#111', marginHorizontal: 4 },
+  pantalla: { flex: 1, backgroundColor: COLORS.fondo },
   contenido: { padding: 16, paddingBottom: 24 },
-  back: { fontSize: 13, color: '#1c2126', marginBottom: 10 },
-  barraTitulo: {
-    backgroundColor: '#686462',
-    borderRadius: 6,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  barraTitulotexto: { color: '#fff', fontSize: 14, fontWeight: '700' },
-  filaAtencion: { flexDirection: 'row', gap: 8, marginBottom: 12 },
+  filaAtencion: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
+  tituloSeccion: { fontSize: 14, fontWeight: '700', color: COLORS.textoPrimario, marginBottom: 10 },
   periodo: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#d7dbe0',
-    borderRadius: 6,
+    backgroundColor: COLORS.superficie,
+    borderWidth: 1.5,
+    borderColor: COLORS.borde,
+    borderRadius: RADIOS.sm,
     paddingHorizontal: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: 6,
   },
-  periodoTexto: { fontSize: 11.5, color: '#1c2126' },
-  filaStats: { flexDirection: 'row', gap: 8, marginBottom: 16 },
+  periodoTexto: { fontSize: 11.5, color: COLORS.textoPrimario, fontWeight: '600' },
+  filaStats: { flexDirection: 'row', gap: 8, marginBottom: 20 },
   stat: {
     flex: 1,
-    backgroundColor: '#686462',
-    borderRadius: 8,
+    borderRadius: RADIOS.md,
+    borderWidth: 1.5,
     paddingVertical: 12,
     paddingHorizontal: 6,
     alignItems: 'center',
     gap: 6,
   },
-  statTexto: { color: '#fff', fontSize: 10.5, textAlign: 'center' },
-  statNumero: { color: '#fff', fontSize: 20, fontWeight: '700' },
+  statTexto: { fontSize: 10.5, textAlign: 'center', fontWeight: '600' },
+  statNumero: { fontSize: 22, fontWeight: '800' },
   barra: {
-    backgroundColor: '#686462',
-    borderRadius: 6,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-  barraTexto: { color: '#fff', fontSize: 13, fontWeight: '600' },
-  buscador: {
-    height: 40,
-    borderRadius: 6,
+    backgroundColor: COLORS.superficie,
     borderWidth: 1,
-    borderColor: '#d7dbe0',
-    backgroundColor: '#fff',
+    borderColor: COLORS.bordeSuave,
+    borderRadius: RADIOS.md,
+    height: 46,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  barraIzquierda: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  barraMarca: { width: 4, height: 18, borderRadius: 2 },
+  barraTexto: { color: COLORS.textoPrimario, fontSize: 13, fontWeight: '700' },
+  barraDerecha: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  barraNumero: { color: COLORS.textoSecundario, fontSize: 13, fontWeight: '700' },
+  barraChevron: { color: COLORS.azul, fontSize: 12 },
+  buscador: {
+    height: 44,
+    borderRadius: RADIOS.md,
+    borderWidth: 1.5,
+    borderColor: COLORS.borde,
+    backgroundColor: COLORS.superficie,
     paddingHorizontal: 12,
     fontSize: 13,
-    color: '#1c2126',
+    color: COLORS.textoPrimario,
     marginBottom: 16,
   },
-  desplegable: { marginTop: -4, marginBottom: 10, paddingHorizontal: 4 },
-  sinTickets: { color: '#5b6570', fontSize: 12, fontStyle: 'italic' },
-  ticketBox: {
-    backgroundColor: '#eceef0',
-    borderRadius: 6,
-    padding: 10,
-    marginTop: 6,
-  },
+  desplegable: { marginTop: 8, marginBottom: 10, paddingHorizontal: 2, gap: 8 },
+  sinTickets: { color: COLORS.textoSecundario, fontSize: 12, fontStyle: 'italic' },
+  ticketBox: {},
   ticketBoxVencido: {
-    backgroundColor: '#fbe9e7',
-    borderWidth: 1,
-    borderColor: '#7c0101',
+    backgroundColor: COLOR_ESTADO.VENCIDO.suave,
+    borderColor: COLOR_ESTADO.VENCIDO.color,
   },
   ticketFila: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  ticketTexto: { fontSize: 13, color: '#1c2126', fontWeight: '600', flex: 1 },
-  ticketSubtexto: { fontSize: 11, color: '#5b6570', marginTop: 2 },
-  tagVencido: {
-    backgroundColor: '#7c0101',
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  tagVencidoTexto: { color: '#fff', fontSize: 9.5, fontWeight: '700' },
+  ticketTexto: { fontSize: 13, color: COLORS.textoPrimario, fontWeight: '700', flex: 1 },
+  ticketSubtexto: { fontSize: 11, color: COLORS.textoSecundario, marginTop: 4 },
 });

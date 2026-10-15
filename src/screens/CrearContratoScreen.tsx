@@ -2,8 +2,12 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/Header';
+import TopBar from '../components/TopBar';
 import SelectField from '../components/SelectField';
 import DateField from '../components/DateField';
+import Card from '../components/Card';
+import Button from '../components/Button';
+import { COLORS, RADIOS } from '../theme/colors';
 import { OrdenCompra } from '../types';
 import { addContrato } from '../data/store';
 import { EMPRESAS_EJEMPLO } from '../data/datosTemporales';
@@ -97,16 +101,9 @@ export default function CrearContratoScreen({ navigation }: any) {
   return (
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
       <Header />
-      <View style={styles.linea} />
+      <TopBar title="Nuevo contrato" onBack={() => navigation.goBack()} />
 
       <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
-        <View style={styles.tituloFila}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.back}>←</Text>
-          </TouchableOpacity>
-          <Text style={styles.titulo}>Nuevo contrato</Text>
-        </View>
-
         <Text style={styles.seccion}>DATOS DEL CONTRATO</Text>
 
         <Text style={styles.label}>
@@ -116,7 +113,7 @@ export default function CrearContratoScreen({ navigation }: any) {
         <TextInput
           style={styles.input}
           placeholder="Ej: Mantención áreas verdes sector norte"
-          placeholderTextColor="#8b93a0"
+          placeholderTextColor={COLORS.textoTenue}
           value={nombreContrato}
           onChangeText={setNombreContrato}
         />
@@ -156,7 +153,7 @@ export default function CrearContratoScreen({ navigation }: any) {
         <TextInput
           style={styles.input}
           placeholder="Días hábiles, ej: 5"
-          placeholderTextColor="#8b93a0"
+          placeholderTextColor={COLORS.textoTenue}
           value={diasRespuesta}
           onChangeText={(v) => setDiasRespuesta(v.replace(/[^0-9]/g, ''))}
           keyboardType="number-pad"
@@ -166,7 +163,7 @@ export default function CrearContratoScreen({ navigation }: any) {
         <Text style={styles.seccion}>ÓRDENES DE COMPRA (OPCIONAL)</Text>
 
         {ordenesCompra.map((oc, i) => (
-          <View key={oc.id} style={styles.ocBloque}>
+          <Card key={oc.id} style={styles.ocBloque}>
             <TouchableOpacity style={styles.ocCerrar} onPress={() => quitarOrdenCompra(oc.id)}>
               <Text style={styles.ocCerrarTexto}>×</Text>
             </TouchableOpacity>
@@ -176,7 +173,7 @@ export default function CrearContratoScreen({ navigation }: any) {
             <TextInput
               style={styles.input}
               placeholder="Ej: 4521-2026"
-              placeholderTextColor="#8b93a0"
+              placeholderTextColor={COLORS.textoTenue}
               value={oc.codigo}
               onChangeText={(v) => actualizarOrdenCompra(oc.id, 'codigo', v)}
             />
@@ -188,7 +185,7 @@ export default function CrearContratoScreen({ navigation }: any) {
             <TextInput
               style={styles.input}
               placeholder="$"
-              placeholderTextColor="#8b93a0"
+              placeholderTextColor={COLORS.textoTenue}
               value={oc.monto}
               onChangeText={(v) => actualizarOrdenCompra(oc.id, 'monto', v.replace(/[^0-9]/g, ''))}
               keyboardType="number-pad"
@@ -201,104 +198,60 @@ export default function CrearContratoScreen({ navigation }: any) {
               onChange={(v) => actualizarOrdenCompra(oc.id, 'fecha', v)}
               error={errores[`ocFecha_${oc.id}`]}
             />
-          </View>
+          </Card>
         ))}
 
-        <TouchableOpacity style={styles.botonSecundario} onPress={agregarOrdenCompra}>
-          <Text style={styles.botonSecundarioTexto}>+ Agregar orden de compra</Text>
-        </TouchableOpacity>
+        <Button label="+ Agregar orden de compra" variante="punteado" onPress={agregarOrdenCompra} style={styles.botonAgregar} />
       </ScrollView>
 
       <View style={styles.barraInferior}>
-        <TouchableOpacity style={styles.botonClaro} onPress={() => navigation.goBack()}>
-          <Text style={styles.botonClaroTexto}>Cancelar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.botonOscuroFull, { flex: 1, marginTop: 0 }]} onPress={crear}>
-          <Text style={styles.botonOscuroTexto}>Crear contrato</Text>
-        </TouchableOpacity>
+        <Button label="Cancelar" variante="secundario" onPress={() => navigation.goBack()} style={{ flex: 1 }} />
+        <Button label="Crear contrato" variante="primario" onPress={crear} style={{ flex: 1 }} />
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  pantalla: { flex: 1, backgroundColor: '#d9d9d9' },
-  linea: { height: 1, backgroundColor: '#111', marginHorizontal: 4 },
+  pantalla: { flex: 1, backgroundColor: COLORS.fondo },
   contenido: { padding: 16, paddingBottom: 24 },
-  tituloFila: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
-  back: { fontSize: 18, color: '#1c2126' },
-  titulo: { fontSize: 16, fontWeight: '700', color: '#1c2126' },
   seccion: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#1c2126',
+    color: COLORS.azulOscuro,
     marginTop: 18,
     marginBottom: 8,
+    letterSpacing: 0.3,
   },
-  label: { fontSize: 12, color: '#1c2126', marginBottom: 4, marginTop: 6 },
-  req: { color: '#7c0101' },
+  label: { fontSize: 12, color: COLORS.textoPrimario, marginBottom: 4, marginTop: 6, fontWeight: '600' },
+  req: { color: COLORS.rojo },
   input: {
-    height: 44,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#d7dbe0',
-    backgroundColor: '#fff',
+    height: 46,
+    borderRadius: RADIOS.md,
+    borderWidth: 1.5,
+    borderColor: COLORS.borde,
+    backgroundColor: COLORS.superficie,
     paddingHorizontal: 12,
     fontSize: 13,
-    color: '#1c2126',
+    color: COLORS.textoPrimario,
     marginBottom: 8,
     justifyContent: 'center',
   },
-  inputDeshabilitado: { backgroundColor: '#eceef0' },
-  valorTexto: { color: '#1c2126', fontSize: 13 },
-  placeholderTexto: { color: '#8b93a0', fontSize: 13 },
-  error: { color: '#7c0101', fontSize: 11, marginTop: -4, marginBottom: 6 },
-  filaDoble: { flexDirection: 'row', gap: 10 },
-  ocBloque: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e3e6ea',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-  },
-  ocCerrar: { position: 'absolute', top: 8, right: 10, zIndex: 1 },
-  ocCerrarTexto: { fontSize: 16, color: '#9aa3ad', fontWeight: '700' },
-  ocLabel: { fontSize: 11, color: '#5b6570', fontWeight: '700', marginBottom: 4 },
-  botonSecundario: {
-    borderWidth: 1,
-    borderColor: '#9aa3ad',
-    borderStyle: 'dashed',
-    borderRadius: 8,
-    height: 42,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-  botonSecundarioTexto: { color: '#5b6570', fontSize: 12.5, fontWeight: '700' },
-  botonOscuroFull: {
-    minHeight: 44,
-    borderRadius: 8,
-    backgroundColor: '#686462',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  botonOscuroTexto: { color: '#fff', fontSize: 12.5, fontWeight: '600', textAlign: 'center' },
+  inputDeshabilitado: { backgroundColor: COLORS.fondo },
+  valorTexto: { color: COLORS.textoPrimario, fontSize: 13 },
+  placeholderTexto: { color: COLORS.textoTenue, fontSize: 13 },
+  error: { color: COLORS.rojo, fontSize: 11, marginTop: -4, marginBottom: 6 },
+  ocBloque: { marginBottom: 10 },
+  ocCerrar: { position: 'absolute', top: 10, right: 12, zIndex: 1 },
+  ocCerrarTexto: { fontSize: 16, color: COLORS.textoTenue, fontWeight: '700' },
+  ocLabel: { fontSize: 11, color: COLORS.azul, fontWeight: '700', marginBottom: 4 },
+  botonAgregar: { marginBottom: 6 },
   barraInferior: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#00000022',
-    backgroundColor: '#d9d9d9',
+    borderTopColor: COLORS.bordeSuave,
+    backgroundColor: COLORS.superficie,
   },
-  botonClaro: {
-    flex: 1,
-    height: 44,
-    borderRadius: 8,
-    backgroundColor: '#1c2126',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  botonClaroTexto: { color: '#fff', fontSize: 13, fontWeight: '600' },
 });

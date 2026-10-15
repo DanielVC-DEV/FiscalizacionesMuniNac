@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, FlatList, Pressable } from 'react-native';
+import { COLORS, RADIOS } from '../theme/colors';
 
 interface Props {
   label: string;
@@ -74,39 +75,39 @@ export default function SelectField({
 
 const styles = StyleSheet.create({
   field: { marginBottom: 12 },
-  label: { fontSize: 12, color: '#1c2126', marginBottom: 4 },
-  req: { color: '#7c0101' },
+  label: { fontSize: 12, color: COLORS.textoPrimario, marginBottom: 4, fontWeight: '600' },
+  req: { color: COLORS.rojo },
   input: {
-    height: 44,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#d7dbe0',
-    backgroundColor: '#fff',
+    height: 46,
+    borderRadius: RADIOS.md,
+    borderWidth: 1.5,
+    borderColor: COLORS.borde,
+    backgroundColor: COLORS.superficie,
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   inputDeshabilitado: {
-    backgroundColor: '#eceef0',
+    backgroundColor: COLORS.fondo,
   },
   inputError: {
-    borderColor: '#7c0101',
+    borderColor: COLORS.rojo,
   },
-  placeholderText: { color: '#8b93a0', fontSize: 13, flex: 1 },
-  valueText: { color: '#1c2126', fontSize: 13, flex: 1 },
-  chevron: { color: '#5b6570' },
-  avisoVacio: { color: '#5b6570', fontSize: 11, marginTop: 4 },
-  errorTexto: { color: '#7c0101', fontSize: 11, marginTop: 4 },
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' },
+  placeholderText: { color: COLORS.textoTenue, fontSize: 13, flex: 1 },
+  valueText: { color: COLORS.textoPrimario, fontSize: 13, flex: 1 },
+  chevron: { color: COLORS.azul, fontWeight: '700' },
+  avisoVacio: { color: COLORS.textoSecundario, fontSize: 11, marginTop: 4 },
+  errorTexto: { color: COLORS.rojo, fontSize: 11, marginTop: 4 },
+  overlay: { flex: 1, backgroundColor: 'rgba(5,15,25,0.45)', justifyContent: 'flex-end' },
   sheet: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    backgroundColor: COLORS.superficie,
+    borderTopLeftRadius: RADIOS.lg,
+    borderTopRightRadius: RADIOS.lg,
     maxHeight: '60%',
     padding: 16,
   },
-  sheetTitle: { fontSize: 14, fontWeight: '700', marginBottom: 8, color: '#1c2126' },
-  option: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#d7dbe0' },
-  optionText: { fontSize: 14, color: '#1c2126' },
+  sheetTitle: { fontSize: 14, fontWeight: '700', marginBottom: 8, color: COLORS.azul },
+  option: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: COLORS.bordeSuave },
+  optionText: { fontSize: 14, color: COLORS.textoPrimario },
 });
