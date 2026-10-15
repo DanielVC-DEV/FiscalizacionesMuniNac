@@ -1,33 +1,60 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import Header from '../components/Header';
-
-// Todavía no existe una lista real de tickets (eso se arma cuando
-// conectemos la creación de tickets a un guardado de verdad). Por ahora
-// esta lista parte vacía a propósito, así que todos los contadores de
-// abajo salen honestamente en 0.
-const TICKETS: any[] = [];
+import { useTickets } from '../data/store';
+import { Ticket, EstadoTicket } from '../types';
+import { esFechaPasada } from '../utils/fechas';
 
 const OPCIONES_PERIODO = ['Este mes', 'Este trimestre', 'Todo'];
 
-type Estado = 'ABIERTO' | 'RESPONDIDO' | 'SUBSANADO_CONFORME' | 'CERRADO';
-
 export default function ResumenScreen({ navigation }: any) {
+  // Tickets reales, creados en "Nuevo ticket" (almacén en memoria,
+  // src/data/store.ts). Ya no es una lista vacía fija: se actualiza sola
+  // apenas se crea un ticket.
+  const TICKETS = useTickets();
+
   const [periodo, setPeriodo] = useState(OPCIONES_PERIODO[0]);
   const [busqueda, setBusqueda] = useState('');
+
+  // "Vencido" depende de la fecha de hoy, no solo de si cambió algún
+  // ticket. Si dejas esta pantalla abierta de un día para otro, o sales y
+  // vuelves a entrar, esto fuerza a recalcular con la fecha actual para
+  // que un ticket que recién venció se vea reflejado altiro.
+  const [, refrescar] = useState(0);
+  useFocusEffect(
+    useCallback(() => {
+      refrescar((n) => n + 1);
+    }, []),
+  );
 
   function siguientePeriodo() {
     const i = OPCIONES_PERIODO.indexOf(periodo);
     setPeriodo(OPCIONES_PERIODO[(i + 1) % OPCIONES_PERIODO.length]);
   }
 
-  // Como TICKETS todavía está vacío, esto siempre da 0. Cuando existan
-  // tickets de verdad, este mismo cálculo los va a contar solos.
-  const porEstado = (estado: Estado) => TICKETS.filter((t) => t.estado === estado);
+  const texto = busqueda.trim().toLowerCase();
+  const filtrados = TICKETS.filter((t) => {
+    if (!texto) return true;
+    return (
+      t.id.toLowerCase().includes(texto) ||
+      t.contrato.toLowerCase().includes(texto) ||
+      t.descripcion.toLowerCase().includes(texto)
+    );
+  });
+
+  // "VENCIDO" no es un estado guardado (sección 13 del informe): se
+  // calcula comparando la fecha de vencimiento con hoy, y solo cuenta si
+  // el ticket todavía no fue subsanado conforme ni cerrado.
+  function esVencido(t: Ticket): boolean {
+    return esFechaPasada(t.fechaVencimiento) && t.estado !== 'SUBSANADO_CONFORME' && t.estado !== 'CERRADO';
+  }
+
+  const porEstado = (estado: EstadoTicket) => filtrados.filter((t) => t.estado === estado);
   const pendientesRevision = porEstado('RESPONDIDO').length;
-  const vencidos = TICKETS.filter((t) => t.vencido).length;
-  const requierenNuevaSubsanacion = TICKETS.filter((t) => t.estado === 'REQUIERE_NUEVA_SUBSANACION').length;
+  const vencidos = filtrados.filter(esVencido).length;
+  const requierenNuevaSubsanacion = porEstado('REQUIERE_NUEVA_SUBSANACION').length;
 
   return (
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
@@ -73,7 +100,7 @@ export default function ResumenScreen({ navigation }: any) {
 
         <TextInput
           style={styles.buscador}
-          placeholder="Buscar ticket ID"
+          placeholder="Buscar por contrato o descripción"
           placeholderTextColor="#8b93a0"
           value={busqueda}
           onChangeText={setBusqueda}
@@ -83,16 +110,15 @@ export default function ResumenScreen({ navigation }: any) {
         <FilaEstado etiqueta="Respondidos" tickets={porEstado('RESPONDIDO')} />
         <FilaEstado etiqueta="Subsanados" tickets={porEstado('SUBSANADO_CONFORME')} />
         <FilaEstado etiqueta="Cerrados" tickets={porEstado('CERRADO')} />
-        <FilaEstado etiqueta="Total" tickets={TICKETS} />
+        <FilaEstado etiqueta="Total" tickets={filtrados} />
       </View>
     </SafeAreaView>
   );
 }
 
 // Cada fila es un acordeón: muestra el nombre del estado y el total, y al
-// tocarla se despliega la lista de tickets de ese estado (por ahora
-// siempre vacía).
-function FilaEstado({ etiqueta, tickets }: { etiqueta: string; tickets: any[] }) {
+// tocarla se despliega la lista de tickets de ese estado.
+function FilaEstado({ etiqueta, tickets }: { etiqueta: string; tickets: Ticket[] }) {
   const [abierto, setAbierto] = useState(false);
 
   return (
@@ -107,11 +133,30 @@ function FilaEstado({ etiqueta, tickets }: { etiqueta: string; tickets: any[] })
           {tickets.length === 0 ? (
             <Text style={styles.sinTickets}>No hay tickets en este estado.</Text>
           ) : (
-            tickets.map((t, i) => (
-              <View key={i} style={styles.ticketBox}>
-                <Text style={styles.ticketTexto}>{t.codigo ?? `Ticket #${i + 1}`}</Text>
-              </View>
-            ))
+            tickets.map((t) => {
+              const vencido =
+                esFechaPasada(t.fechaVencimiento) && t.estado !== 'SUBSANADO_CONFORME' && t.estado !== 'CERRADO';
+              return (
+                <View key={t.id} style={[styles.ticketBox, vencido && styles.ticketBoxVencido]}>
+                  <View style={styles.ticketFila}>
+                    <Text style={styles.ticketTexto} numberOfLines={1}>
+                      {t.contrato}
+                    </Text>
+                    {vencido && (
+                      <View style={styles.tagVencido}>
+                        <Text style={styles.tagVencidoTexto}>VENCIDO</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.ticketSubtexto} numberOfLines={2}>
+                    {t.descripcion}
+                  </Text>
+                  <Text style={styles.ticketSubtexto}>
+                    Creado: {t.fechaCreacion} · Vence: {t.fechaVencimiento}
+                  </Text>
+                </View>
+              );
+            })
           )}
         </View>
       )}
@@ -184,5 +229,19 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 6,
   },
-  ticketTexto: { fontSize: 13, color: '#1c2126' },
+  ticketBoxVencido: {
+    backgroundColor: '#fbe9e7',
+    borderWidth: 1,
+    borderColor: '#7c0101',
+  },
+  ticketFila: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  ticketTexto: { fontSize: 13, color: '#1c2126', fontWeight: '600', flex: 1 },
+  ticketSubtexto: { fontSize: 11, color: '#5b6570', marginTop: 2 },
+  tagVencido: {
+    backgroundColor: '#7c0101',
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  tagVencidoTexto: { color: '#fff', fontSize: 9.5, fontWeight: '700' },
 });

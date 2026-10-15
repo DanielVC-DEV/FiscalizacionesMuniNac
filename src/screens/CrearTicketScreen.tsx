@@ -16,14 +16,14 @@ import Header from '../components/Header';
 import SelectField from '../components/SelectField';
 import { PRIORIDADES, DIAS_PLAZO_POR_PRIORIDAD, Prioridad } from '../types';
 import { sumarDiasHabiles, formatearFecha } from '../utils/businessDays';
+import { useContratos, contratoLabel, addTicket } from '../data/store';
+import { AREAS_EJEMPLO, SUPERVISORES_EJEMPLO } from '../data/datosTemporales';
 
-// Todavía no existen contratos, áreas ni supervisores reales (eso se arma
-// en otra pantalla más adelante), así que estas listas parten vacías a
-// propósito. Cuando construyamos Contratos/Administración, esto se va a
-// reemplazar por datos reales.
-const CONTRATOS: string[] = [];
-const AREAS: string[] = [];
-const SUPERVISORES: string[] = [];
+// AREAS_EJEMPLO y SUPERVISORES_EJEMPLO son data de ejemplo temporal (ver
+// src/data/datosTemporales.ts): todavía no existe la pantalla de
+// Administración donde se gestionen de verdad.
+const AREAS: string[] = AREAS_EJEMPLO;
+const SUPERVISORES: string[] = SUPERVISORES_EJEMPLO;
 const DESTINATARIOS_NOTIFICACION: string[] = [];
 
 interface Foto {
@@ -32,6 +32,12 @@ interface Foto {
 }
 
 export default function CrearTicketScreen({ navigation }: any) {
+  // Contratos reales, creados en "Nuevo contrato" (almacén en memoria,
+  // src/data/store.ts). A diferencia de Área y Supervisor, esto ya no es
+  // data de ejemplo.
+  const contratos = useContratos();
+  const opcionesContrato = contratos.map(contratoLabel);
+
   const [contrato, setContrato] = useState<string | null>(null);
   const [area, setArea] = useState<string | null>(null);
   const [supervisor, setSupervisor] = useState<string | null>(null);
@@ -124,10 +130,30 @@ export default function CrearTicketScreen({ navigation }: any) {
 
   function crear() {
     if (!validar()) return;
-    // Por ahora no hay dónde guardar el ticket (no existe backend ni lista
-    // de tickets todavía), así que solo confirmamos que el formulario es
-    // válido. Esto se conecta de verdad cuando armemos esa parte.
-    Alert.alert('Formulario válido', 'Cuando exista el backend, aquí se va a crear el ticket.');
+    // Todavía no hay backend: esto se guarda en el almacén en memoria
+    // (src/data/store.ts), igual que los contratos. Dura mientras la app
+    // esté abierta; cuando exista el backend, esto se reemplaza por un
+    // guardado real.
+    addTicket({
+      id: `${Date.now()}`,
+      contrato: contrato!,
+      area: area!,
+      supervisor: supervisor!,
+      prioridad: prioridad!,
+      descripcion: descripcion.trim(),
+      fotos: fotos.map((f) => f.uri),
+      direccion: direccion.trim(),
+      sector: sector.trim(),
+      referencia: referencia.trim(),
+      coordenadas: coordenadas.trim(),
+      copiaA,
+      estado: 'ABIERTO',
+      fechaCreacion: formatearFecha(new Date()),
+      diasPlazo: plazoInfo!.dias,
+      fechaVencimiento: formatearFecha(plazoInfo!.vencimiento),
+    });
+    Alert.alert('Ticket creado', 'Ya puedes verlo en el resumen de tickets.');
+    navigation.goBack();
   }
 
   return (
@@ -150,7 +176,7 @@ export default function CrearTicketScreen({ navigation }: any) {
           requerido
           placeholder="Seleccionar contrato"
           value={contrato}
-          options={CONTRATOS}
+          options={opcionesContrato}
           onChange={setContrato}
           mensajeVacio="Aún no hay contratos cargados."
           error={errores.contrato}

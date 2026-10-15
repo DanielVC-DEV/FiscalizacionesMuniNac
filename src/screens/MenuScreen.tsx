@@ -26,12 +26,18 @@ export default function MenuScreen({ navigation }: any) {
           <Text style={styles.tileTexto}>Tickets</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.tile} onPress={() => {}}>
+        <TouchableOpacity
+          style={styles.tile}
+          onPress={() => navigation.navigate('Contratos')}
+        >
           <Text style={styles.tileTexto}>Contratos</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.tile} onPress={() => {}}>
-          <Text style={styles.tileTexto}>Reportes</Text>
+        <TouchableOpacity
+          style={styles.tile}
+          onPress={() => navigation.navigate('Empresas')}
+        >
+          <Text style={styles.tileTexto}>Empresas</Text>
         </TouchableOpacity>
       </View>
     </View>
