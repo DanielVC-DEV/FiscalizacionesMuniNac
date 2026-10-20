@@ -25,10 +25,15 @@ const pool = require('../config/db');
 // desde el frontend.
 async function listar(req, res, next) {
   try {
+    // Incluye datos de empresa y agrupa órdenes para que el listado llegue listo para la interfaz.
     const { rows } = await pool.query(`
-      SELECT c.id_contratos, c.numero_contrato, c.nombre, c.id_licitacion, c.vigencia,
+      SELECT c.id_contratos, c.nombre, c.id_licitacion, c.vigencia,
              c.fecha_inicio, c.fecha_termino, c.monto_actualizado, c.dia_respuesta,
-             c.id_empresa, e.razon_social AS empresa_nombre
+             c.id_empresa, e.razon_social AS empresa_nombre, e.rut AS empresa_rut,
+             (SELECT COALESCE(json_agg(json_build_object(
+                'id_compra', o.id_compra, 'monto', o.monto, 'fecha_compra', o.fecha_compra
+              ) ORDER BY o.fecha_compra), '[]'::json)
+          FROM orden_de_compra o WHERE o.id_contratos = c.id_contratos) AS ordenes_compra
       FROM contratos c
       JOIN empresas e ON e.id_empresa = c.id_empresa
       ORDER BY c.fecha_inicio DESC

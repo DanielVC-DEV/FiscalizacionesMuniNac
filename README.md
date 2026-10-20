@@ -38,7 +38,7 @@ npm run dev               # levanta en http://localhost:3000
 
 Ya probado: instala sin errores y el servidor responde en `/health`.
 
-**Importante:** las rutas de `contratos` relacionadas a prioridades (`PATCH /api/contratos/prioridades/:id`) y las de `respuestas` (`/api/tickets/:id/respuestas`) dependen de `sql/03` — si aún no la corres, esos endpoints específicos van a fallar con un error de "relation does not exist". El resto de la API (áreas, roles, empresas, usuarios, contratos, tickets) funciona solo con `01` + `02`.
+**Importante:** el detalle de contratos y las operaciones de tickets (listar, crear, cambiar estado y respuestas) requieren `sql/03`, porque usan `ticket.id_contrato` y las prioridades por contrato. Si todavía no ejecutas esa migración, esas rutas fallarán. Áreas, roles, empresas, usuarios y el listado general de contratos funcionan con `01` + `02`.
 
 ### Endpoints disponibles
 
@@ -54,7 +54,7 @@ Ya probado: instala sin errores y el servidor responde en `/health`.
 | GET/POST | `/api/tickets` | Listar / crear ticket (crea la observación 1:1 en la misma transacción) |
 | PATCH | `/api/tickets/:id/estado` | Cambiar estado (valida transiciones permitidas) |
 
-## 3. Frontend (local, en el navegador — sin Expo Go)
+## 3. Frontend (Expo, navegador o dispositivo)
 
 El proyecto ya trae el script para eso en `package.json`. Solo falta instalar las dependencias que Expo necesita específicamente para correr en navegador (no vienen por defecto en un proyecto pensado para celular):
 
@@ -67,4 +67,6 @@ npm run web
 
 Esto abre el proyecto en `http://localhost:8081` (o el puerto que indique la consola) directo en tu navegador — no necesitas la app de Expo Go ni un celular conectado.
 
-**Nota:** el frontend todavía usa datos de ejemplo en memoria (`src/data/store.ts`, `src/data/datosTemporales.ts`) — no está conectado a este backend todavía. Esa conexión (reemplazar el store en memoria por llamadas a `/api/...`) es el siguiente paso, cuando quieras que lo armemos.
+El frontend se conecta a la API en `http://localhost:3000/api` por defecto. Para cambiarla, crea `frontend/.env` usando `frontend/.env.example` como referencia y configura `EXPO_PUBLIC_API_URL`. En un teléfono físico, usa la IP local de tu computador (por ejemplo, `http://192.168.1.20:3000/api`) y permite el puerto 3000 en el firewall; `localhost` en el teléfono apunta al propio teléfono. En el emulador Android normalmente se usa `http://10.0.2.2:3000/api`.
+
+Empresas, contratos y tickets se leen y guardan mediante la API. El formulario de tickets usa supervisores registrados para la empresa del contrato seleccionado. El esquema actual todavía no vincula directamente un ticket a un contrato y no incluye carga de archivos; esos datos no se persisten. Las órdenes de compra guardan monto y fecha, ya que el esquema actual no tiene un campo para su código.

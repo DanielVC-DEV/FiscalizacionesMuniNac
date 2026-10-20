@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/Header';
@@ -9,17 +9,16 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import { COLORS, RADIOS } from '../theme/colors';
 import { OrdenCompra } from '../types';
-import { addContrato } from '../data/store';
-import { EMPRESAS_EJEMPLO } from '../data/datosTemporales';
+import { api, EmpresaApi } from '../data/api';
+import { cargarContratos } from '../data/store';
 import { parsearFecha, diferenciaEnDias, hoyComoTexto } from '../utils/fechas';
-
-// EMPRESAS_EJEMPLO es data de ejemplo temporal (ver src/data/datosTemporales.ts):
-// todavía no existe una administración real de empresas.
-const EMPRESAS = EMPRESAS_EJEMPLO;
 
 export default function CrearContratoScreen({ navigation }: any) {
   const [nombreContrato, setNombreContrato] = useState('');
-  const [empresaNombre, setEmpresaNombre] = useState<string | null>(null);
+  const [empresaOpcion, setEmpresaOpcion] = useState<string | null>(null);
+  const [empresas, setEmpresas] = useState<EmpresaApi[]>([]);
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
+  const [guardando, setGuardando] = useState(false);
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaTermino, setFechaTermino] = useState('');
   const [diasRespuesta, setDiasRespuesta] = useState('');
@@ -32,7 +31,15 @@ export default function CrearContratoScreen({ navigation }: any) {
   // así que cambiar solo la prop `value` desde acá no lo actualiza visualmente.
   const [fechaInicioResetId, setFechaInicioResetId] = useState(0);
 
-  const empresaSeleccionada = EMPRESAS.find((e) => e.nombre === empresaNombre) ?? null;
+  const empresaSeleccionada = empresas.find((e) => `${e.razon_social} — ${e.rut}` === empresaOpcion) ?? null;
+  const opcionesEmpresa = empresas.map((e) => `${e.razon_social} — ${e.rut}`);
+
+  useEffect(() => {
+    // Carga las empresas reales para que el contrato se guarde con su ID de base de datos.
+    api.listarEmpresas()
+      .then(setEmpresas)
+      .catch((error: Error) => setErrorCarga(error.message));
+  }, []);
 
   // Si ambas fechas quedan completas y coherentes, el día de respuesta a
   // ticket se calcula solo como la cantidad de días entre inicio y
@@ -75,9 +82,10 @@ export default function CrearContratoScreen({ navigation }: any) {
   }
 
   function validar(): boolean {
+    // Reúne los errores antes de enviar datos para evitar peticiones incompletas.
     const nuevosErrores: Record<string, string> = {};
     if (!nombreContrato.trim()) nuevosErrores.nombreContrato = 'Ingresa el nombre del contrato.';
-    if (!empresaNombre) nuevosErrores.empresa = 'Selecciona la empresa.';
+    if (!empresaOpcion) nuevosErrores.empresa = 'Selecciona la empresa.';
 
     const inicio = parsearFecha(fechaInicio);
     const termino = parsearFecha(fechaTermino);
@@ -99,7 +107,6 @@ export default function CrearContratoScreen({ navigation }: any) {
     ordenesCompra.forEach((oc) => {
       const algoLleno = oc.codigo.trim() || oc.monto.trim() || oc.fecha.trim();
       if (!algoLleno) return; // bloque vacío: se descarta al guardar, no se valida
-      if (!oc.codigo.trim()) nuevosErrores[`ocCodigo_${oc.id}`] = 'Ingresa el código de la orden de compra.';
       if (!oc.monto.trim() || !/^[1-9]\d*$/.test(oc.monto.trim())) {
         nuevosErrores[`ocMonto_${oc.id}`] = 'Ingresa un monto válido.';
       }
@@ -111,25 +118,45 @@ export default function CrearContratoScreen({ navigation }: any) {
     return Object.keys(nuevosErrores).length === 0;
   }
 
-  function crear() {
-    if (!validar()) return;
-    // Todavía no hay backend: esto se guarda en el almacén en memoria
-    // (src/data/store.ts), que dura mientras la app esté abierta. Así el
-    // contrato ya aparece en el listado de Contratos y como opción al
-    // crear un ticket. Cuando exista el backend, esto se reemplaza por un
-    // guardado real.
-    addContrato({
-      id: `${Date.now()}`,
-      nombre: nombreContrato.trim(),
-      rutEmpresa: empresaSeleccionada?.rut ?? '',
-      nombreEmpresa: empresaSeleccionada?.nombre ?? '',
-      fechaInicio: fechaInicio.trim(),
-      fechaTermino: fechaTermino.trim(),
-      diasRespuestaTicket: Number(diasRespuesta) || 0,
-      ordenesCompra: ordenesCompra.filter((oc) => oc.codigo.trim() || oc.monto.trim() || oc.fecha.trim()),
-    });
-    Alert.alert('Contrato creado', 'Ya puedes verlo en el listado y elegirlo al crear un ticket.');
-    navigation.goBack();
+  function fechaParaApi(texto: string): string {
+    // El formulario usa dd/mm/aaaa y PostgreSQL espera una fecha ISO yyyy-mm-dd.
+    const fecha = parsearFecha(texto)!;
+    const anio = fecha.getFullYear();
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    return `${anio}-${mes}-${dia}`;
+  }
+
+  async function crear() {
+    if (!validar() || !empresaSeleccionada) return;
+    setGuardando(true);
+    try {
+      // Primero crea el contrato y obtiene su ID generado por PostgreSQL.
+      const creado = await api.crearContrato({
+        nombre: nombreContrato.trim(),
+        id_empresa: empresaSeleccionada.id_empresa,
+        fecha_inicio: fechaParaApi(fechaInicio),
+        fecha_termino: fechaParaApi(fechaTermino),
+        dia_respuesta: Number(diasRespuesta),
+      });
+
+  // Las órdenes se guardan aparte porque el backend expone un endpoint por contrato.
+      for (const orden of ordenesCompra.filter((item) => item.monto.trim() || item.fecha.trim())) {
+        await api.agregarOrdenCompra(String(creado.id_contratos), {
+          monto: Number(orden.monto),
+          fecha_compra: fechaParaApi(orden.fecha),
+        });
+      }
+
+  // Recarga el listado para mostrar el registro persistido, no una copia temporal.
+      await cargarContratos();
+      Alert.alert('Contrato creado', 'El contrato quedó guardado en el servidor.');
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('No se pudo crear el contrato', (error as Error).message);
+    } finally {
+      setGuardando(false);
+    }
   }
 
   return (
@@ -157,9 +184,9 @@ export default function CrearContratoScreen({ navigation }: any) {
           label="Empresa"
           requerido
           placeholder="Seleccionar empresa registrada"
-          value={empresaNombre}
-          options={EMPRESAS.map((e) => e.nombre)}
-          onChange={setEmpresaNombre}
+          value={empresaOpcion}
+          options={opcionesEmpresa}
+          onChange={setEmpresaOpcion}
           mensajeVacio="Aún no hay empresas registradas."
           error={errores.empresa}
         />
@@ -209,6 +236,8 @@ export default function CrearContratoScreen({ navigation }: any) {
         />
         {!!errores.diasRespuesta && <Text style={styles.error}>{errores.diasRespuesta}</Text>}
 
+        {!!errorCarga && <Text style={styles.error}>{errorCarga}</Text>}
+
         <Text style={styles.seccion}>ÓRDENES DE COMPRA (OPCIONAL)</Text>
 
         {ordenesCompra.map((oc, i) => (
@@ -217,18 +246,6 @@ export default function CrearContratoScreen({ navigation }: any) {
               <Text style={styles.ocCerrarTexto}>×</Text>
             </TouchableOpacity>
             <Text style={styles.ocLabel}>Orden de compra {i + 1}</Text>
-
-            <Text style={styles.label}>Código de la orden de compra</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ej: 4521-2026"
-              placeholderTextColor={COLORS.textoTenue}
-              value={oc.codigo}
-              onChangeText={(v) => actualizarOrdenCompra(oc.id, 'codigo', v)}
-            />
-            {!!errores[`ocCodigo_${oc.id}`] && (
-              <Text style={styles.error}>{errores[`ocCodigo_${oc.id}`]}</Text>
-            )}
 
             <Text style={styles.label}>Monto</Text>
             <TextInput
@@ -255,7 +272,14 @@ export default function CrearContratoScreen({ navigation }: any) {
 
       <View style={styles.barraInferior}>
         <Button label="Cancelar" variante="secundario" onPress={() => navigation.goBack()} style={{ flex: 1 }} />
-        <Button label="Crear contrato" variante="primario" onPress={crear} style={{ flex: 1 }} />
+        <Button
+          label={guardando ? 'Guardando…' : 'Crear contrato'}
+          variante="primario"
+          onPress={crear}
+          disabled={guardando}
+          cargando={guardando}
+          style={{ flex: 1 }}
+        />
       </View>
     </SafeAreaView>
   );

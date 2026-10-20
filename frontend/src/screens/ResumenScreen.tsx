@@ -7,7 +7,7 @@ import TopBar from '../components/TopBar';
 import Card from '../components/Card';
 import EstadoBadge from '../components/EstadoBadge';
 import { COLORS, COLOR_ESTADO, RADIOS } from '../theme/colors';
-import { useTickets } from '../data/store';
+import { cargarTickets, useTickets } from '../data/store';
 import { Ticket, EstadoTicket } from '../types';
 import { esFechaPasada } from '../utils/fechas';
 
@@ -21,6 +21,7 @@ export default function ResumenScreen({ navigation }: any) {
 
   const [periodo, setPeriodo] = useState(OPCIONES_PERIODO[0]);
   const [busqueda, setBusqueda] = useState('');
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
 
   // "Vencido" depende de la fecha de hoy, no solo de si cambió algún
   // ticket. Si dejas esta pantalla abierta de un día para otro, o sales y
@@ -30,6 +31,8 @@ export default function ResumenScreen({ navigation }: any) {
   useFocusEffect(
     useCallback(() => {
       refrescar((n) => n + 1);
+      // Recarga tickets al entrar y conserva el aviso si el servidor no está disponible.
+      cargarTickets().catch((error: Error) => setErrorCarga(error.message));
     }, []),
   );
 
@@ -98,6 +101,7 @@ export default function ResumenScreen({ navigation }: any) {
         </View>
 
         <Text style={styles.tituloSeccion}>Estado general</Text>
+        {!!errorCarga && <Text style={styles.sinTickets}>No se pudo cargar el servidor: {errorCarga}</Text>}
 
         <TextInput
           style={styles.buscador}

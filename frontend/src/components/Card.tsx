@@ -1,10 +1,10 @@
 import { ReactNode } from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { COLORS, RADIOS } from '../theme/colors';
 
 interface Props {
   children: ReactNode;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
 // Contenedor blanco con borde suave, reutilizado por tarjetas de

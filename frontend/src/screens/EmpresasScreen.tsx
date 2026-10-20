@@ -1,33 +1,40 @@
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/Header';
 import TopBar from '../components/TopBar';
 import Card from '../components/Card';
 import { COLORS } from '../theme/colors';
-import { EMPRESAS_EJEMPLO } from '../data/datosTemporales';
-
-// EMPRESAS_EJEMPLO es data de ejemplo temporal (ver src/data/datosTemporales.ts):
-// todavía no existe una administración real de empresas. Por ahora esta
-// pantalla solo las muestra; cuando se construya esa administración de
-// verdad, esto se reemplaza por el registro real.
+import { api, EmpresaApi } from '../data/api';
 
 export default function EmpresasScreen({ navigation }: any) {
+  const [empresas, setEmpresas] = useState<EmpresaApi[]>([]);
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Consulta el catálogo persistido al montar la pantalla.
+    api.listarEmpresas()
+      .then(setEmpresas)
+      .catch((error: Error) => setErrorCarga(error.message));
+  }, []);
+
   return (
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
       <Header />
       <TopBar title="Empresas" onBack={() => navigation.goBack()} />
 
       <View style={styles.contenido}>
-        <Text style={styles.nota}>Datos de ejemplo temporales, mientras no existe la Administración real.</Text>
+        {!!errorCarga && <Text style={styles.nota}>No se pudo cargar el servidor: {errorCarga}</Text>}
 
         <View style={styles.lista}>
-          {EMPRESAS_EJEMPLO.map((e) => (
-            <Card key={e.rut} style={styles.card}>
-              <Text style={styles.cardNombre}>{e.nombre}</Text>
-              <Text style={styles.cardRut}>RUT {e.rut}</Text>
+          {empresas.map((empresa) => (
+            <Card key={empresa.id_empresa} style={styles.card}>
+              <Text style={styles.cardNombre}>{empresa.razon_social}</Text>
+              <Text style={styles.cardRut}>RUT {empresa.rut}</Text>
             </Card>
           ))}
         </View>
+        {!errorCarga && empresas.length === 0 && <Text style={styles.nota}>No hay empresas registradas.</Text>}
       </View>
     </SafeAreaView>
   );

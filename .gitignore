@@ -1,0 +1,5 @@
+**/node_modules/
+**/.expo/
+backend/.env
+frontend/.env
+frontend/web-build/

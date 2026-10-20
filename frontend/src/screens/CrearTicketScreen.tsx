@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -17,17 +17,10 @@ import TopBar from '../components/TopBar';
 import SelectField from '../components/SelectField';
 import Button from '../components/Button';
 import { COLORS, RADIOS } from '../theme/colors';
-import { PRIORIDADES, DIAS_PLAZO_POR_PRIORIDAD, Prioridad } from '../types';
+import { Prioridad } from '../types';
 import { sumarDiasHabiles, formatearFecha } from '../utils/businessDays';
-import { useContratos, contratoLabel, addTicket } from '../data/store';
-import { AREAS_EJEMPLO, SUPERVISORES_EJEMPLO } from '../data/datosTemporales';
-
-// AREAS_EJEMPLO y SUPERVISORES_EJEMPLO son data de ejemplo temporal (ver
-// src/data/datosTemporales.ts): todavía no existe la pantalla de
-// Administración donde se gestionen de verdad.
-const AREAS: string[] = AREAS_EJEMPLO;
-const SUPERVISORES: string[] = SUPERVISORES_EJEMPLO;
-const DESTINATARIOS_NOTIFICACION: string[] = [];
+import { api, ContratoApi } from '../data/api';
+import { cargarContratos, cargarTickets, useContratos, contratoLabel } from '../data/store';
 
 interface Foto {
   id: string;
@@ -35,15 +28,14 @@ interface Foto {
 }
 
 export default function CrearTicketScreen({ navigation }: any) {
-  // Contratos reales, creados en "Nuevo contrato" (almacén en memoria,
-  // src/data/store.ts). A diferencia de Área y Supervisor, esto ya no es
-  // data de ejemplo.
+  // Contratos y supervisores cargados desde el backend.
   const contratos = useContratos();
   const opcionesContrato = contratos.map(contratoLabel);
 
   const [contrato, setContrato] = useState<string | null>(null);
-  const [area, setArea] = useState<string | null>(null);
-  const [supervisor, setSupervisor] = useState<string | null>(null);
+  const [supervisorOpcion, setSupervisorOpcion] = useState<string | null>(null);
+  const [supervisores, setSupervisores] = useState<{ id_usuario: number; nombre: string; email: string }[]>([]);
+  const [prioridadesContrato, setPrioridadesContrato] = useState<NonNullable<ContratoApi['prioridades']>>([]);
   const [prioridad, setPrioridad] = useState<Prioridad | null>(null);
   const [descripcion, setDescripcion] = useState('');
   const [fotos, setFotos] = useState<Foto[]>([]);
@@ -51,14 +43,47 @@ export default function CrearTicketScreen({ navigation }: any) {
   const [sector, setSector] = useState('');
   const [referencia, setReferencia] = useState('');
   const [coordenadas, setCoordenadas] = useState('');
-  const [copiaA, setCopiaA] = useState<string[]>([]);
   const [buscandoUbicacion, setBuscandoUbicacion] = useState(false);
   const [ubicacionError, setUbicacionError] = useState<string | null>(null);
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
+  const [guardando, setGuardando] = useState(false);
   const [errores, setErrores] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    // Carga contratos al entrar para que el selector no dependa de datos de ejemplo.
+    cargarContratos().catch((error: Error) => setErrorCarga(error.message));
+  }, []);
+
+  const contratoSeleccionado = contratos.find((item) => contratoLabel(item) === contrato) ?? null;
+  const supervisorSeleccionado = supervisores.find((item) => `${item.nombre} — ${item.email}` === supervisorOpcion);
+
+  async function seleccionarContrato(valor: string | null) {
+    // Al cambiar de contrato se descartan las opciones dependientes de la selección anterior.
+    setContrato(valor);
+    setSupervisorOpcion(null);
+    setSupervisores([]);
+    setPrioridadesContrato([]);
+    setPrioridad(null);
+    setErrorCarga(null);
+    const seleccionado = contratos.find((item) => contratoLabel(item) === valor);
+    if (!seleccionado?.idEmpresa) return;
+    try {
+      // Ambas consultas pertenecen al contrato elegido: supervisores de su empresa y prioridades vigentes.
+      const [datos, detalle] = await Promise.all([
+        api.listarSupervisores(Number(seleccionado.idEmpresa)),
+        api.obtenerContrato(seleccionado.id),
+      ]);
+      setSupervisores(datos);
+      setPrioridadesContrato(detalle.prioridades ?? []);
+    } catch (error) {
+      setErrorCarga((error as Error).message);
+    }
+  }
 
   const plazoInfo = prioridad
     ? (() => {
-        const dias = DIAS_PLAZO_POR_PRIORIDAD[prioridad];
+        // El plazo viene de la configuración de prioridad del contrato, no de una constante global.
+        const dias = prioridadesContrato.find((item) => item.nombre_prioridad === prioridad)?.dias_habiles ?? 0;
         const vencimiento = sumarDiasHabiles(new Date(), dias);
         return { dias, vencimiento };
       })()
@@ -114,49 +139,47 @@ export default function CrearTicketScreen({ navigation }: any) {
     }
   }
 
-  function alternarCopiaA(destinatario: string) {
-    setCopiaA((prev) =>
-      prev.includes(destinatario) ? prev.filter((d) => d !== destinatario) : [...prev, destinatario],
-    );
-  }
-
   function validar(): boolean {
     const nuevosErrores: Record<string, string> = {};
     if (!contrato) nuevosErrores.contrato = 'Selecciona el contrato asociado.';
-    if (!area) nuevosErrores.area = 'Selecciona el área responsable.';
-    if (!supervisor) nuevosErrores.supervisor = 'Selecciona el supervisor asignado.';
+    if (!supervisorOpcion) nuevosErrores.supervisor = 'Selecciona el supervisor asignado.';
     if (!prioridad) nuevosErrores.prioridad = 'Selecciona una prioridad.';
     if (!descripcion.trim()) nuevosErrores.descripcion = 'Describe la observación.';
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   }
 
-  function crear() {
-    if (!validar()) return;
-    // Todavía no hay backend: esto se guarda en el almacén en memoria
-    // (src/data/store.ts), igual que los contratos. Dura mientras la app
-    // esté abierta; cuando exista el backend, esto se reemplaza por un
-    // guardado real.
-    addTicket({
-      id: `${Date.now()}`,
-      contrato: contrato!,
-      area: area!,
-      supervisor: supervisor!,
-      prioridad: prioridad!,
-      descripcion: descripcion.trim(),
-      fotos: fotos.map((f) => f.uri),
-      direccion: direccion.trim(),
-      sector: sector.trim(),
-      referencia: referencia.trim(),
-      coordenadas: coordenadas.trim(),
-      copiaA,
-      estado: 'ABIERTO',
-      fechaCreacion: formatearFecha(new Date()),
-      diasPlazo: plazoInfo!.dias,
-      fechaVencimiento: formatearFecha(plazoInfo!.vencimiento),
-    });
-    Alert.alert('Ticket creado', 'Ya puedes verlo en el resumen de tickets.');
-    navigation.goBack();
+  async function crear() {
+    if (!validar() || !contratoSeleccionado?.idEmpresa || !supervisorSeleccionado) return;
+    setGuardando(true);
+    try {
+      // Combina los campos de ubicación, ya que el esquema los almacena en una sola columna.
+      const fechaVencimiento = plazoInfo!.vencimiento;
+      const ubicacion = [direccion, sector, referencia, coordenadas].map((item) => item.trim()).filter(Boolean).join(', ');
+      const prioridadSeleccionada = prioridadesContrato.find((item) => item.nombre_prioridad === prioridad);
+      if (!prioridadSeleccionada) throw new Error('El contrato no tiene esa prioridad configurada.');
+      // Se envían IDs de contrato, usuario y prioridad requeridos por sql/03.
+      await api.crearTicket({
+        id_contrato: Number(contratoSeleccionado.id),
+        id_usuario: supervisorSeleccionado.id_usuario,
+        id_prioridad: prioridadSeleccionada.id_prioridad_contrato,
+        descripcion: descripcion.trim(),
+        ubicacion: ubicacion || null,
+        plazo_subsanar: plazoInfo!.dias,
+        fecha_vencimiento: `${fechaVencimiento.getFullYear()}-${String(fechaVencimiento.getMonth() + 1).padStart(2, '0')}-${String(fechaVencimiento.getDate()).padStart(2, '0')}`,
+      });
+      // Refresca el resumen desde el servidor después de confirmar la creación.
+      await cargarTickets();
+      const mensaje = fotos.length
+        ? 'El ticket quedó guardado. Las fotos no se enviaron porque el servidor aún no admite carga de archivos.'
+        : 'El ticket quedó guardado en el servidor.';
+      Alert.alert('Ticket creado', mensaje);
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('No se pudo crear el ticket', (error as Error).message);
+    } finally {
+      setGuardando(false);
+    }
   }
 
   return (
@@ -173,40 +196,31 @@ export default function CrearTicketScreen({ navigation }: any) {
           placeholder="Seleccionar contrato"
           value={contrato}
           options={opcionesContrato}
-          onChange={setContrato}
+          onChange={seleccionarContrato}
           mensajeVacio="Aún no hay contratos cargados."
           error={errores.contrato}
-        />
-
-        <SelectField
-          label="Área responsable"
-          requerido
-          placeholder="Seleccionar área"
-          value={area}
-          options={AREAS}
-          onChange={setArea}
-          mensajeVacio="Aún no hay áreas cargadas."
-          error={errores.area}
         />
 
         <SelectField
           label="Supervisor asignado"
           requerido
           placeholder="Seleccionar supervisor"
-          value={supervisor}
-          options={SUPERVISORES}
-          onChange={setSupervisor}
-          mensajeVacio="Aún no hay supervisores cargados."
+          value={supervisorOpcion}
+          options={supervisores.map((item) => `${item.nombre} — ${item.email}`)}
+          onChange={setSupervisorOpcion}
+          mensajeVacio="La empresa no tiene supervisores registrados."
           error={errores.supervisor}
         />
+        {!!errorCarga && <Text style={styles.error}>{errorCarga}</Text>}
 
         <SelectField
           label="Prioridad"
           requerido
           placeholder="Seleccionar prioridad"
           value={prioridad}
-          options={PRIORIDADES}
+          options={prioridadesContrato.map((item) => item.nombre_prioridad)}
           onChange={(v) => setPrioridad(v as Prioridad)}
+          mensajeVacio="El contrato no tiene prioridades configuradas."
           error={errores.prioridad}
         />
         {plazoInfo && (
@@ -295,27 +309,6 @@ export default function CrearTicketScreen({ navigation }: any) {
           onChangeText={setCoordenadas}
         />
 
-        <Text style={styles.seccion}>NOTIFICACIÓN</Text>
-        <Text style={styles.label}>Enviar copia a (opcional)</Text>
-        {DESTINATARIOS_NOTIFICACION.length === 0 ? (
-          <Text style={styles.avisoVacio}>Aún no hay destinatarios cargados.</Text>
-        ) : (
-          <View style={styles.chips}>
-            {DESTINATARIOS_NOTIFICACION.map((d) => {
-              const activo = copiaA.includes(d);
-              return (
-                <TouchableOpacity
-                  key={d}
-                  style={[styles.chip, activo && styles.chipActivo]}
-                  onPress={() => alternarCopiaA(d)}
-                >
-                  <Text style={[styles.chipTexto, activo && styles.chipTextoActivo]}>{d}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
-
         <View style={styles.auto}>
           <Text style={styles.autoTexto}>Información del creador del ticket: fecha y hora</Text>
           <Text style={styles.autoTexto}>La ID se genera automáticamente</Text>
@@ -324,7 +317,14 @@ export default function CrearTicketScreen({ navigation }: any) {
 
       <View style={styles.barraInferior}>
         <Button label="Cancelar" variante="secundario" onPress={() => navigation.goBack()} style={{ flex: 1 }} />
-        <Button label="Crear" variante="primario" onPress={crear} style={{ flex: 1 }} />
+        <Button
+          label={guardando ? 'Guardando…' : 'Crear'}
+          variante="primario"
+          onPress={crear}
+          disabled={guardando}
+          cargando={guardando}
+          style={{ flex: 1 }}
+        />
       </View>
     </SafeAreaView>
   );

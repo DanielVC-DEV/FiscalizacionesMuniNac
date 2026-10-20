@@ -1,19 +1,25 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import Header from '../components/Header';
 import TopBar from '../components/TopBar';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { COLORS, RADIOS } from '../theme/colors';
-import { useContratos } from '../data/store';
+import { cargarContratos, useContratos } from '../data/store';
 
 export default function ContratosScreen({ navigation }: any) {
-  // Lee del almacén en memoria (src/data/store.ts): todavía no hay backend,
-  // así que esto dura solo mientras la app esté abierta. Un contrato creado
-  // en "Nuevo contrato" aparece aquí de inmediato.
   const CONTRATOS = useContratos();
   const [busqueda, setBusqueda] = useState('');
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Actualiza el listado cada vez que se vuelve a esta pantalla.
+      cargarContratos().catch((error: Error) => setErrorCarga(error.message));
+    }, []),
+  );
 
   const texto = busqueda.trim().toLowerCase();
   const filtrados = CONTRATOS.filter((c) => {
@@ -36,6 +42,8 @@ export default function ContratosScreen({ navigation }: any) {
           onPress={() => navigation.navigate('CrearContrato')}
           style={styles.botonNuevo}
         />
+
+        {!!errorCarga && <Text style={styles.sinContratos}>No se pudo cargar el servidor: {errorCarga}</Text>}
 
         <TextInput
           style={styles.buscador}

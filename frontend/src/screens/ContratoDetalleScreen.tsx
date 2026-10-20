@@ -50,7 +50,7 @@ export default function ContratoDetalleScreen({ navigation, route }: any) {
             {contrato.ordenesCompra.map((oc) => (
               <Card key={oc.id} style={styles.ocItem}>
                 <View style={styles.ocFila}>
-                  <Text style={styles.ocCodigo}>OC {oc.codigo}</Text>
+                  <Text style={styles.ocCodigo}>OC {oc.codigo || oc.id}</Text>
                   <Text style={styles.ocMonto}>{formatearMonto(oc.monto)}</Text>
                 </View>
                 <Text style={styles.ocFecha}>Fecha: {oc.fecha}</Text>
@@ -61,7 +61,7 @@ export default function ContratoDetalleScreen({ navigation, route }: any) {
 
         <SeccionLabel texto="Tickets asociados a este contrato" />
         <Text style={styles.sinDatos}>
-          Todavía no hay tickets guardados para consultar (esto se conecta cuando exista el backend).
+          El esquema actual guarda los tickets por empresa, pero todavía no los vincula directamente a un contrato.
         </Text>
       </ScrollView>
     </SafeAreaView>

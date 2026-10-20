@@ -1,12 +1,6 @@
 const pool = require('../config/db');
 const { cambiarEstadoTicket } = require('../services/ticketStateMachine');
 
-// Nota: este controlador trabaja contra el esquema "estable" (01 + 02 en
-// /sql). Si más adelante confirmas con tu supervisor los cambios de la
-// migración 03 (ticket.id_contrato, prioridad por contrato), hay que
-// actualizar create() para usar id_contrato + id_prioridad en vez de
-// id_empresa + prioridad como texto.
-
 function generarNumeroTicket() {
   // Esquema actual no trae un trigger para esto (a diferencia de
   // contratos.numero_contrato). Formato simple mientras no se defina
@@ -16,13 +10,20 @@ function generarNumeroTicket() {
 
 async function listar(req, res, next) {
   try {
+    // Une ticket con contrato, prioridad, empresa, supervisor y observación para evitar consultas adicionales desde la app.
     const { rows } = await pool.query(`
-      SELECT t.id_ticket, t.numero, t.prioridad, t.estado,
+      SELECT t.id_ticket, t.numero, t.id_contrato, t.id_prioridad,
+             p.nombre_prioridad AS prioridad, t.estado,
              t.fecha_hora_creacion, t.plazo_subsanar, t.fecha_vencimiento,
-             e.razon_social AS empresa_nombre, u.nombre AS supervisor_nombre
+             c.nombre AS contrato_nombre, e.razon_social AS empresa_nombre,
+             u.nombre AS supervisor_nombre,
+             o.descripcion, o.foto, o.ubicacion
       FROM ticket t
+      JOIN contratos c ON c.id_contratos = t.id_contrato
+      JOIN prioridad_contrato p ON p.id_prioridad_contrato = t.id_prioridad
       JOIN empresas e ON e.id_empresa = t.id_empresa
       JOIN usuario u ON u.id_usuario = t.id_usuario
+      JOIN observaciones o ON o.id_observacion = t.id_observacion
       ORDER BY t.fecha_hora_creacion DESC
     `);
     res.json(rows);
@@ -33,10 +34,13 @@ async function listar(req, res, next) {
 
 async function obtener(req, res, next) {
   try {
+    // Recupera el ticket con su observación y etiquetas legibles para la vista de detalle.
     const { rows } = await pool.query(
-      `SELECT t.*, e.razon_social AS empresa_nombre, u.nombre AS supervisor_nombre,
+      `SELECT t.*, p.nombre_prioridad AS prioridad,
+              e.razon_social AS empresa_nombre, u.nombre AS supervisor_nombre,
               o.descripcion, o.fecha AS observacion_fecha, o.foto, o.ubicacion
        FROM ticket t
+       JOIN prioridad_contrato p ON p.id_prioridad_contrato = t.id_prioridad
        JOIN empresas e ON e.id_empresa = t.id_empresa
        JOIN usuario u ON u.id_usuario = t.id_usuario
        JOIN observaciones o ON o.id_observacion = t.id_observacion
@@ -62,39 +66,42 @@ async function obtener(req, res, next) {
 // si falla uno, no debe quedar el otro suelto).
 async function crear(req, res, next) {
   const {
-    id_empresa, id_usuario, prioridad,
+    id_contrato, id_usuario, id_prioridad,
     descripcion, foto, ubicacion,
     plazo_subsanar, fecha_vencimiento,
     id_usuario_creador, // quién registra la observación
   } = req.body;
 
-  if (!id_empresa || !id_usuario || !prioridad || !descripcion || !fecha_vencimiento) {
+  if (!id_contrato || !id_usuario || !id_prioridad || !descripcion || !fecha_vencimiento) {
     return res.status(400).json({
-      error: 'id_empresa, id_usuario, prioridad, descripcion y fecha_vencimiento son obligatorios',
+      error: 'id_contrato, id_usuario, id_prioridad, descripcion y fecha_vencimiento son obligatorios',
     });
   }
 
   const client = await pool.connect();
   try {
+    // La observación y el ticket deben guardarse juntos: si uno falla, se revierten ambos.
     await client.query('BEGIN');
 
+    // Registra el contenido y la ubicación antes de crear el ticket que la referencia.
     const observacion = await client.query(
       `INSERT INTO observaciones (id_usuario, descripcion, foto, ubicacion)
        VALUES ($1,$2,$3,$4) RETURNING id_observacion`,
       [id_usuario_creador || id_usuario, descripcion, foto || null, ubicacion || null]
     );
 
+    // PostgreSQL completa empresa y prioridad a partir de los IDs asociados al contrato.
     const ticket = await client.query(
       `INSERT INTO ticket
-         (numero, id_empresa, id_usuario, id_observacion, prioridad, plazo_subsanar, fecha_vencimiento)
+         (numero, id_contrato, id_usuario, id_observacion, id_prioridad, plazo_subsanar, fecha_vencimiento)
        VALUES ($1,$2,$3,$4,$5,$6,$7)
        RETURNING *`,
       [
         generarNumeroTicket(),
-        id_empresa,
+        id_contrato,
         id_usuario,
         observacion.rows[0].id_observacion,
-        prioridad,
+        id_prioridad,
         plazo_subsanar || null,
         fecha_vencimiento,
       ]
@@ -111,6 +118,7 @@ async function crear(req, res, next) {
 }
 
 async function cambiarEstado(req, res, next) {
+  // El servicio valida las transiciones permitidas antes de actualizar el estado.
   const { estado } = req.body;
   if (!estado) return res.status(400).json({ error: 'Falta el campo "estado"' });
 
