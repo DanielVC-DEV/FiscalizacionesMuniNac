@@ -28,6 +28,12 @@ const OPCIONES = [
     destino: 'Empresas',
     glifo: <IconoEdificio />,
   },
+  {
+    titulo: 'Áreas',
+    descripcion: 'Administrar áreas',
+    destino: 'Areas',
+    glifo: <IconoDocumento />,
+  },
 ] as const;
 
 export default function MenuScreen({ navigation }: any) {

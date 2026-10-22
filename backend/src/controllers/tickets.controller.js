@@ -66,20 +66,32 @@ async function obtener(req, res, next) {
 // si falla uno, no debe quedar el otro suelto).
 async function crear(req, res, next) {
   const {
-    id_contrato, id_usuario, id_prioridad,
+    id_contrato, id_prioridad,
     descripcion, foto, ubicacion,
     plazo_subsanar, fecha_vencimiento,
     id_usuario_creador, // quién registra la observación
   } = req.body;
 
-  if (!id_contrato || !id_usuario || !id_prioridad || !descripcion || !fecha_vencimiento) {
+  if (!id_contrato || !id_prioridad || !descripcion || !fecha_vencimiento) {
     return res.status(400).json({
-      error: 'id_contrato, id_usuario, id_prioridad, descripcion y fecha_vencimiento son obligatorios',
+      error: 'id_contrato, id_prioridad, descripcion y fecha_vencimiento son obligatorios',
     });
   }
 
   const client = await pool.connect();
   try {
+    const contrato = await client.query(
+      'SELECT id_supervisor FROM contratos WHERE id_contratos = $1',
+      [id_contrato]
+    );
+    if (contrato.rows.length === 0) {
+      return res.status(404).json({ error: 'Contrato no encontrado' });
+    }
+    const idSupervisor = contrato.rows[0].id_supervisor;
+    if (!idSupervisor) {
+      return res.status(400).json({ error: 'El contrato no tiene un supervisor asignado' });
+    }
+
     // La observación y el ticket deben guardarse juntos: si uno falla, se revierten ambos.
     await client.query('BEGIN');
 
@@ -87,7 +99,7 @@ async function crear(req, res, next) {
     const observacion = await client.query(
       `INSERT INTO observaciones (id_usuario, descripcion, foto, ubicacion)
        VALUES ($1,$2,$3,$4) RETURNING id_observacion`,
-      [id_usuario_creador || id_usuario, descripcion, foto || null, ubicacion || null]
+      [id_usuario_creador || idSupervisor, descripcion, foto || null, ubicacion || null]
     );
 
     // PostgreSQL completa empresa y prioridad a partir de los IDs asociados al contrato.
@@ -99,7 +111,7 @@ async function crear(req, res, next) {
       [
         generarNumeroTicket(),
         id_contrato,
-        id_usuario,
+        idSupervisor,
         observacion.rows[0].id_observacion,
         id_prioridad,
         plazo_subsanar || null,

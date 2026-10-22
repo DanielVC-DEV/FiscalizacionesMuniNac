@@ -33,8 +33,6 @@ export default function CrearTicketScreen({ navigation }: any) {
   const opcionesContrato = contratos.map(contratoLabel);
 
   const [contrato, setContrato] = useState<string | null>(null);
-  const [supervisorOpcion, setSupervisorOpcion] = useState<string | null>(null);
-  const [supervisores, setSupervisores] = useState<{ id_usuario: number; nombre: string; email: string }[]>([]);
   const [prioridadesContrato, setPrioridadesContrato] = useState<NonNullable<ContratoApi['prioridades']>>([]);
   const [prioridad, setPrioridad] = useState<Prioridad | null>(null);
   const [descripcion, setDescripcion] = useState('');
@@ -55,25 +53,18 @@ export default function CrearTicketScreen({ navigation }: any) {
   }, []);
 
   const contratoSeleccionado = contratos.find((item) => contratoLabel(item) === contrato) ?? null;
-  const supervisorSeleccionado = supervisores.find((item) => `${item.nombre} — ${item.email}` === supervisorOpcion);
 
   async function seleccionarContrato(valor: string | null) {
-    // Al cambiar de contrato se descartan las opciones dependientes de la selección anterior.
+    // Al cambiar de contrato se descartan las prioridades anteriores.
     setContrato(valor);
-    setSupervisorOpcion(null);
-    setSupervisores([]);
     setPrioridadesContrato([]);
     setPrioridad(null);
     setErrorCarga(null);
     const seleccionado = contratos.find((item) => contratoLabel(item) === valor);
-    if (!seleccionado?.idEmpresa) return;
+    if (!seleccionado) return;
     try {
-      // Ambas consultas pertenecen al contrato elegido: supervisores de su empresa y prioridades vigentes.
-      const [datos, detalle] = await Promise.all([
-        api.listarSupervisores(Number(seleccionado.idEmpresa)),
-        api.obtenerContrato(seleccionado.id),
-      ]);
-      setSupervisores(datos);
+      // Las prioridades dependen del contrato; el supervisor ya viene asignado desde ese contrato.
+      const detalle = await api.obtenerContrato(seleccionado.id);
       setPrioridadesContrato(detalle.prioridades ?? []);
     } catch (error) {
       setErrorCarga((error as Error).message);
@@ -142,7 +133,9 @@ export default function CrearTicketScreen({ navigation }: any) {
   function validar(): boolean {
     const nuevosErrores: Record<string, string> = {};
     if (!contrato) nuevosErrores.contrato = 'Selecciona el contrato asociado.';
-    if (!supervisorOpcion) nuevosErrores.supervisor = 'Selecciona el supervisor asignado.';
+    if (contratoSeleccionado && !contratoSeleccionado.idSupervisor) {
+      nuevosErrores.supervisor = 'El contrato seleccionado no tiene un supervisor asignado.';
+    }
     if (!prioridad) nuevosErrores.prioridad = 'Selecciona una prioridad.';
     if (!descripcion.trim()) nuevosErrores.descripcion = 'Describe la observación.';
     setErrores(nuevosErrores);
@@ -150,7 +143,7 @@ export default function CrearTicketScreen({ navigation }: any) {
   }
 
   async function crear() {
-    if (!validar() || !contratoSeleccionado?.idEmpresa || !supervisorSeleccionado) return;
+    if (!validar() || !contratoSeleccionado?.idSupervisor) return;
     setGuardando(true);
     try {
       // Combina los campos de ubicación, ya que el esquema los almacena en una sola columna.
@@ -161,7 +154,6 @@ export default function CrearTicketScreen({ navigation }: any) {
       // Se envían IDs de contrato, usuario y prioridad requeridos por sql/03.
       await api.crearTicket({
         id_contrato: Number(contratoSeleccionado.id),
-        id_usuario: supervisorSeleccionado.id_usuario,
         id_prioridad: prioridadSeleccionada.id_prioridad_contrato,
         descripcion: descripcion.trim(),
         ubicacion: ubicacion || null,
@@ -201,16 +193,13 @@ export default function CrearTicketScreen({ navigation }: any) {
           error={errores.contrato}
         />
 
-        <SelectField
-          label="Supervisor asignado"
-          requerido
-          placeholder="Seleccionar supervisor"
-          value={supervisorOpcion}
-          options={supervisores.map((item) => `${item.nombre} — ${item.email}`)}
-          onChange={setSupervisorOpcion}
-          mensajeVacio="La empresa no tiene supervisores registrados."
-          error={errores.supervisor}
-        />
+        <Text style={styles.label}>Supervisor asignado al contrato</Text>
+        <View style={[styles.input, styles.supervisorLectura]}>
+          <Text style={contratoSeleccionado?.supervisorNombre ? styles.textoSupervisor : styles.textoSupervisorVacio}>
+            {contratoSeleccionado?.supervisorNombre ?? 'Se muestra al seleccionar un contrato'}
+          </Text>
+        </View>
+        {!!errores.supervisor && <Text style={styles.error}>{errores.supervisor}</Text>}
         {!!errorCarga && <Text style={styles.error}>{errorCarga}</Text>}
 
         <SelectField
@@ -365,6 +354,9 @@ const styles = StyleSheet.create({
     color: COLORS.textoPrimario,
     textAlignVertical: 'top',
   },
+  supervisorLectura: { justifyContent: 'center', backgroundColor: COLORS.fondo },
+  textoSupervisor: { color: COLORS.textoPrimario, fontSize: 13 },
+  textoSupervisorVacio: { color: COLORS.textoTenue, fontSize: 13 },
   error: { color: COLORS.rojo, fontSize: 11, marginTop: 4 },
   avisoVacio: { color: COLORS.textoSecundario, fontSize: 11.5, marginBottom: 6 },
   auto: {

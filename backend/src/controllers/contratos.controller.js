@@ -29,13 +29,16 @@ async function listar(req, res, next) {
     const { rows } = await pool.query(`
       SELECT c.id_contratos, c.nombre, c.id_licitacion, c.vigencia,
              c.fecha_inicio, c.fecha_termino, c.monto_actualizado, c.dia_respuesta,
-             c.id_empresa, e.razon_social AS empresa_nombre, e.rut AS empresa_rut,
+             c.id_empresa, c.id_supervisor,
+             e.razon_social AS empresa_nombre, e.rut AS empresa_rut,
+             u.nombre AS supervisor_nombre, u.email AS supervisor_email,
              (SELECT COALESCE(json_agg(json_build_object(
                 'id_compra', o.id_compra, 'monto', o.monto, 'fecha_compra', o.fecha_compra
               ) ORDER BY o.fecha_compra), '[]'::json)
           FROM orden_de_compra o WHERE o.id_contratos = c.id_contratos) AS ordenes_compra
       FROM contratos c
       JOIN empresas e ON e.id_empresa = c.id_empresa
+      LEFT JOIN usuario u ON u.id_usuario = c.id_supervisor
       ORDER BY c.fecha_inicio DESC
     `);
     res.json(rows);
@@ -58,8 +61,11 @@ async function obtener(req, res, next) {
   const { id } = req.params;
   try {
     const contrato = await pool.query(
-      `SELECT c.*, e.razon_social AS empresa_nombre
-       FROM contratos c JOIN empresas e ON e.id_empresa = c.id_empresa
+      `SELECT c.*, e.razon_social AS empresa_nombre,
+              u.nombre AS supervisor_nombre, u.email AS supervisor_email
+       FROM contratos c
+       JOIN empresas e ON e.id_empresa = c.id_empresa
+       LEFT JOIN usuario u ON u.id_usuario = c.id_supervisor
        WHERE c.id_contratos = $1`,
       [id]
     );
@@ -105,28 +111,42 @@ async function obtener(req, res, next) {
 async function crear(req, res, next) {
   const {
     nombre, id_empresa, fecha_inicio, fecha_termino,
-    dia_respuesta, id_licitacion, vigencia, monto_actualizado,
+    dia_respuesta, id_licitacion, vigencia, monto_actualizado, id_supervisor,
   } = req.body;
 
   // Validación mínima en el backend: NUNCA confíes solo en la
   // validación del frontend, porque cualquiera puede mandar un request
   // directo a la API sin pasar por la app.
-  if (!nombre || !id_empresa || !fecha_inicio || !fecha_termino) {
+  if (!nombre || !id_empresa || !fecha_inicio || !fecha_termino || !id_supervisor) {
     return res.status(400).json({
-      error: 'nombre, id_empresa, fecha_inicio y fecha_termino son obligatorios',
+      error: 'nombre, id_empresa, id_supervisor, fecha_inicio y fecha_termino son obligatorios',
     });
   }
 
   try {
+    const supervisor = await pool.query(
+      `SELECT u.id_usuario
+       FROM usuario u
+       JOIN rol_usuario ru ON ru.id_usuario = u.id_usuario
+       JOIN rol r ON r.id_rol = ru.id_rol
+       WHERE u.id_usuario = $1 AND u.id_empresa = $2 AND r.nombre = 'supervisor_empresa'`,
+      [id_supervisor, id_empresa]
+    );
+    if (supervisor.rows.length === 0) {
+      return res.status(400).json({
+        error: 'El supervisor debe pertenecer a la empresa y tener rol supervisor_empresa',
+      });
+    }
+
     // RETURNING * hace que PostgreSQL devuelva la fila recién creada
     // en la misma consulta — así no hay que hacer un SELECT aparte
     // después del INSERT.
     const { rows } = await pool.query(
       `INSERT INTO contratos
-         (nombre, id_empresa, fecha_inicio, fecha_termino, dia_respuesta, id_licitacion, vigencia, monto_actualizado)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+         (nombre, id_empresa, id_supervisor, fecha_inicio, fecha_termino, dia_respuesta, id_licitacion, vigencia, monto_actualizado)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
        RETURNING *`,
-      [nombre, id_empresa, fecha_inicio, fecha_termino, dia_respuesta, id_licitacion, vigencia, monto_actualizado]
+      [nombre, id_empresa, id_supervisor, fecha_inicio, fecha_termino, dia_respuesta, id_licitacion, vigencia, monto_actualizado]
     );
 
     // 201 = "Created". Es la convención REST para un POST que creó algo.

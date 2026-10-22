@@ -32,6 +32,8 @@ export interface OrdenCompra {
 export interface Contrato {
   id: string;
   idEmpresa?: string;
+  idSupervisor?: number | null;
+  supervisorNombre?: string | null;
   // Campos mínimos que pide la sección 20 del informe:
   nombre: string;
   rutEmpresa: string;

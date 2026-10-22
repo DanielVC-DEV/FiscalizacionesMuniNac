@@ -34,6 +34,8 @@ function normalizarContrato(contrato: ContratoApi): Contrato {
   return {
     id: String(contrato.id_contratos),
     idEmpresa: String(contrato.id_empresa),
+    idSupervisor: contrato.id_supervisor,
+    supervisorNombre: contrato.supervisor_nombre,
     nombre: contrato.nombre,
     rutEmpresa: contrato.empresa_rut,
     nombreEmpresa: contrato.empresa_nombre,

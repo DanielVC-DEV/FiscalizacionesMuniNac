@@ -29,6 +29,9 @@ export interface ContratoApi {
   fecha_termino: string;
   dia_respuesta: number | null;
   id_empresa: number;
+  id_supervisor: number | null;
+  supervisor_nombre?: string | null;
+  supervisor_email?: string | null;
   empresa_nombre: string;
   empresa_rut: string;
   ordenes_compra?: {
@@ -85,6 +88,10 @@ export const api = {
   // Lecturas de catálogos y recursos usados por los formularios.
   listarEmpresas: () => request<EmpresaApi[]>('/empresas'),
   listarAreas: () => request<AreaApi[]>('/areas'),
+  crearArea: (body: { nombre: string }) =>
+    request<AreaApi>('/areas', { method: 'POST', body: JSON.stringify(body) }),
+  crearEmpresa: (body: Record<string, unknown>) =>
+    request<EmpresaApi>('/empresas', { method: 'POST', body: JSON.stringify(body) }),
   listarUsuarios: () => request<UsuarioApi[]>('/usuarios'),
   listarSupervisores: (idEmpresa: number) =>
     request<Pick<UsuarioApi, 'id_usuario' | 'nombre' | 'email'>[]>(`/empresas/${idEmpresa}/supervisores`),

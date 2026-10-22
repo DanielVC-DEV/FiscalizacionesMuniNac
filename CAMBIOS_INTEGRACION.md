@@ -3,13 +3,15 @@
 ## Cliente API
 
 - Se agregó `frontend/src/data/api.ts` como cliente REST para empresas, áreas, usuarios, supervisores, contratos y tickets.
+- El catálogo de áreas ahora permite crear registros mediante `POST /api/areas`.
+- La pantalla de empresas permite registrar empresas asociadas a un área.
 - La URL base se configura con `EXPO_PUBLIC_API_URL`. El valor predeterminado es `http://localhost:3000/api`.
 - Los errores HTTP se convierten en mensajes que pueden mostrarse en la interfaz.
 
 ## Empresas y contratos
 
 - La pantalla de empresas consulta `GET /api/empresas` en lugar de mostrar datos de ejemplo.
-- El formulario de contratos consulta las empresas existentes y envía `POST /api/contratos` con el ID de empresa y las fechas en formato ISO.
+- El formulario de contratos consulta empresas y supervisores de la empresa seleccionada; guarda el supervisor en el contrato.
 - Las órdenes de compra se guardan con monto y fecha usando `POST /api/contratos/:id/ordenes-compra`.
 - El listado de contratos se actualiza desde el servidor al abrirse.
 - El backend agrega al listado de contratos el RUT de la empresa y las órdenes de compra para que la app pueda mostrarlos.
@@ -17,9 +19,10 @@
 ## Tickets
 
 - El resumen consulta `GET /api/tickets` al abrirse y muestra los tickets guardados en el servidor.
-- El formulario carga los contratos, los supervisores asociados a la empresa y las prioridades definidas para el contrato.
-- La creación envía `id_contrato`, `id_usuario` e `id_prioridad`, junto con descripción, plazo y ubicación. El backend obtiene la empresa a partir del contrato y devuelve el nombre del contrato al listado.
+- El formulario carga los contratos y las prioridades definidas para cada contrato, mostrando el supervisor asignado sin permitir cambiarlo desde el ticket.
+- La creación envía `id_contrato` e `id_prioridad`, junto con descripción, plazo y ubicación. El backend deriva el supervisor y la empresa desde el contrato.
 - Se alinearon los controladores de tickets con el esquema activo de la migración `sql/03_contrato_prioridad_respuesta.sql`.
+- La migración `sql/04_supervisor_contrato.sql` agrega la asignación del supervisor al contrato y actualiza la derivación del supervisor al crear tickets.
 - La pantalla de detalle muestra el identificador de la orden de compra cuando el esquema no proporciona un código.
 
 ## Configuración y documentación
@@ -32,7 +35,7 @@
 
 ## Limitaciones actuales
 
-- La creación de tickets necesita que la empresa tenga un supervisor registrado. En la base probada no había supervisores disponibles.
+- Para crear contratos se necesita un supervisor registrado para la empresa seleccionada.
 - El backend aún no implementa carga de fotos, por lo que las fotos seleccionadas no se envían ni persisten.
 - La tabla de órdenes de compra no tiene un campo para el código; se guardan monto y fecha.
 - Las ubicaciones se guardan como un único texto; sector, referencia y coordenadas no se almacenan por separado.

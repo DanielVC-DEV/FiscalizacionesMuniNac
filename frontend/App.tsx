@@ -8,6 +8,7 @@ import ContratosScreen from './src/screens/ContratosScreen';
 import ContratoDetalleScreen from './src/screens/ContratoDetalleScreen';
 import CrearContratoScreen from './src/screens/CrearContratoScreen';
 import EmpresasScreen from './src/screens/EmpresasScreen';
+import AreasScreen from './src/screens/AreasScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ export default function App() {
             options={{ headerShown: false }}
           />
           <Stack.Screen name="Empresas" component={EmpresasScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Areas" component={AreasScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

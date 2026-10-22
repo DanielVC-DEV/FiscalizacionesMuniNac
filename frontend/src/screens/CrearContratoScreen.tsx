@@ -17,6 +17,8 @@ export default function CrearContratoScreen({ navigation }: any) {
   const [nombreContrato, setNombreContrato] = useState('');
   const [empresaOpcion, setEmpresaOpcion] = useState<string | null>(null);
   const [empresas, setEmpresas] = useState<EmpresaApi[]>([]);
+  const [supervisorOpcion, setSupervisorOpcion] = useState<string | null>(null);
+  const [supervisores, setSupervisores] = useState<{ id_usuario: number; nombre: string; email: string }[]>([]);
   const [errorCarga, setErrorCarga] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [fechaInicio, setFechaInicio] = useState('');
@@ -33,6 +35,23 @@ export default function CrearContratoScreen({ navigation }: any) {
 
   const empresaSeleccionada = empresas.find((e) => `${e.razon_social} — ${e.rut}` === empresaOpcion) ?? null;
   const opcionesEmpresa = empresas.map((e) => `${e.razon_social} — ${e.rut}`);
+  const supervisorSeleccionado = supervisores.find(
+    (item) => `${item.nombre} — ${item.email}` === supervisorOpcion
+  );
+
+  async function seleccionarEmpresa(valor: string) {
+    setEmpresaOpcion(valor);
+    setSupervisorOpcion(null);
+    setSupervisores([]);
+    setErrorCarga(null);
+    const empresa = empresas.find((item) => `${item.razon_social} — ${item.rut}` === valor);
+    if (!empresa) return;
+    try {
+      setSupervisores(await api.listarSupervisores(empresa.id_empresa));
+    } catch (error) {
+      setErrorCarga((error as Error).message);
+    }
+  }
 
   useEffect(() => {
     // Carga las empresas reales para que el contrato se guarde con su ID de base de datos.
@@ -86,6 +105,7 @@ export default function CrearContratoScreen({ navigation }: any) {
     const nuevosErrores: Record<string, string> = {};
     if (!nombreContrato.trim()) nuevosErrores.nombreContrato = 'Ingresa el nombre del contrato.';
     if (!empresaOpcion) nuevosErrores.empresa = 'Selecciona la empresa.';
+    if (!supervisorOpcion) nuevosErrores.supervisor = 'Selecciona el supervisor del contrato.';
 
     const inicio = parsearFecha(fechaInicio);
     const termino = parsearFecha(fechaTermino);
@@ -128,13 +148,14 @@ export default function CrearContratoScreen({ navigation }: any) {
   }
 
   async function crear() {
-    if (!validar() || !empresaSeleccionada) return;
+    if (!validar() || !empresaSeleccionada || !supervisorSeleccionado) return;
     setGuardando(true);
     try {
       // Primero crea el contrato y obtiene su ID generado por PostgreSQL.
       const creado = await api.crearContrato({
         nombre: nombreContrato.trim(),
         id_empresa: empresaSeleccionada.id_empresa,
+        id_supervisor: supervisorSeleccionado.id_usuario,
         fecha_inicio: fechaParaApi(fechaInicio),
         fecha_termino: fechaParaApi(fechaTermino),
         dia_respuesta: Number(diasRespuesta),
@@ -186,9 +207,20 @@ export default function CrearContratoScreen({ navigation }: any) {
           placeholder="Seleccionar empresa registrada"
           value={empresaOpcion}
           options={opcionesEmpresa}
-          onChange={setEmpresaOpcion}
+          onChange={seleccionarEmpresa}
           mensajeVacio="Aún no hay empresas registradas."
           error={errores.empresa}
+        />
+
+        <SelectField
+          label="Supervisor del contrato"
+          requerido
+          placeholder="Seleccionar supervisor"
+          value={supervisorOpcion}
+          options={supervisores.map((item) => `${item.nombre} — ${item.email}`)}
+          onChange={setSupervisorOpcion}
+          mensajeVacio={empresaSeleccionada ? 'La empresa no tiene supervisores registrados.' : 'Selecciona primero una empresa.'}
+          error={errores.supervisor}
         />
 
         <Text style={styles.label}>RUT de la empresa</Text>
