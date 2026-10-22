@@ -166,3 +166,19 @@
 {"_e":"devserver:start","_t":1792695032270,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
 {"_e":"metro:config","_t":1792695036021,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
 {"_e":"expo:dev-tools-plugin:load","_t":1792695038235,"plugins":[]}
+{"_e":"metro:instantiate","_t":1792695045781,"atlas":false,"workers":10,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1792695046370,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1792695046371,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1792695046374,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1792695046474,"id":"1","progress":0.6782006920415224,"total":102,"current":84}
+{"_e":"metro:bundling:progress","_t":1792695046580,"id":"1","progress":0.9888580256546299,"total":179,"current":178}
+{"_e":"metro:bundling:progress","_t":1792695049282,"id":"1","progress":0.999,"total":179,"current":179}
+{"_e":"metro:bundling:progress","_t":1792695049387,"id":"1","progress":0.999,"total":298,"current":224}
+{"_e":"metro:bundling:progress","_t":1792695049487,"id":"1","progress":0.999,"total":424,"current":372}
+{"_e":"metro:bundling:progress","_t":1792695049587,"id":"1","progress":0.999,"total":510,"current":504}
+{"_e":"metro:bundling:progress","_t":1792695049688,"id":"1","progress":0.999,"total":511,"current":506}
+{"_e":"metro:bundling:progress","_t":1792695049952,"id":"1","progress":0.999,"total":511,"current":507}
+{"_e":"metro:bundling:done","_t":1792695050117,"id":"1","total":511,"ms":3746.457}
+{"_e":"metro:client_log","_t":1792695050249,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1792695050249,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:bundling:started","_t":1792695052599,"id":"5","platform":"web","environment":null,"entry":"index.ts"}
