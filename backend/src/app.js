@@ -1,12 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 
-const catalogosRoutes = require('./routes/catalogos.routes');
-const empresasRoutes = require('./routes/empresas.routes');
-const contratosRoutes = require('./routes/contratos.routes');
-const usuariosRoutes = require('./routes/usuarios.routes');
-const ticketsRoutes = require('./routes/tickets.routes');
-const errorHandler = require('./middlewares/errorHandler');
+const catalogosRoutes = require('./modules/catalogos/catalogos.routes');
+const empresasRoutes = require('./modules/empresas/empresas.routes');
+const contratosRoutes = require('./modules/contratos/contratos.routes');
+const usuariosRoutes = require('./modules/usuarios/usuarios.routes');
+const ticketsRoutes = require('./modules/tickets/tickets.routes');
+const errorHandler = require('./core/middlewares/errorHandler');
 
 const app = express();
 
