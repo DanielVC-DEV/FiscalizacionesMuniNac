@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import * as Location from 'expo-location';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '../../core/ui/Header';
+import Header from '../auth/components/SesionHeader';
 import TopBar from '../../core/ui/TopBar';
 import SelectField from '../../core/ui/SelectField';
 import Button from '../../core/ui/Button';

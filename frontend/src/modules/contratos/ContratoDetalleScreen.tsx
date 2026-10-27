@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '../../core/ui/Header';
+import Header from '../auth/components/SesionHeader';
 import TopBar from '../../core/ui/TopBar';
 import Card from '../../core/ui/Card';
 import SeccionLabel from '../../core/ui/SeccionLabel';

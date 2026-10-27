@@ -16,6 +16,31 @@
 // =====================================================================
 
 const pool = require('../../core/config/db');
+const {
+  esIdValido, esFechaISO, esEnteroPositivo, textoValido, textoOpcional,
+} = require('../../core/utils/validaciones');
+
+// Valida los campos editables de un contrato (alta y edición comparten las mismas reglas).
+// Devuelve el mensaje de error, o null si todo está bien.
+function validarDatosContrato({
+  nombre, fecha_inicio, fecha_termino, dia_respuesta, id_licitacion, vigencia, monto_actualizado,
+}) {
+  if (!textoValido(nombre, 200)) return 'El nombre del contrato es obligatorio (máximo 200 caracteres)';
+  if (!esFechaISO(fecha_inicio)) return 'La fecha de inicio no es válida (formato aaaa-mm-dd)';
+  if (!esFechaISO(fecha_termino)) return 'La fecha de término no es válida (formato aaaa-mm-dd)';
+  if (fecha_termino < fecha_inicio) return 'La fecha de término debe ser igual o posterior a la fecha de inicio';
+  if (dia_respuesta !== undefined && dia_respuesta !== null && !esEnteroPositivo(dia_respuesta)) {
+    return 'El día de respuesta debe ser un número entero mayor a 0';
+  }
+  if (!textoOpcional(id_licitacion, 50) || !textoOpcional(vigencia, 50)) {
+    return 'La licitación o la vigencia supera el largo permitido (máximo 50 caracteres)';
+  }
+  if (monto_actualizado !== undefined && monto_actualizado !== null &&
+      !(typeof monto_actualizado === 'number' && Number.isFinite(monto_actualizado) && monto_actualizado >= 0)) {
+    return 'El monto actualizado debe ser un número mayor o igual a 0';
+  }
+  return null;
+}
 
 // ---------------------------------------------------------------------
 // READ (todos) — GET /api/contratos
@@ -59,6 +84,7 @@ async function listar(req, res, next) {
 // detalle con una sola llamada en vez de tres.
 async function obtener(req, res, next) {
   const { id } = req.params;
+  if (!esIdValido(id)) return res.status(400).json({ error: 'ID de contrato inválido' });
   try {
     const contrato = await pool.query(
       `SELECT c.*, e.razon_social AS empresa_nombre,
@@ -117,11 +143,12 @@ async function crear(req, res, next) {
   // Validación mínima en el backend: NUNCA confíes solo en la
   // validación del frontend, porque cualquiera puede mandar un request
   // directo a la API sin pasar por la app.
-  if (!nombre || !id_empresa || !fecha_inicio || !fecha_termino || !id_supervisor) {
-    return res.status(400).json({
-      error: 'nombre, id_empresa, id_supervisor, fecha_inicio y fecha_termino son obligatorios',
-    });
+  if (!esIdValido(id_empresa) || !esIdValido(id_supervisor)) {
+    return res.status(400).json({ error: 'id_empresa e id_supervisor son obligatorios y deben ser válidos' });
   }
+
+  const errorDatos = validarDatosContrato(req.body);
+  if (errorDatos) return res.status(400).json({ error: errorDatos });
 
   try {
     const supervisor = await pool.query(
@@ -172,9 +199,10 @@ async function actualizar(req, res, next) {
     dia_respuesta, id_licitacion, vigencia, monto_actualizado,
   } = req.body;
 
-  if (!nombre || !fecha_inicio || !fecha_termino) {
-    return res.status(400).json({ error: 'nombre, fecha_inicio y fecha_termino son obligatorios' });
-  }
+  if (!esIdValido(id)) return res.status(400).json({ error: 'ID de contrato inválido' });
+
+  const errorDatos = validarDatosContrato(req.body);
+  if (errorDatos) return res.status(400).json({ error: errorDatos });
 
   try {
     const { rows } = await pool.query(
@@ -202,6 +230,7 @@ async function actualizar(req, res, next) {
 // ---------------------------------------------------------------------
 async function eliminar(req, res, next) {
   const { id } = req.params;
+  if (!esIdValido(id)) return res.status(400).json({ error: 'ID de contrato inválido' });
   try {
     const { rows } = await pool.query(
       'DELETE FROM contratos WHERE id_contratos = $1 RETURNING id_contratos',

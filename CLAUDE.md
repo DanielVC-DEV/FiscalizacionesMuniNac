@@ -45,6 +45,7 @@ Arquitectura por capas dentro de `src/`:
 | `modules/contratos` | Contratos, detalle y alta. Subcarpeta `components/`. | [contratos](frontend/src/modules/contratos/README.md), [components](frontend/src/modules/contratos/components/README.md) |
 | `modules/empresas` | Empresas contratistas. | [empresas](frontend/src/modules/empresas/README.md) |
 | `modules/areas` | Áreas municipales. | [areas](frontend/src/modules/areas/README.md) |
+| `modules/auth` | Inicio de sesión y sesión activa (primera pantalla de la app). Subcarpeta `components/`. | [auth](frontend/src/modules/auth/README.md), [components](frontend/src/modules/auth/components/README.md) |
 
 Cada módulo sigue la misma forma:
 
@@ -91,6 +92,7 @@ npx expo lint                # requiere eslint instalado en node_modules
 | `empresas` | `/api/empresas` | routes, controller | [empresas](backend/src/modules/empresas/README.md) |
 | `contratos` | `/api/contratos` | routes, controller, ordenesCompra, prioridades | [contratos](backend/src/modules/contratos/README.md) |
 | `tickets` | `/api/tickets` | routes, controller, respuestas, ticketStateMachine | [tickets](backend/src/modules/tickets/README.md) |
+| `auth` | `/api/auth` (y middleware de sesión sobre todo `/api`) | routes, controller, sesiones, middleware | [auth](backend/src/modules/auth/README.md) |
 
 Cada módulo sigue la misma forma:
 
@@ -105,6 +107,7 @@ Cada módulo sigue la misma forma:
 - Toda validación de negocio se repite en el backend; nunca confiar sólo en la app.
 - Errores: `next(err)` hacia `core/middlewares/errorHandler.js`. Para errores de negocio, `res.status(...).json({ error })` o asignar `err.status`.
 - Cambios de esquema: nuevo archivo numerado en `sql/`, nunca editar uno ya ejecutado.
+- Autenticación: todo `/api` exige token de sesión salvo `/api/auth/login`. No hay registro desde la app: las cuentas se crean en PostgreSQL con un hash scrypt (`core/utils/passwords.js`). Nunca se aceptan hashes desde el cliente. Roles: `admin` gestiona usuarios, supervisores, empresas, áreas y contratos; `director` consulta y opera tickets. Las rutas de escritura se protegen con `autorizar('admin')` (`modules/auth/autorizacion.middleware.js`).
 
 ### Comandos (backend)
 

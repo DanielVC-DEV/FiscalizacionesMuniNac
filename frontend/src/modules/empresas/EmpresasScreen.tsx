@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '../../core/ui/Header';
+import Header from '../auth/components/SesionHeader';
 import TopBar from '../../core/ui/TopBar';
 import Card from '../../core/ui/Card';
 import Button from '../../core/ui/Button';
@@ -10,6 +10,7 @@ import SelectField from '../../core/ui/SelectField';
 import { COLORS, RADIOS } from '../../core/theme/colors';
 import { empresasApi, EmpresaApi } from './api';
 import { areasApi, AreaApi } from '../areas/api';
+import { normalizarRut } from '../../core/utils/rut';
 
 export default function EmpresasScreen({ navigation }: any) {
   const [empresas, setEmpresas] = useState<EmpresaApi[]>([]);
@@ -48,13 +49,22 @@ export default function EmpresasScreen({ navigation }: any) {
       setErrorFormulario('Completa la razón social, el RUT y el área.');
       return;
     }
+    if (razonSocial.trim().length > 200) {
+      setErrorFormulario('La razón social no puede superar los 200 caracteres.');
+      return;
+    }
+    const rutFormateado = normalizarRut(rut);
+    if (!rutFormateado) {
+      setErrorFormulario('El RUT no es válido. Revisa el número y el dígito verificador.');
+      return;
+    }
 
     setGuardando(true);
     setErrorFormulario(null);
     try {
       await empresasApi.crear({
         razon_social: razonSocial.trim(),
-        rut: rut.trim(),
+        rut: rutFormateado,
         id_area: area.id_area,
       });
       setRazonSocial('');
@@ -104,7 +114,12 @@ export default function EmpresasScreen({ navigation }: any) {
               style={styles.input}
               value={rut}
               onChangeText={setRut}
-              placeholder="RUT de la empresa"
+              onBlur={() => {
+                // Si el RUT es válido, lo deja con formato 12.345.678-5 al salir del campo.
+                const formateado = normalizarRut(rut);
+                if (formateado) setRut(formateado);
+              }}
+              placeholder="Ej: 12.345.678-5"
               placeholderTextColor={COLORS.textoTenue}
               autoCapitalize="characters"
             />

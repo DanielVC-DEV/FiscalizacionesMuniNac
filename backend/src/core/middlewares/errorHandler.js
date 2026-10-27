@@ -11,6 +11,10 @@ module.exports = function errorHandler(err, req, res, next) {
   if (err.code === '23514') {
     return res.status(400).json({ error: 'Valor no permitido para uno de los campos (restricción CHECK).' });
   }
+  // Valor con formato o largo que la columna no acepta (ej. texto en un INTEGER, fecha inexistente).
+  if (['22P02', '22001', '22007', '22008', '22003'].includes(err.code)) {
+    return res.status(400).json({ error: 'Uno de los valores enviados no tiene el formato o largo permitido.' });
+  }
 
   const status = err.status || 500;
   res.status(status).json({ error: err.message || 'Error interno del servidor' });

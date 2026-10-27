@@ -1,4 +1,7 @@
 const pool = require('../../core/config/db');
+const {
+  normalizarRut, esIdValido, textoValido, textoOpcional,
+} = require('../../core/utils/validaciones');
 
 async function listar(req, res, next) {
   try {
@@ -20,6 +23,7 @@ async function listar(req, res, next) {
 }
 
 async function obtener(req, res, next) {
+  if (!esIdValido(req.params.id)) return res.status(400).json({ error: 'ID de empresa inválido' });
   try {
     const { rows } = await pool.query(
       `SELECT e.*, a.nombre AS area_nombre, u.nombre AS supervisor_nombre
@@ -43,8 +47,28 @@ async function crear(req, res, next) {
     administrador_contrato_nombre, administrador_contrato_email, administrador_contrato_telefono,
   } = req.body;
 
-  if (!razon_social || !rut || !id_area) {
-    return res.status(400).json({ error: 'razon_social, rut e id_area son obligatorios' });
+  if (!textoValido(razon_social, 200)) {
+    return res.status(400).json({ error: 'La razón social es obligatoria (máximo 200 caracteres)' });
+  }
+
+  // El RUT se valida con dígito verificador y se guarda siempre en el mismo formato.
+  const rutNormalizado = normalizarRut(rut);
+  if (!rutNormalizado) {
+    return res.status(400).json({ error: 'El RUT no es válido. Revisa el número y el dígito verificador.' });
+  }
+
+  if (!esIdValido(id_area)) {
+    return res.status(400).json({ error: 'El área indicada no es válida' });
+  }
+
+  if (
+    !textoOpcional(direccion_comercial, 255) ||
+    !textoOpcional(direccion_base_nacimiento, 255) ||
+    !textoOpcional(administrador_contrato_nombre, 150) ||
+    !textoOpcional(administrador_contrato_email, 150) ||
+    !textoOpcional(administrador_contrato_telefono, 30)
+  ) {
+    return res.status(400).json({ error: 'Uno de los campos de contacto o dirección supera el largo permitido' });
   }
 
   try {
@@ -54,11 +78,14 @@ async function crear(req, res, next) {
           administrador_contrato_nombre, administrador_contrato_email, administrador_contrato_telefono)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
        RETURNING *`,
-      [razon_social, rut, id_area, direccion_comercial, direccion_base_nacimiento,
-       administrador_contrato_nombre, administrador_contrato_email, administrador_contrato_telefono]
+      [razon_social.trim(), rutNormalizado, id_area, direccion_comercial || null, direccion_base_nacimiento || null,
+       administrador_contrato_nombre || null, administrador_contrato_email || null, administrador_contrato_telefono || null]
     );
     res.status(201).json(rows[0]);
   } catch (err) {
+    if (err.code === '23505') {
+      return res.status(409).json({ error: 'Ya existe una empresa registrada con ese RUT' });
+    }
     next(err);
   }
 }
@@ -69,6 +96,10 @@ async function crear(req, res, next) {
 async function asignarSupervisorContraparte(req, res, next) {
   const { id } = req.params;
   const { id_usuario } = req.body;
+
+  if (!esIdValido(id) || !esIdValido(id_usuario)) {
+    return res.status(400).json({ error: 'ID de empresa o de usuario inválido' });
+  }
 
   try {
     const check = await pool.query(
@@ -98,6 +129,7 @@ async function asignarSupervisorContraparte(req, res, next) {
 // Lista los usuarios con rol supervisor_empresa de una empresa (para el
 // selector de "supervisor contraparte" y para CrearTicketScreen).
 async function listarSupervisores(req, res, next) {
+  if (!esIdValido(req.params.id)) return res.status(400).json({ error: 'ID de empresa inválido' });
   try {
     const { rows } = await pool.query(
       `SELECT u.id_usuario, u.nombre, u.email

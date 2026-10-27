@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '../../core/ui/Header';
+import Header from '../auth/components/SesionHeader';
 import TopBar from '../../core/ui/TopBar';
 import SelectField from '../../core/ui/SelectField';
 import DateField from '../../core/ui/DateField';

@@ -5,7 +5,7 @@
 - [empresas.routes.js](empresas.routes.js): `GET /api/empresas`, `GET /api/empresas/:id`, `POST /api/empresas`, `GET /api/empresas/:id/supervisores`, `PATCH /api/empresas/:id/supervisor-contraparte`.
 - [empresas.controller.js](empresas.controller.js):
   - `listar` y `obtener`: incluyen el área y el supervisor contraparte.
-  - `crear`: exige `razon_social`, `rut` e `id_area`.
+  - `crear`: exige `razon_social`, `rut` e `id_area`. El RUT se valida con dígito verificador y se guarda en formato `12.345.678-5` (un RUT repetido responde 409).
   - `listarSupervisores`: usuarios de la empresa con rol `supervisor_empresa`.
   - `asignarSupervisorContraparte`: sólo acepta un usuario de la misma empresa con ese rol.
 

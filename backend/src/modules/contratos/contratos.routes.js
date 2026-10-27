@@ -11,20 +11,24 @@ const router = require('express').Router();
 const ctrl = require('./contratos.controller');
 const ordenesCtrl = require('./ordenesCompra.controller');
 const prioridadesCtrl = require('./prioridades.controller');
+const autorizar = require('../auth/autorizacion.middleware');
+
+// Los contratos se consultan con cualquier rol; crear, editar y eliminar es sólo del administrador.
+const soloAdmin = autorizar('admin');
 
 // CRUD básico de contratos
-router.get('/', ctrl.listar);          // GET    /api/contratos
-router.get('/:id', ctrl.obtener);      // GET    /api/contratos/5
-router.post('/', ctrl.crear);          // POST   /api/contratos
-router.put('/:id', ctrl.actualizar);   // PUT    /api/contratos/5
-router.delete('/:id', ctrl.eliminar);  // DELETE /api/contratos/5
+router.get('/', ctrl.listar);                      // GET    /api/contratos
+router.get('/:id', ctrl.obtener);                  // GET    /api/contratos/5
+router.post('/', soloAdmin, ctrl.crear);           // POST   /api/contratos
+router.put('/:id', soloAdmin, ctrl.actualizar);    // PUT    /api/contratos/5
+router.delete('/:id', soloAdmin, ctrl.eliminar);   // DELETE /api/contratos/5
 
 // Sub-recursos de un contrato
-router.post('/:id/ordenes-compra', ordenesCtrl.agregarOrdenCompra); // POST /api/contratos/5/ordenes-compra
+router.post('/:id/ordenes-compra', soloAdmin, ordenesCtrl.agregarOrdenCompra); // POST /api/contratos/5/ordenes-compra
 
 // Prioridades (requiere sql/03). Nota: esta ruta va ANTES que '/:id'
 // quedaría mal interpretada si no, pero como usa un path distinto
 // ('/prioridades/:idPrioridad') no hay conflicto con '/:id' de arriba.
-router.patch('/prioridades/:idPrioridad', prioridadesCtrl.actualizarPrioridad); // PATCH /api/contratos/prioridades/3
+router.patch('/prioridades/:idPrioridad', soloAdmin, prioridadesCtrl.actualizarPrioridad); // PATCH /api/contratos/prioridades/3
 
 module.exports = router;

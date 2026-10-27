@@ -4,7 +4,10 @@ Registro único de las pantallas y del stack de navegación (React Navigation, `
 
 ## Archivos
 
-- [AppNavigator.tsx](AppNavigator.tsx): define las rutas `Menu`, `Resumen`, `CrearTicket`, `Contratos`, `ContratoDetalle`, `CrearContrato`, `Empresas` y `Areas`. Cada pantalla viene de su módulo.
+- [AppNavigator.tsx](AppNavigator.tsx): define dos grupos de rutas según la sesión (`useSesion()` de [modules/auth](../modules/auth/README.md)):
+  - Sin sesión: `Login`. Es la pantalla inicial.
+  - Con sesión: `Menu`, `Resumen`, `CrearTicket`, `Contratos` y `ContratoDetalle`.
+  - Sólo con rol `admin`: `CrearContrato`, `Empresas`, `Areas` y `Supervisores`. Si el rol no es admin, esas rutas no existen para la navegación.
 
 ## Cómo agregar una pantalla
 

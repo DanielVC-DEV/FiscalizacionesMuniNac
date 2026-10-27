@@ -2,15 +2,17 @@ import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
-import Header from '../../core/ui/Header';
+import Header from '../auth/components/SesionHeader';
 import TopBar from '../../core/ui/TopBar';
 import Card from '../../core/ui/Card';
 import Button from '../../core/ui/Button';
 import { COLORS, RADIOS } from '../../core/theme/colors';
+import { esAdministrador, useSesion } from '../auth/store';
 import { cargarContratos, useContratos } from './store';
 
 export default function ContratosScreen({ navigation }: any) {
   const CONTRATOS = useContratos();
+  const esAdmin = esAdministrador(useSesion()?.usuario);
   const [busqueda, setBusqueda] = useState('');
   const [errorCarga, setErrorCarga] = useState<string | null>(null);
 
@@ -37,11 +39,13 @@ export default function ContratosScreen({ navigation }: any) {
       <TopBar title="Contratos" onBack={() => navigation.goBack()} />
 
       <View style={styles.contenido}>
-        <Button
-          label="+ Nuevo contrato"
-          onPress={() => navigation.navigate('CrearContrato')}
-          style={styles.botonNuevo}
-        />
+        {esAdmin && (
+          <Button
+            label="+ Nuevo contrato"
+            onPress={() => navigation.navigate('CrearContrato')}
+            style={styles.botonNuevo}
+          />
+        )}
 
         {!!errorCarga && <Text style={styles.sinContratos}>No se pudo cargar el servidor: {errorCarga}</Text>}
 

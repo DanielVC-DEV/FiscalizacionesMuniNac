@@ -1,14 +1,20 @@
+import { ReactNode } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { COLORS } from '../theme/colors';
 
+interface Props {
+  // Contenido opcional a la derecha (por ejemplo, el usuario y cerrar sesión).
+  derecha?: ReactNode;
+}
+
 // Barra de marca, presente en todas las pantallas: logo + nombre de la
-// plataforma + usuario. Es la forma "natural" de que el logo aparezca en
-// toda la app sin tener que agregarlo pantalla por pantalla.
-export default function Header() {
+// plataforma + lo que se pase en "derecha". No conoce la sesión: eso lo
+// arma modules/auth/components/SesionHeader.tsx.
+export default function Header({ derecha }: Props) {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../../../assets/logo.png')}
+        source={require('../../../assets/logo.png')}
         style={styles.logo}
         resizeMode="contain"
         accessibilityLabel="Logo Ilustre Municipalidad de Nacimiento"
@@ -18,9 +24,7 @@ export default function Header() {
           Ilustre Municipalidad de Nacimiento
         </Text>
       </View>
-      <View style={styles.usuario}>
-        <Text style={styles.usuarioIniciales}>U</Text>
-      </View>
+      {derecha}
     </View>
   );
 }

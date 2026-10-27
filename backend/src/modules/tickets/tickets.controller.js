@@ -1,5 +1,8 @@
 const pool = require('../../core/config/db');
-const { cambiarEstadoTicket } = require('./ticketStateMachine');
+const { cambiarEstadoTicket, ESTADOS } = require('./ticketStateMachine');
+const {
+  esIdValido, esFechaISO, esEnteroPositivo, textoValido, textoOpcional,
+} = require('../../core/utils/validaciones');
 
 function generarNumeroTicket() {
   // Esquema actual no trae un trigger para esto (a diferencia de
@@ -33,6 +36,7 @@ async function listar(req, res, next) {
 }
 
 async function obtener(req, res, next) {
+  if (!esIdValido(req.params.id)) return res.status(400).json({ error: 'ID de ticket inválido' });
   try {
     // Recupera el ticket con su observación y etiquetas legibles para la vista de detalle.
     const { rows } = await pool.query(
@@ -72,10 +76,23 @@ async function crear(req, res, next) {
     id_usuario_creador, // quién registra la observación
   } = req.body;
 
-  if (!id_contrato || !id_prioridad || !descripcion || !fecha_vencimiento) {
-    return res.status(400).json({
-      error: 'id_contrato, id_prioridad, descripcion y fecha_vencimiento son obligatorios',
-    });
+  if (!esIdValido(id_contrato) || !esIdValido(id_prioridad)) {
+    return res.status(400).json({ error: 'id_contrato e id_prioridad son obligatorios y deben ser válidos' });
+  }
+  if (!textoValido(descripcion, 5000)) {
+    return res.status(400).json({ error: 'La descripción es obligatoria (máximo 5000 caracteres)' });
+  }
+  if (!esFechaISO(fecha_vencimiento)) {
+    return res.status(400).json({ error: 'La fecha de vencimiento no es válida (formato aaaa-mm-dd)' });
+  }
+  if (plazo_subsanar !== undefined && plazo_subsanar !== null && !esEnteroPositivo(plazo_subsanar)) {
+    return res.status(400).json({ error: 'plazo_subsanar debe ser un número entero mayor a 0' });
+  }
+  if (id_usuario_creador !== undefined && id_usuario_creador !== null && !esIdValido(id_usuario_creador)) {
+    return res.status(400).json({ error: 'id_usuario_creador no es válido' });
+  }
+  if (!textoOpcional(ubicacion, 255) || !textoOpcional(foto, 500)) {
+    return res.status(400).json({ error: 'La ubicación o la foto supera el largo permitido' });
   }
 
   const client = await pool.connect();
@@ -92,6 +109,15 @@ async function crear(req, res, next) {
       return res.status(400).json({ error: 'El contrato no tiene un supervisor asignado' });
     }
 
+    // La prioridad tiene que ser de ESTE contrato: sus días hábiles son los que definen el plazo.
+    const prioridad = await client.query(
+      'SELECT 1 FROM prioridad_contrato WHERE id_prioridad_contrato = $1 AND id_contrato = $2',
+      [id_prioridad, id_contrato]
+    );
+    if (prioridad.rows.length === 0) {
+      return res.status(400).json({ error: 'La prioridad indicada no pertenece a este contrato' });
+    }
+
     // La observación y el ticket deben guardarse juntos: si uno falla, se revierten ambos.
     await client.query('BEGIN');
 
@@ -99,7 +125,7 @@ async function crear(req, res, next) {
     const observacion = await client.query(
       `INSERT INTO observaciones (id_usuario, descripcion, foto, ubicacion)
        VALUES ($1,$2,$3,$4) RETURNING id_observacion`,
-      [id_usuario_creador || idSupervisor, descripcion, foto || null, ubicacion || null]
+      [id_usuario_creador || idSupervisor, descripcion.trim(), foto || null, ubicacion || null]
     );
 
     // PostgreSQL completa empresa y prioridad a partir de los IDs asociados al contrato.
@@ -132,7 +158,12 @@ async function crear(req, res, next) {
 async function cambiarEstado(req, res, next) {
   // El servicio valida las transiciones permitidas antes de actualizar el estado.
   const { estado } = req.body;
+  if (!esIdValido(req.params.id)) return res.status(400).json({ error: 'ID de ticket inválido' });
   if (!estado) return res.status(400).json({ error: 'Falta el campo "estado"' });
+  // Un estado fuera del catálogo daría error de enum en PostgreSQL (500): se rechaza antes.
+  if (!Object.values(ESTADOS).includes(estado)) {
+    return res.status(400).json({ error: `Estado no válido: "${estado}"` });
+  }
 
   try {
     const resultado = await cambiarEstadoTicket(pool, req.params.id, estado);

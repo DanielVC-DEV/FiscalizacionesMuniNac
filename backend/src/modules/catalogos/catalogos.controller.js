@@ -1,4 +1,5 @@
 const pool = require('../../core/config/db');
+const { textoValido } = require('../../core/utils/validaciones');
 
 async function listarAreas(req, res, next) {
   try {
@@ -11,7 +12,9 @@ async function listarAreas(req, res, next) {
 
 async function crearArea(req, res, next) {
   const nombre = typeof req.body.nombre === 'string' ? req.body.nombre.trim() : '';
-  if (!nombre) return res.status(400).json({ error: 'nombre es obligatorio' });
+  if (!textoValido(nombre, 150)) {
+    return res.status(400).json({ error: 'nombre es obligatorio (máximo 150 caracteres)' });
+  }
 
   try {
     const { rows } = await pool.query(

@@ -9,7 +9,7 @@ Código reutilizable por todos los módulos. No contiene lógica de una funciona
 | [api/](api/README.md) | Cliente HTTP base (`client.ts`). | [api/README.md](api/README.md) |
 | [theme/](theme/README.md) | Paleta oficial, radios y sombras (`colors.ts`). | [theme/README.md](theme/README.md) |
 | [ui/](ui/README.md) | Componentes visuales reutilizables. | [ui/README.md](ui/README.md) |
-| [utils/](utils/README.md) | Fechas, días hábiles y formato de montos. | [utils/README.md](utils/README.md) |
+| [utils/](utils/README.md) | Fechas, días hábiles, formato de montos y validación de RUT. | [utils/README.md](utils/README.md) |
 
 ## Reglas
 

@@ -1,7 +1,8 @@
-import { Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '../../core/ui/Header';
+import Header from '../auth/components/SesionHeader';
 import { COLORS, RADIOS, SOMBRA } from '../../core/theme/colors';
+import { esAdministrador, useSesion } from '../auth/store';
 import { IconoBarras, IconoTicket, IconoDocumento, IconoEdificio } from './components/IconosMenu';
 
 // Destinos del menú principal. "destino" es el nombre de la ruta registrada
@@ -37,37 +38,52 @@ const OPCIONES = [
     destino: 'Areas',
     glifo: <IconoDocumento />,
   },
+  {
+    titulo: 'Supervisores',
+    descripcion: 'Crear supervisores de empresa',
+    destino: 'Supervisores',
+    glifo: <IconoDocumento />,
+  },
 ] as const;
 
+// Destinos que sólo ve el administrador (ver auth/store.ts).
+const DESTINOS_ADMIN: string[] = ['Empresas', 'Areas', 'Supervisores'];
+
 export default function MenuScreen({ navigation }: any) {
+  const sesion = useSesion();
+  const esAdmin = esAdministrador(sesion?.usuario);
+  const opcionesVisibles = OPCIONES.filter((opcion) => esAdmin || !DESTINOS_ADMIN.includes(opcion.destino));
+
   return (
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
       <Header />
 
-      <View style={styles.encabezado}>
-        <Image
-          source={require('../../../assets/logo-completo.png')}
-          style={styles.logoGrande}
-          resizeMode="contain"
-          accessibilityLabel="Ilustre Municipalidad de Nacimiento, Unidos por una mejor comuna"
-        />
-        <Text style={styles.titulo}>¿Qué haremos hoy?</Text>
-      </View>
+      <ScrollView contentContainerStyle={styles.contenido}>
+        <View style={styles.encabezado}>
+          <Image
+            source={require('../../../assets/logo-completo.png')}
+            style={styles.logoGrande}
+            resizeMode="contain"
+            accessibilityLabel="Ilustre Municipalidad de Nacimiento, Unidos por una mejor comuna"
+          />
+          <Text style={styles.titulo}>¿Qué haremos hoy?</Text>
+        </View>
 
-      <View style={styles.grilla}>
-        {OPCIONES.map((opcion) => (
-          <TouchableOpacity
-            key={opcion.destino}
-            style={styles.tile}
-            activeOpacity={0.75}
-            onPress={() => navigation.navigate(opcion.destino)}
-          >
-            <View style={styles.tileIcono}>{opcion.glifo}</View>
-            <Text style={styles.tileTitulo}>{opcion.titulo}</Text>
-            <Text style={styles.tileDescripcion}>{opcion.descripcion}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+        <View style={styles.grilla}>
+          {opcionesVisibles.map((opcion) => (
+            <TouchableOpacity
+              key={opcion.destino}
+              style={styles.tile}
+              activeOpacity={0.75}
+              onPress={() => navigation.navigate(opcion.destino)}
+            >
+              <View style={styles.tileIcono}>{opcion.glifo}</View>
+              <Text style={styles.tileTitulo}>{opcion.titulo}</Text>
+              <Text style={styles.tileDescripcion}>{opcion.descripcion}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -77,6 +93,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.fondo,
   },
+  contenido: { paddingBottom: 16 },
   encabezado: { alignItems: 'center', paddingHorizontal: 20, paddingTop: 10, paddingBottom: 2 },
   // Ancho y alto fijos (no "aspectRatio"): esta imagen es un rectángulo
   // ancho (900x360 en el archivo original), y calcular el alto desde un

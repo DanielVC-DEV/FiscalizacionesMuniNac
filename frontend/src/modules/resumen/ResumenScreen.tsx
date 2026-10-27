@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
-import Header from '../../core/ui/Header';
+import Header from '../auth/components/SesionHeader';
 import TopBar from '../../core/ui/TopBar';
 import { COLORS, COLOR_ESTADO, RADIOS } from '../../core/theme/colors';
 import { esFechaPasada } from '../../core/utils/fechas';

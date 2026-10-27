@@ -1,6 +1,7 @@
 // Prioridades (plazos en días hábiles) configuradas por contrato.
 
 const pool = require('../../core/config/db');
+const { esIdValido, esEnteroPositivo } = require('../../core/utils/validaciones');
 
 // ---------------------------------------------------------------------
 // Prioridades por contrato (requiere sql/03) — PATCH /api/contratos/prioridades/:idPrioridad
@@ -12,8 +13,9 @@ const pool = require('../../core/config/db');
 async function actualizarPrioridad(req, res, next) {
   const { idPrioridad } = req.params;
   const { dias_habiles } = req.body;
-  if (!dias_habiles || dias_habiles <= 0) {
-    return res.status(400).json({ error: 'dias_habiles debe ser un número mayor a 0' });
+  if (!esIdValido(idPrioridad)) return res.status(400).json({ error: 'ID de prioridad inválido' });
+  if (!esEnteroPositivo(dias_habiles)) {
+    return res.status(400).json({ error: 'dias_habiles debe ser un número entero mayor a 0' });
   }
   try {
     const { rows } = await pool.query(

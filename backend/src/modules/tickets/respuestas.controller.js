@@ -4,8 +4,10 @@
 
 const pool = require('../../core/config/db');
 const { cambiarEstadoTicket } = require('./ticketStateMachine');
+const { esIdValido, textoValido } = require('../../core/utils/validaciones');
 
 async function listarPorTicket(req, res, next) {
+  if (!esIdValido(req.params.idTicket)) return res.status(400).json({ error: 'ID de ticket inválido' });
   try {
     const { rows } = await pool.query(
       `SELECT r.id_respuesta, r.comentario, r.foto, r.fecha, u.nombre AS usuario_nombre
@@ -25,8 +27,10 @@ async function crear(req, res, next) {
   const { idTicket } = req.params;
   const { id_usuario, comentario, foto } = req.body;
 
-  if (!id_usuario || !comentario) {
-    return res.status(400).json({ error: 'id_usuario y comentario son obligatorios' });
+  if (!esIdValido(idTicket)) return res.status(400).json({ error: 'ID de ticket inválido' });
+  if (!esIdValido(id_usuario)) return res.status(400).json({ error: 'id_usuario es obligatorio y debe ser válido' });
+  if (!textoValido(comentario, 5000)) {
+    return res.status(400).json({ error: 'El comentario es obligatorio (máximo 5000 caracteres)' });
   }
 
   const client = await pool.connect();
@@ -36,7 +40,7 @@ async function crear(req, res, next) {
     const respuesta = await client.query(
       `INSERT INTO respuesta (id_ticket, id_usuario, comentario, foto)
        VALUES ($1,$2,$3,$4) RETURNING *`,
-      [idTicket, id_usuario, comentario, foto || null]
+      [idTicket, id_usuario, comentario.trim(), foto || null]
     );
 
     await client.query('COMMIT');

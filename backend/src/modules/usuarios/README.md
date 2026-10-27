@@ -9,4 +9,4 @@ Listado de usuarios con su rol, y alta de usuario con su rol en una sola transac
 
 Tablas: `usuario`, `rol_usuario`, `rol`.
 
-Nota: el alta recibe `password_hash` ya calculado; el controlador no genera hashes.
+Nota: el alta recibe `password` en claro y el controlador lo hashea con [core/utils/passwords.js](../../core/utils/README.md). Nunca se acepta un hash calculado por el cliente. Estas rutas quedan detrás del middleware de sesión de [auth](../auth/README.md).
