@@ -16,6 +16,7 @@ Este archivo es la referencia de todo el código del repositorio. Cada carpeta d
 | [frontend/](frontend/) | App móvil Expo / React Native (TypeScript). | [frontend/src/README.md](frontend/src/README.md) |
 | [backend/](backend/) | API Express + PostgreSQL (JavaScript). | [backend/README.md](backend/README.md) |
 | [CAMBIOS_INTEGRACION.md](CAMBIOS_INTEGRACION.md) | Notas de integración frontend-backend. | — |
+| [AUTENTICACION_Y_ROLES.md](AUTENTICACION_Y_ROLES.md) | Guía de login, roles, creación de cuentas y problemas frecuentes. | — |
 
 Reglas de modularidad: ver las secciones de cada lado.
 

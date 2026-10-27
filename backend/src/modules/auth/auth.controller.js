@@ -3,6 +3,10 @@ const { verificarPassword } = require('../../core/utils/passwords');
 const { esEmailValido } = require('../../core/utils/validaciones');
 const { crearSesion, cerrarSesion } = require('./sesiones');
 
+// Roles que pueden entrar a la app. Las cuentas de supervisor de empresa
+// existen en la base, pero no tienen acceso a este sistema.
+const ROLES_CON_ACCESO = ['admin', 'director'];
+
 // Las cuentas no se crean desde la app: el administrador las registra en la
 // base de datos (usuario + rol_usuario). Aquí sólo se verifican.
 async function login(req, res, next) {
@@ -29,9 +33,12 @@ async function login(req, res, next) {
       return res.status(401).json({ error: 'Correo o contraseña incorrectos' });
     }
 
-    // Una cuenta sin rol no tiene permisos en la app; no se deja entrar.
+    // Una cuenta sin rol, o con un rol sin acceso a la app, no se deja entrar.
     if (!usuario.rol) {
       return res.status(403).json({ error: 'Tu cuenta no tiene un rol asignado. Contacta al administrador.' });
+    }
+    if (!ROLES_CON_ACCESO.includes(usuario.rol)) {
+      return res.status(403).json({ error: 'Tu rol no tiene acceso a esta aplicación.' });
     }
 
     const sesion = await crearSesion(usuario.id_usuario);

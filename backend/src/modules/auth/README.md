@@ -21,5 +21,6 @@ Inicio y cierre de sesión contra PostgreSQL. No hay registro desde la app: las 
 
 - Las cuentas se crean en PostgreSQL (`usuario` + `rol_usuario`) con un hash scrypt generado por [core/utils/passwords.js](../../core/utils/README.md). Nunca se guarda la contraseña en claro.
 - Una cuenta sin fila en `rol_usuario` no puede iniciar sesión (403).
+- Sólo los roles `admin` y `director` pueden iniciar sesión. Un `supervisor_empresa` recibe 403 aunque su contraseña sea correcta.
 - Roles: `admin` gestiona usuarios, supervisores, empresas, áreas y contratos (crear, editar, eliminar). `director` consulta todo y opera tickets (crear, seguimiento, estados). Lectura de empresas, contratos y áreas es para todos los roles.
 - Un usuario sin sesión no llega a ningún otro endpoint de `/api`.
