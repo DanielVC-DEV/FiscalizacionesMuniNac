@@ -132,4 +132,4 @@ npm run dev    # con --watch
 - **Feriados**: el servidor descuenta los feriados de la tabla `feriado` (se cargan con `POST /api/feriados`), pero la lista está vacía y falta confirmar el calendario con la Municipalidad. `frontend/src/core/utils/businessDays.ts` todavía no los descuenta; el vencimiento lo recalcula el servidor.
 - **Estados**: la máquina usa `RESPONDIDO` como "respuesta pendiente de revisión", pero el informe describe `ABIERTO` así y `RESPONDIDO` como "revisada con pendientes". Confirmar con la Municipalidad antes de cambiar la máquina.
 - **Consulta externa**: la vista pública no muestra fotos. Si la Municipalidad las quiere, hay que agregar un enlace de descarga firmado.
-- **Pantallas nuevas**: el backend ya expone conformidad, cierre, reapertura, solicitud de subsanación, indicadores, PDF, enlaces y destinatarios, pero la app móvil no tiene pantallas para ellos.
+- **Pantallas pendientes**: la app móvil ya permite responder y revisar tickets (pedir nueva subsanación o dar conformidad). Aún faltan pantallas para cierre y reapertura, además de indicadores, PDF, enlaces y administración de destinatarios.

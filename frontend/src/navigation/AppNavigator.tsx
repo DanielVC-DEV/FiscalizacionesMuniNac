@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MenuScreen from '../modules/menu/MenuScreen';
 import ResumenScreen from '../modules/resumen/ResumenScreen';
 import CrearTicketScreen from '../modules/tickets/CrearTicketScreen';
+import TicketDetalleScreen from '../modules/tickets/TicketDetalleScreen';
 import ContratosScreen from '../modules/contratos/ContratosScreen';
 import ContratoDetalleScreen from '../modules/contratos/ContratoDetalleScreen';
 import CrearContratoScreen from '../modules/contratos/CrearContratoScreen';
@@ -29,6 +30,7 @@ export default function AppNavigator() {
           <Stack.Screen name="Menu" component={MenuScreen} />
           <Stack.Screen name="Resumen" component={ResumenScreen} />
           <Stack.Screen name="CrearTicket" component={CrearTicketScreen} />
+          <Stack.Screen name="TicketDetalle" component={TicketDetalleScreen} />
           <Stack.Screen name="Contratos" component={ContratosScreen} />
           <Stack.Screen name="ContratoDetalle" component={ContratoDetalleScreen} />
         </Stack.Group>

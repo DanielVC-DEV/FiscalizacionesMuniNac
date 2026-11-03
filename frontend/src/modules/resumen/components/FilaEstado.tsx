@@ -10,11 +10,12 @@ interface Props {
   etiqueta: string;
   estadoClave?: EstadoTicket;
   tickets: Ticket[];
+  onSeleccionar: (ticket: Ticket) => void;
 }
 
 // Cada fila es un acordeón: muestra el nombre del estado y el total, y al
 // tocarla se despliega la lista de tickets de ese estado.
-export default function FilaEstado({ etiqueta, estadoClave, tickets }: Props) {
+export default function FilaEstado({ etiqueta, estadoClave, tickets, onSeleccionar }: Props) {
   const [abierto, setAbierto] = useState(false);
   const color = estadoClave ? COLOR_ESTADO[estadoClave].color : COLORS.azul;
 
@@ -39,24 +40,26 @@ export default function FilaEstado({ etiqueta, estadoClave, tickets }: Props) {
               const vencido =
                 esFechaPasada(t.fechaVencimiento) && t.estado !== 'SUBSANADO_CONFORME' && t.estado !== 'CERRADO';
               return (
-                <Card key={t.id} style={[styles.ticketBox, vencido && styles.ticketBoxVencido]}>
-                  <View style={styles.ticketFila}>
-                    <Text style={styles.ticketTexto} numberOfLines={1}>
-                      {t.contrato}
+                <TouchableOpacity key={t.id} activeOpacity={0.75} onPress={() => onSeleccionar(t)}>
+                  <Card style={[styles.ticketBox, vencido && styles.ticketBoxVencido]}>
+                    <View style={styles.ticketFila}>
+                      <Text style={styles.ticketTexto} numberOfLines={1}>
+                        {t.contrato}
+                      </Text>
+                      {vencido ? (
+                        <EstadoBadge estado="VENCIDO" tamano="sm" />
+                      ) : (
+                        <EstadoBadge estado={t.estado} tamano="sm" />
+                      )}
+                    </View>
+                    <Text style={styles.ticketSubtexto} numberOfLines={2}>
+                      {t.descripcion}
                     </Text>
-                    {vencido ? (
-                      <EstadoBadge estado="VENCIDO" tamano="sm" />
-                    ) : (
-                      <EstadoBadge estado={t.estado} tamano="sm" />
-                    )}
-                  </View>
-                  <Text style={styles.ticketSubtexto} numberOfLines={2}>
-                    {t.descripcion}
-                  </Text>
-                  <Text style={styles.ticketSubtexto}>
-                    Creado: {t.fechaCreacion} · Vence: {t.fechaVencimiento}
-                  </Text>
-                </Card>
+                    <Text style={styles.ticketSubtexto}>
+                      Creado: {t.fechaCreacion} · Vence: {t.fechaVencimiento}
+                    </Text>
+                  </Card>
+                </TouchableOpacity>
               );
             })
           )}

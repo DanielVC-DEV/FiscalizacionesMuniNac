@@ -26,6 +26,7 @@ export type EstadoTicket =
   | 'CERRADO';
 
 export interface Ticket {
+  idTicket: number;
   id: string;
   contrato: string;
   area: string;

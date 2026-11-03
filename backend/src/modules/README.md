@@ -21,7 +21,7 @@ Cada carpeta es un recurso con sus rutas y controladores. Las rutas se montan en
 - `auth` no depende de otros módulos; el resto de los módulos sólo se ejecuta si el middleware de `auth` deja pasar la petición.
 
 - `tickets` toma el supervisor y la prioridad desde el contrato (por SQL, al crear el ticket).
-- `tickets` usa `feriados` (para el vencimiento) y `notificaciones` (para los avisos de creación y solicitud). `notificaciones` usa la máquina de estados de `tickets` para el mantenimiento. Son importaciones de servicios explícitos, no de controladores.
+- `tickets` usa `feriados` (para el vencimiento) y `notificaciones` (para avisos de creación, solicitud y respuesta de subsanación). `notificaciones` usa la máquina de estados de `tickets` para el mantenimiento. Son importaciones de servicios explícitos, no de controladores.
 - `reportes` usa el filtro y la consulta base de `tickets/ticketFiltros.js`.
 - `contratos` y `empresas` validan que el supervisor tenga rol `supervisor_empresa`.
 - Todos usan [core/config/db.js](../core/config/README.md).

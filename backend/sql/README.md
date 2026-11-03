@@ -10,5 +10,6 @@ Scripts en orden. Cada uno asume que los anteriores ya se ejecutaron.
 | [04_supervisor_contrato.sql](04_supervisor_contrato.sql) | Supervisor asignado a cada contrato (`contratos.id_supervisor`). |
 | [05_autenticacion.sql](05_autenticacion.sql) | Tabla `sesion` para los tokens de acceso (sólo se guarda el hash del token). |
 | [06_fiscalizacion.sql](06_fiscalizacion.sql) | Ubicación completa, creador/conformidad/cierre del ticket, historial `ticket_actuacion` (append-only), `archivo`, `feriado`, destinatarios y `notificacion`, y `consulta_externa`. |
+| [07_notificacion_respuesta.sql](07_notificacion_respuesta.sql) | Permite registrar avisos por correo cuando la empresa envía una respuesta de subsanación. |
 
 Módulos que dependen de estos scripts: [contratos](../src/modules/contratos/README.md), [tickets](../src/modules/tickets/README.md) y [auth](../src/modules/auth/README.md).

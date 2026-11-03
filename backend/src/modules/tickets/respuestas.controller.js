@@ -9,6 +9,7 @@ const { transicionar, TransicionInvalidaError } = require('./ticketStateMachine'
 const { TIPOS_ACTUACION, registrarActuacion } = require('./actuaciones');
 const { validarFotos, registrarFotos } = require('./fotos');
 const { puedeVerTicket } = require('./ticketAcceso');
+const { notificarTicket } = require('../notificaciones/notificaciones.service');
 
 async function listarPorTicket(req, res, next) {
   if (!esIdValido(req.params.idTicket)) return res.status(400).json({ error: 'ID de ticket inválido' });
@@ -90,6 +91,9 @@ async function crear(req, res, next) {
 
       return insercion.rows[0];
     });
+
+    notificarTicket(pool, idTicket, 'RESPUESTA', { comentario: comentario.trim() })
+      .catch((err) => console.error('No se pudo notificar la respuesta de subsanación:', err));
 
     res.status(201).json(aviso ? { respuesta, aviso } : { respuesta });
   } catch (err) {

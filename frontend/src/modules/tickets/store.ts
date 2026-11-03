@@ -27,6 +27,7 @@ export function addTicket(ticket: Ticket) {
 function normalizarTicket(ticket: TicketApi): Ticket {
   // Completa el modelo de pantalla con los campos disponibles en el esquema actual.
   return {
+    idTicket: ticket.id_ticket,
     id: ticket.numero,
     contrato: ticket.contrato_nombre,
     area: '',

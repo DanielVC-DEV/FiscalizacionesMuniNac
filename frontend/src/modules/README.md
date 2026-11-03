@@ -8,7 +8,7 @@ Cada carpeta es un módulo independiente. Un módulo contiene sus pantallas, su 
 |---|---|---|
 | [menu](menu/README.md) | Menú principal con accesos a cada módulo. | [menu/README.md](menu/README.md) |
 | [resumen](resumen/README.md) | Resumen de tickets por estado, con vencidos calculados. | [resumen/README.md](resumen/README.md) |
-| [tickets](tickets/README.md) | Creación de tickets de fiscalización. | [tickets/README.md](tickets/README.md) |
+| [tickets](tickets/README.md) | Creación, detalle y subsanación de tickets de fiscalización. | [tickets/README.md](tickets/README.md) |
 | [contratos](contratos/README.md) | Listado, detalle y alta de contratos y órdenes de compra. | [contratos/README.md](contratos/README.md) |
 | [empresas](empresas/README.md) | Listado y alta de empresas contratistas. | [empresas/README.md](empresas/README.md) |
 | [areas](areas/README.md) | Listado y alta de áreas. | [areas/README.md](areas/README.md) |

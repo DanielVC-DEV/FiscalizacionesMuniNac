@@ -23,7 +23,7 @@ El alcance por rol está en [ticketAcceso.js](ticketAcceso.js): el supervisor de
 - [tickets.routes.js](tickets.routes.js): declara las URL, los verbos y la autorización (`soloMunicipal`).
 - [tickets.controller.js](tickets.controller.js): listado, detalle, creación, cambios de estado, conformidad, cierre y reapertura.
   - `crear`: el creador sale de la sesión (no del cuerpo). El plazo viene de `prioridad_contrato.dias_habiles` y el vencimiento se calcula con `sumarDiasHabiles` y los feriados. Guarda ubicación completa y fotos. Notifica después de confirmar la transacción.
-- [respuestas.controller.js](respuestas.controller.js): la respuesta, su actuación y el paso a `RESPONDIDO` van en una sola transacción. Si el ticket no puede pasar a `RESPONDIDO`, la respuesta queda guardada y se devuelve un `aviso`.
+- [respuestas.controller.js](respuestas.controller.js): la respuesta, su actuación y el paso a `RESPONDIDO` van en una sola transacción. Si el ticket no puede pasar a `RESPONDIDO`, la respuesta queda guardada y se devuelve un `aviso`; después se notifica por correo al creador municipal y a los destinatarios configurados.
 - [archivos.controller.js](archivos.controller.js): entrega el archivo sólo si el usuario puede ver el ticket.
 - [ticketStateMachine.js](ticketStateMachine.js): `ESTADOS`, `TRANSICIONES_PERMITIDAS`, `transicionar` (dentro de una transacción ya abierta), `cambiarEstadoTicket` (abre su propia transacción) y `marcarTicketsVencidos` (lo usa el mantenimiento diario). Cada transición escribe su actuación.
 - [actuaciones.js](actuaciones.js): `registrarActuacion` e `obtenerHistorial`. El historial (`ticket_actuacion`) es append-only: un trigger en la base impide editarlo o borrarlo.
@@ -46,4 +46,4 @@ Nota: el informe describe `RESPONDIDO` como "revisada, con aspectos pendientes" 
 
 `ticket`, `observaciones`, `respuesta`, `ticket_actuacion`, `archivo`, `contratos`, `empresas`, `area`, `usuario`, `prioridad_contrato`, `feriado`, `notificacion`.
 
-Requiere las migraciones [sql/03](../../../sql/03_contrato_prioridad_respuesta.sql) (respuesta y prioridades) y [sql/06](../../../sql/06_fiscalizacion.sql) (historial, archivos y conformidad).
+Requiere las migraciones [sql/03](../../../sql/03_contrato_prioridad_respuesta.sql) (respuesta y prioridades), [sql/06](../../../sql/06_fiscalizacion.sql) (historial, archivos y conformidad) y [sql/07](../../../sql/07_notificacion_respuesta.sql) (tipo de notificación por respuesta).

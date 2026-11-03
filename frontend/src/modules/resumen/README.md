@@ -6,7 +6,7 @@ Muestra los tickets agrupados por estado, con indicadores de pendientes, vencido
 
 - [ResumenScreen.tsx](ResumenScreen.tsx): pantalla. Calcula el estado VENCIDO a partir de la fecha de vencimiento (no es un estado guardado, sección 13 del informe) y recarga tickets al enfocar la pantalla.
 - [components/Stat.tsx](components/Stat.tsx): tarjeta de indicador numérico.
-- [components/FilaEstado.tsx](components/FilaEstado.tsx): acordeón por estado con la lista de tickets.
+- [components/FilaEstado.tsx](components/FilaEstado.tsx): acordeón por estado con la lista de tickets y acceso a su detalle.
 
 Ver también [components/README.md](components/README.md).
 

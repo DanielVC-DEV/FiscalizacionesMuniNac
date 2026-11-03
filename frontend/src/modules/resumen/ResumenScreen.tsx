@@ -110,11 +110,12 @@ export default function ResumenScreen({ navigation }: any) {
           onChangeText={setBusqueda}
         />
 
-        <FilaEstado etiqueta="Abiertos" estadoClave="ABIERTO" tickets={porEstado('ABIERTO')} />
-        <FilaEstado etiqueta="Respondidos" estadoClave="RESPONDIDO" tickets={porEstado('RESPONDIDO')} />
-        <FilaEstado etiqueta="Subsanados" estadoClave="SUBSANADO_CONFORME" tickets={porEstado('SUBSANADO_CONFORME')} />
-        <FilaEstado etiqueta="Cerrados" estadoClave="CERRADO" tickets={porEstado('CERRADO')} />
-        <FilaEstado etiqueta="Total" tickets={filtrados} />
+        <FilaEstado etiqueta="Abiertos" estadoClave="ABIERTO" tickets={porEstado('ABIERTO')} onSeleccionar={(t) => navigation.navigate('TicketDetalle', { idTicket: t.idTicket })} />
+        <FilaEstado etiqueta="Respondidos" estadoClave="RESPONDIDO" tickets={porEstado('RESPONDIDO')} onSeleccionar={(t) => navigation.navigate('TicketDetalle', { idTicket: t.idTicket })} />
+        <FilaEstado etiqueta="Requieren nueva subsanación" estadoClave="REQUIERE_NUEVA_SUBSANACION" tickets={porEstado('REQUIERE_NUEVA_SUBSANACION')} onSeleccionar={(t) => navigation.navigate('TicketDetalle', { idTicket: t.idTicket })} />
+        <FilaEstado etiqueta="Subsanados" estadoClave="SUBSANADO_CONFORME" tickets={porEstado('SUBSANADO_CONFORME')} onSeleccionar={(t) => navigation.navigate('TicketDetalle', { idTicket: t.idTicket })} />
+        <FilaEstado etiqueta="Cerrados" estadoClave="CERRADO" tickets={porEstado('CERRADO')} onSeleccionar={(t) => navigation.navigate('TicketDetalle', { idTicket: t.idTicket })} />
+        <FilaEstado etiqueta="Total" tickets={filtrados} onSeleccionar={(t) => navigation.navigate('TicketDetalle', { idTicket: t.idTicket })} />
       </View>
     </SafeAreaView>
   );

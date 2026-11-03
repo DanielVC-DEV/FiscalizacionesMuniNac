@@ -182,3 +182,193 @@
 {"_e":"metro:client_log","_t":1792695050249,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
 {"_e":"metro:client_log","_t":1792695050249,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
 {"_e":"metro:bundling:started","_t":1792695052599,"id":"5","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"root:init","_t":1793141192794,"format":"v0-jsonl","version":"57.0.26"}
+{"_e":"env:mode","_t":1793141192813,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1793141192831,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1793141197570,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1793141206109,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1793141209236,"plugins":[]}
+{"_e":"metro:instantiate","_t":1793141217368,"atlas":false,"workers":10,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1793141226512,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793141226513,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1793141226520,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1793141231194,"id":"1","progress":0.010000000000000002,"total":1,"current":1}
+{"_e":"metro:bundling:progress","_t":1793141231303,"id":"1","progress":0.09,"total":7,"current":3}
+{"_e":"metro:bundling:progress","_t":1793141231418,"id":"1","progress":0.09,"total":29,"current":4}
+{"_e":"metro:bundling:progress","_t":1793141231527,"id":"1","progress":0.09,"total":39,"current":5}
+{"_e":"metro:bundling:progress","_t":1793141231642,"id":"1","progress":0.09,"total":40,"current":7}
+{"_e":"metro:bundling:progress","_t":1793141231746,"id":"1","progress":0.09,"total":44,"current":9}
+{"_e":"metro:bundling:progress","_t":1793141231849,"id":"1","progress":0.09,"total":44,"current":10}
+{"_e":"metro:bundling:progress","_t":1793141231949,"id":"1","progress":0.09,"total":47,"current":10}
+{"_e":"metro:bundling:progress","_t":1793141231978,"id":"1","progress":0.09,"total":47,"current":11}
+{"_e":"metro:bundling:progress","_t":1793141232087,"id":"1","progress":0.09,"total":66,"current":12}
+{"_e":"metro:bundling:progress","_t":1793141232260,"id":"1","progress":0.09,"total":66,"current":13}
+{"_e":"metro:bundling:progress","_t":1793141232364,"id":"1","progress":0.09,"total":79,"current":14}
+{"_e":"metro:bundling:progress","_t":1793141232482,"id":"1","progress":0.09,"total":93,"current":20}
+{"_e":"metro:bundling:progress","_t":1793141232597,"id":"1","progress":0.09,"total":111,"current":24}
+{"_e":"metro:bundling:progress","_t":1793141232699,"id":"1","progress":0.09,"total":116,"current":33}
+{"_e":"metro:bundling:progress","_t":1793141232802,"id":"1","progress":0.10562500000000001,"total":120,"current":39}
+{"_e":"metro:bundling:progress","_t":1793141232902,"id":"1","progress":0.16131416285944639,"total":122,"current":49}
+{"_e":"metro:bundling:progress","_t":1793141233002,"id":"1","progress":0.19409262066604724,"total":143,"current":63}
+{"_e":"metro:bundling:progress","_t":1793141233103,"id":"1","progress":0.2533222227095303,"total":151,"current":76}
+{"_e":"metro:bundling:progress","_t":1793141233222,"id":"1","progress":0.2533222227095303,"total":183,"current":92}
+{"_e":"metro:bundling:progress","_t":1793141233335,"id":"1","progress":0.2877875434027778,"total":192,"current":103}
+{"_e":"metro:bundling:progress","_t":1793141233437,"id":"1","progress":0.2877875434027778,"total":232,"current":117}
+{"_e":"metro:bundling:progress","_t":1793141233538,"id":"1","progress":0.2877875434027778,"total":276,"current":135}
+{"_e":"metro:bundling:progress","_t":1793141233684,"id":"1","progress":0.2877875434027778,"total":291,"current":151}
+{"_e":"metro:bundling:progress","_t":1793141233792,"id":"1","progress":0.32815446690934613,"total":302,"current":173}
+{"_e":"metro:bundling:progress","_t":1793141233898,"id":"1","progress":0.35229968782518206,"total":310,"current":184}
+{"_e":"metro:bundling:progress","_t":1793141234030,"id":"1","progress":0.35613943808532783,"total":310,"current":185}
+{"_e":"metro:bundling:progress","_t":1793141234142,"id":"1","progress":0.3756503642039542,"total":310,"current":190}
+{"_e":"metro:bundling:progress","_t":1793141234242,"id":"1","progress":0.39910304862685814,"total":315,"current":199}
+{"_e":"metro:bundling:progress","_t":1793141234353,"id":"1","progress":0.39910304862685814,"total":335,"current":211}
+{"_e":"metro:bundling:progress","_t":1793141234461,"id":"1","progress":0.4279497379763972,"total":347,"current":227}
+{"_e":"metro:bundling:progress","_t":1793141234563,"id":"1","progress":0.4279497379763972,"total":366,"current":237}
+{"_e":"metro:bundling:progress","_t":1793141234662,"id":"1","progress":0.4717520775623269,"total":380,"current":261}
+{"_e":"metro:bundling:progress","_t":1793141234762,"id":"1","progress":0.5107288479457577,"total":389,"current":278}
+{"_e":"metro:bundling:progress","_t":1793141234863,"id":"1","progress":0.557902552988548,"total":407,"current":304}
+{"_e":"metro:bundling:progress","_t":1793141234964,"id":"1","progress":0.6446800575416911,"total":411,"current":330}
+{"_e":"metro:bundling:progress","_t":1793141235064,"id":"1","progress":0.7059254612502858,"total":413,"current":347}
+{"_e":"metro:bundling:progress","_t":1793141235165,"id":"1","progress":0.7423117890647696,"total":419,"current":361}
+{"_e":"metro:bundling:progress","_t":1793141235265,"id":"1","progress":0.7717704603022097,"total":428,"current":376}
+{"_e":"metro:bundling:progress","_t":1793141235365,"id":"1","progress":0.7762619107686933,"total":454,"current":400}
+{"_e":"metro:bundling:progress","_t":1793141235469,"id":"1","progress":0.8017856380024777,"total":459,"current":411}
+{"_e":"metro:bundling:progress","_t":1793141235585,"id":"1","progress":0.8017856380024777,"total":472,"current":421}
+{"_e":"metro:bundling:progress","_t":1793141235684,"id":"1","progress":0.8349531346845499,"total":487,"current":445}
+{"_e":"metro:bundling:progress","_t":1793141235785,"id":"1","progress":0.8632897265794531,"total":508,"current":472}
+{"_e":"metro:bundling:progress","_t":1793141235885,"id":"1","progress":0.8823495620804147,"total":511,"current":480}
+{"_e":"metro:bundling:progress","_t":1793141235985,"id":"1","progress":0.9254001069843427,"total":526,"current":506}
+{"_e":"metro:bundling:progress","_t":1793141236088,"id":"1","progress":0.9521689224569908,"total":537,"current":524}
+{"_e":"metro:bundling:progress","_t":1793141236187,"id":"1","progress":0.9852400548696845,"total":540,"current":536}
+{"_e":"metro:bundling:progress","_t":1793141236301,"id":"1","progress":0.9963336419493309,"total":545,"current":544}
+{"_e":"metro:bundling:progress","_t":1793141237519,"id":"1","progress":0.999,"total":545,"current":545}
+{"_e":"metro:bundling:progress","_t":1793141237626,"id":"1","progress":0.999,"total":547,"current":547}
+{"_e":"metro:bundling:done","_t":1793141238190,"id":"1","total":547,"ms":11677.1797}
+{"_e":"metro:client_log","_t":1793141239173,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793141239174,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:bundling:started","_t":1793141505700,"id":"4","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793141505700,"id":"4","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1793141505727,"id":"4","total":1,"ms":27.0822}
+{"_e":"metro:client_log","_t":1793141505938,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793141505938,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:bundling:started","_t":1793141765723,"id":"7","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793141765723,"id":"7","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1793141765747,"id":"7","total":1,"ms":23.6675}
+{"_e":"metro:client_log","_t":1793141765978,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793141765978,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:bundling:started","_t":1793141772225,"id":"a","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793141772225,"id":"a","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1793141772255,"id":"a","total":1,"ms":30.4978}
+{"_e":"metro:client_log","_t":1793141772455,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793141772455,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:bundling:started","_t":1793141800449,"id":"e","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"root:init","_t":1793198735611,"format":"v0-jsonl","version":"57.0.26"}
+{"_e":"env:mode","_t":1793198735627,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1793198735642,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1793198737415,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1793198738874,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1793198739171,"plugins":[]}
+{"_e":"metro:instantiate","_t":1793198743554,"atlas":false,"workers":10,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1793198755197,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793198755197,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1793198755203,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1793198755303,"id":"1","progress":0.12808864265927977,"total":95,"current":34}
+{"_e":"metro:bundling:progress","_t":1793198755403,"id":"1","progress":0.28196923261823215,"total":258,"current":137}
+{"_e":"metro:bundling:progress","_t":1793198755503,"id":"1","progress":0.7352855375854747,"total":414,"current":355}
+{"_e":"metro:bundling:progress","_t":1793198755613,"id":"1","progress":0.9402006992427869,"total":527,"current":511}
+{"_e":"metro:bundling:done","_t":1793198755673,"id":"1","total":527,"ms":476.0677}
+{"_e":"metro:client_log","_t":1793198755823,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793198755823,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:bundling:started","_t":1793198770249,"id":"5","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:started","_t":1793200080684,"id":"9","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:client_log","_t":1793201917012,"level":"error","data":["Project is incompatible with this version of Expo Go\n\n• The installed version of Expo Go is for SDK 58.\n• The project you opened uses SDK 57.\n\nHow to fix this error:\nEither upgrade this project to SDK 58 or install an older version of Expo Go that is compatible with your project.\n\n<a href='https://docs.expo.dev/workflow/upgrading-expo-sdk-walkthrough/'>Learn how to upgrade to SDK 58.</a>\n\n<a href='https://expo.dev/go?sdkVersion=57&platform=android&device=true'>Learn how to install Expo Go for SDK 57</a>."]}
+{"_e":"root:init","_t":1793201938086,"format":"v0-jsonl","version":"57.0.26"}
+{"_e":"env:mode","_t":1793201938087,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1793201938089,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1793201938339,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1793201938697,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1793201938949,"plugins":[]}
+{"_e":"metro:instantiate","_t":1793201942998,"atlas":false,"workers":10,"host":"::","port":8081}
+{"_e":"root:init","_t":1793201970512,"format":"v0-jsonl","version":"57.0.26"}
+{"_e":"env:mode","_t":1793201970512,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1793201970514,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1793201970711,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1793201971007,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1793201971212,"plugins":[]}
+{"_e":"metro:instantiate","_t":1793201975156,"atlas":false,"workers":10,"host":"::","port":8081}
+{"_e":"root:init","_t":1793201989015,"format":"v0-jsonl","version":"57.0.26"}
+{"_e":"env:mode","_t":1793201989016,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1793201989018,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1793201989230,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1793201989513,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1793201989705,"plugins":[]}
+{"_e":"metro:instantiate","_t":1793201993628,"atlas":false,"workers":10,"host":"::","port":8081}
+{"_e":"metro:client_log","_t":1793202003287,"level":"error","data":["Project is incompatible with this version of Expo Go\n\n• The installed version of Expo Go is for SDK 58.\n• The project you opened uses SDK 57.\n\nHow to fix this error:\nEither upgrade this project to SDK 58 or install an older version of Expo Go that is compatible with your project.\n\n<a href='https://docs.expo.dev/workflow/upgrading-expo-sdk-walkthrough/'>Learn how to upgrade to SDK 58.</a>\n\n<a href='https://expo.dev/go?sdkVersion=57&platform=android&device=true'>Learn how to install Expo Go for SDK 57</a>."]}
+{"_e":"metro:client_log","_t":1793202033240,"level":"error","data":["Project is incompatible with this version of Expo Go\n\n• The installed version of Expo Go is for SDK 58.\n• The project you opened uses SDK 57.\n\nHow to fix this error:\nEither upgrade this project to SDK 58 or install an older version of Expo Go that is compatible with your project.\n\n<a href='https://docs.expo.dev/workflow/upgrading-expo-sdk-walkthrough/'>Learn how to upgrade to SDK 58.</a>\n\n<a href='https://expo.dev/go?sdkVersion=57&platform=android&device=true'>Learn how to install Expo Go for SDK 57</a>."]}
+{"_e":"root:init","_t":1793202054254,"format":"v0-jsonl","version":"57.0.26"}
+{"_e":"env:mode","_t":1793202054255,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1793202054257,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1793202054454,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1793202054734,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1793202054913,"plugins":[]}
+{"_e":"metro:instantiate","_t":1793202058870,"atlas":false,"workers":10,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1793202066083,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793202066083,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1793202066091,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1793202066191,"id":"1","progress":0.18748007227122968,"total":194,"current":84}
+{"_e":"metro:bundling:progress","_t":1793202066291,"id":"1","progress":0.5645969226927998,"total":358,"current":269}
+{"_e":"metro:bundling:progress","_t":1793202066391,"id":"1","progress":0.924413705027825,"total":519,"current":499}
+{"_e":"metro:bundling:done","_t":1793202066466,"id":"1","total":519,"ms":382.6737}
+{"_e":"metro:bundling:started","_t":1793202066572,"id":"3","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:client_log","_t":1793202066679,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793202066679,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"root:init","_t":1793738865774,"format":"v0-jsonl","version":"57.0.26"}
+{"_e":"env:mode","_t":1793738865776,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1793738865779,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1793738866475,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1793738867908,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1793738869130,"plugins":[]}
+{"_e":"metro:instantiate","_t":1793738873703,"atlas":false,"workers":10,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1793738877981,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793738877981,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1793738877985,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1793738878085,"id":"1","progress":0.36,"total":200,"current":120}
+{"_e":"metro:bundling:progress","_t":1793738878186,"id":"1","progress":0.5625,"total":324,"current":243}
+{"_e":"metro:bundling:progress","_t":1793738878286,"id":"1","progress":0.7913821160200324,"total":471,"current":419}
+{"_e":"metro:bundling:progress","_t":1793738878389,"id":"1","progress":0.999,"total":547,"current":547}
+{"_e":"metro:bundling:done","_t":1793738878424,"id":"1","total":547,"ms":442.7481}
+{"_e":"metro:client_log","_t":1793738878777,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793738878778,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:bundling:started","_t":1793738903381,"id":"5","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793738903381,"id":"5","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1793738903401,"id":"5","total":1,"ms":20.4678}
+{"_e":"metro:client_log","_t":1793738903553,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793738903553,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:bundling:started","_t":1793738931099,"id":"9","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:failed","_t":1793740024028,"id":null,"message":"Unable to resolve \"../modules/tickets/TicketDetalleScreen\" from \"src\\navigation\\AppNavigator.tsx\"\n  3 | import ResumenScreen from '../modules/resumen/ResumenScreen';\n  4 | import CrearTicketScreen from '../modules/tickets/CrearTicketScreen';\n> 5 | import TicketDetalleScreen from '../modules/tickets/TicketDetalleScreen';\n    |                                  ^\n  6 | import ContratosScreen from '../modules/contratos/ContratosScreen';\n  7 | import ContratoDetalleScreen from '../modules/contratos/ContratoDetalleScreen';\n  8 | import CrearContratoScreen from '../modules/contratos/CrearContratoScreen';","importStack":"\u001b[1mImport stack:\u001b[22m\n\n\u001b[90m \u001b[39msrc\\navigation\\AppNavigator.tsx\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"../modules/tickets/TicketDetalleScreen\"\u001b[39m\n\n\u001b[90m \u001b[39mApp.tsx\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./src/navigation/AppNavigator\"\u001b[39m\n\n\u001b[90m \u001b[39mindex.ts\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./App\"\u001b[39m\n\n\u001b[90m \u001b[39m\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./index.ts\"\u001b[39m\n","filename":null,"targetModuleName":"../modules/tickets/TicketDetalleScreen","originModulePath":"src\\navigation\\AppNavigator.tsx"}
+{"_e":"metro:client_log","_t":1793740024072,"level":"error","data":["[UnableToResolveError: Unable to resolve module ../modules/tickets/TicketDetalleScreen from C:\\Users\\User\\FiscalizacionesMuniNac\\frontend\\src\\navigation\\AppNavigator.tsx: \n\nNone of these files exist:\n  * src\\modules\\tickets\\TicketDetalleScreen(.web.ts|.ts|.web.tsx|.tsx|.web.mjs|.mjs|.web.js|.js|.web.jsx|.jsx|.web.json|.json|.web.cjs|.cjs|.web.scss|.scss|.web.sass|.sass|.web.css|.css)\n  * src\\modules\\tickets\\TicketDetalleScreen\n  3 | import ResumenScreen from '../modules/resumen/ResumenScreen';\n  4 | import CrearTicketScreen from '../modules/tickets/CrearTicketScreen';\n> 5 | import TicketDetalleScreen from '../modules/tickets/TicketDetalleScreen';\n    |                                  ^\n  6 | import ContratosScreen from '../modules/contratos/ContratosScreen';\n  7 | import ContratoDetalleScreen from '../modules/contratos/ContratoDetalleScreen';\n  8 | import CrearContratoScreen from '../modules/contratos/CrearContratoScreen';]"]}
+{"_e":"metro:bundling:failed","_t":1793740024714,"id":null,"message":"Unable to resolve \"../modules/tickets/TicketDetalleScreen\" from \"src\\navigation\\AppNavigator.tsx\"\n  3 | import ResumenScreen from '../modules/resumen/ResumenScreen';\n  4 | import CrearTicketScreen from '../modules/tickets/CrearTicketScreen';\n> 5 | import TicketDetalleScreen from '../modules/tickets/TicketDetalleScreen';\n    |                                  ^\n  6 | import ContratosScreen from '../modules/contratos/ContratosScreen';\n  7 | import ContratoDetalleScreen from '../modules/contratos/ContratoDetalleScreen';\n  8 | import CrearContratoScreen from '../modules/contratos/CrearContratoScreen';","importStack":"\u001b[1mImport stack:\u001b[22m\n\n\u001b[90m \u001b[39msrc\\navigation\\AppNavigator.tsx\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"../modules/tickets/TicketDetalleScreen\"\u001b[39m\n\n\u001b[90m \u001b[39mApp.tsx\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./src/navigation/AppNavigator\"\u001b[39m\n\n\u001b[90m \u001b[39mindex.ts\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./App\"\u001b[39m\n\n\u001b[90m \u001b[39m\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./index.ts\"\u001b[39m\n","filename":null,"targetModuleName":"../modules/tickets/TicketDetalleScreen","originModulePath":"src\\navigation\\AppNavigator.tsx"}
+{"_e":"metro:client_log","_t":1793740024754,"level":"error","data":["[UnableToResolveError: Unable to resolve module ../modules/tickets/TicketDetalleScreen from C:\\Users\\User\\FiscalizacionesMuniNac\\frontend\\src\\navigation\\AppNavigator.tsx: \n\nNone of these files exist:\n  * src\\modules\\tickets\\TicketDetalleScreen(.web.ts|.ts|.web.tsx|.tsx|.web.mjs|.mjs|.web.js|.js|.web.jsx|.jsx|.web.json|.json|.web.cjs|.cjs|.web.scss|.scss|.web.sass|.sass|.web.css|.css)\n  * src\\modules\\tickets\\TicketDetalleScreen\n  3 | import ResumenScreen from '../modules/resumen/ResumenScreen';\n  4 | import CrearTicketScreen from '../modules/tickets/CrearTicketScreen';\n> 5 | import TicketDetalleScreen from '../modules/tickets/TicketDetalleScreen';\n    |                                  ^\n  6 | import ContratosScreen from '../modules/contratos/ContratosScreen';\n  7 | import ContratoDetalleScreen from '../modules/contratos/ContratoDetalleScreen';\n  8 | import CrearContratoScreen from '../modules/contratos/CrearContratoScreen';]"]}
+{"_e":"metro:bundling:failed","_t":1793740025179,"id":null,"message":"Unable to resolve \"../modules/tickets/TicketDetalleScreen\" from \"src\\navigation\\AppNavigator.tsx\"\n  3 | import ResumenScreen from '../modules/resumen/ResumenScreen';\n  4 | import CrearTicketScreen from '../modules/tickets/CrearTicketScreen';\n> 5 | import TicketDetalleScreen from '../modules/tickets/TicketDetalleScreen';\n    |                                  ^\n  6 | import ContratosScreen from '../modules/contratos/ContratosScreen';\n  7 | import ContratoDetalleScreen from '../modules/contratos/ContratoDetalleScreen';\n  8 | import CrearContratoScreen from '../modules/contratos/CrearContratoScreen';","importStack":"\u001b[1mImport stack:\u001b[22m\n\n\u001b[90m \u001b[39msrc\\navigation\\AppNavigator.tsx\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"../modules/tickets/TicketDetalleScreen\"\u001b[39m\n\n\u001b[90m \u001b[39mApp.tsx\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./src/navigation/AppNavigator\"\u001b[39m\n\n\u001b[90m \u001b[39mindex.ts\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./App\"\u001b[39m\n\n\u001b[90m \u001b[39m\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./index.ts\"\u001b[39m\n","filename":null,"targetModuleName":"../modules/tickets/TicketDetalleScreen","originModulePath":"src\\navigation\\AppNavigator.tsx"}
+{"_e":"metro:client_log","_t":1793740025181,"level":"error","data":["[UnableToResolveError: Unable to resolve module ../modules/tickets/TicketDetalleScreen from C:\\Users\\User\\FiscalizacionesMuniNac\\frontend\\src\\navigation\\AppNavigator.tsx: \n\nNone of these files exist:\n  * src\\modules\\tickets\\TicketDetalleScreen(.web.ts|.ts|.web.tsx|.tsx|.web.mjs|.mjs|.web.js|.js|.web.jsx|.jsx|.web.json|.json|.web.cjs|.cjs|.web.scss|.scss|.web.sass|.sass|.web.css|.css)\n  * src\\modules\\tickets\\TicketDetalleScreen\n  3 | import ResumenScreen from '../modules/resumen/ResumenScreen';\n  4 | import CrearTicketScreen from '../modules/tickets/CrearTicketScreen';\n> 5 | import TicketDetalleScreen from '../modules/tickets/TicketDetalleScreen';\n    |                                  ^\n  6 | import ContratosScreen from '../modules/contratos/ContratosScreen';\n  7 | import ContratoDetalleScreen from '../modules/contratos/ContratoDetalleScreen';\n  8 | import CrearContratoScreen from '../modules/contratos/CrearContratoScreen';]"]}
+{"_e":"metro:bundling:started","_t":1793740298204,"id":"d","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793740298205,"id":"d","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1793740298223,"id":"d","total":1,"ms":18.5192}
+{"_e":"metro:client_log","_t":1793740298364,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793740298364,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:bundling:started","_t":1793740299567,"id":"g","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793740299567,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1793740299585,"id":"g","total":1,"ms":17.6755}
+{"_e":"metro:client_log","_t":1793740299682,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793740299682,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:bundling:started","_t":1793740404777,"id":"l","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:started","_t":1793740744797,"id":"o","platform":"web","environment":null,"entry":"src\\modules\\tickets\\TicketDetalleScreen.tsx"}
+{"_e":"metro:bundling:started","_t":1793740765797,"id":"p","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793740765797,"id":"p","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1793740765817,"id":"p","total":1,"ms":19.9356}
+{"_e":"metro:bundling:started","_t":1793740765928,"id":"r","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:client_log","_t":1793740766033,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793740766033,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:bundling:started","_t":1793741037401,"id":"v","platform":"web","environment":null,"entry":"src\\modules\\tickets\\api.ts"}
+{"_e":"metro:bundling:started","_t":1793741037402,"id":"w","platform":"web","environment":null,"entry":"src\\modules\\tickets\\TicketDetalleScreen.tsx"}
+{"_e":"metro:bundling:started","_t":1793741353443,"id":"x","platform":"web","environment":null,"entry":"src\\modules\\tickets\\TicketDetalleScreen.tsx"}
