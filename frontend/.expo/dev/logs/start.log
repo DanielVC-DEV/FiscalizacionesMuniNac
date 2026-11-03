@@ -372,3 +372,9 @@
 {"_e":"metro:bundling:started","_t":1793741037401,"id":"v","platform":"web","environment":null,"entry":"src\\modules\\tickets\\api.ts"}
 {"_e":"metro:bundling:started","_t":1793741037402,"id":"w","platform":"web","environment":null,"entry":"src\\modules\\tickets\\TicketDetalleScreen.tsx"}
 {"_e":"metro:bundling:started","_t":1793741353443,"id":"x","platform":"web","environment":null,"entry":"src\\modules\\tickets\\TicketDetalleScreen.tsx"}
+{"_e":"metro:bundling:started","_t":1793741441174,"id":"y","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:progress","_t":1793741441175,"id":"y","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1793741441195,"id":"y","total":1,"ms":20.1112}
+{"_e":"metro:bundling:started","_t":1793741441317,"id":"10","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:client_log","_t":1793741441419,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1793741441419,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
