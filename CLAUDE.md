@@ -92,7 +92,11 @@ npx expo lint                # requiere eslint instalado en node_modules
 | `usuarios` | `/api/usuarios` | routes, controller | [usuarios](backend/src/modules/usuarios/README.md) |
 | `empresas` | `/api/empresas` | routes, controller | [empresas](backend/src/modules/empresas/README.md) |
 | `contratos` | `/api/contratos` | routes, controller, ordenesCompra, prioridades | [contratos](backend/src/modules/contratos/README.md) |
-| `tickets` | `/api/tickets` | routes, controller, respuestas, ticketStateMachine | [tickets](backend/src/modules/tickets/README.md) |
+| `tickets` | `/api/tickets` | routes, controller, respuestas, archivos, actuaciones, fotos, ticketStateMachine, ticketAcceso, ticketFiltros | [tickets](backend/src/modules/tickets/README.md) |
+| `feriados` | `/api/feriados` | routes, controller, service | [feriados](backend/src/modules/feriados/README.md) |
+| `notificaciones` | `/api/notificaciones` | routes, controller, service, mantenimiento | [notificaciones](backend/src/modules/notificaciones/README.md) |
+| `consulta` | `/api/consulta` (pública: `/api/consulta/publica/:token`) | routes, controller | [consulta](backend/src/modules/consulta/README.md) |
+| `reportes` | `/api/reportes` | routes, controller, reportePdf | [reportes](backend/src/modules/reportes/README.md) |
 | `auth` | `/api/auth` (y middleware de sesión sobre todo `/api`) | routes, controller, sesiones, middleware | [auth](backend/src/modules/auth/README.md) |
 
 Cada módulo sigue la misma forma:
@@ -124,6 +128,8 @@ npm run dev    # con --watch
 - **Expo Router**: `frontend/AGENTS.md` pide Expo Router con rutas en `src/app/`. La navegación actual usa React Navigation (`src/navigation/`). La migración no se ha hecho.
 - **Secretos**: `backend/.env` está en el control de versiones. Debe sacarse del repositorio y rotar sus credenciales.
 - **node_modules en Git**: el índice contiene `frontend/node_modules` (~25 000 archivos). Revisar `.gitignore` y ejecutar `git rm -r --cached`.
-- **Fotos**: el alta de tickets guarda `foto` pero el envío de archivos aún no está implementado en el servidor.
-- **Feriados**: `sumarDiasHabiles` no descuenta feriados (pendiente de confirmar con la Municipalidad).
-- **Tickets por contrato**: el detalle de contrato no muestra tickets asociados.
+- **Fotos**: el servidor acepta fotos en base64 (`fotos: ["data:image/jpeg;base64,..."]`) y las guarda en `backend/uploads/`. La app móvil todavía envía URIs locales: falta cambiar `CrearTicketScreen` y las respuestas para enviar base64.
+- **Feriados**: el servidor descuenta los feriados de la tabla `feriado` (se cargan con `POST /api/feriados`), pero la lista está vacía y falta confirmar el calendario con la Municipalidad. `frontend/src/core/utils/businessDays.ts` todavía no los descuenta; el vencimiento lo recalcula el servidor.
+- **Estados**: la máquina usa `RESPONDIDO` como "respuesta pendiente de revisión", pero el informe describe `ABIERTO` así y `RESPONDIDO` como "revisada con pendientes". Confirmar con la Municipalidad antes de cambiar la máquina.
+- **Consulta externa**: la vista pública no muestra fotos. Si la Municipalidad las quiere, hay que agregar un enlace de descarga firmado.
+- **Pantallas nuevas**: el backend ya expone conformidad, cierre, reapertura, solicitud de subsanación, indicadores, PDF, enlaces y destinatarios, pero la app móvil no tiene pantallas para ellos.

@@ -3,3 +3,5 @@
 backend/.env
 frontend/.env
 frontend/web-build/
+# Archivos subidos (fotografías)
+backend/uploads/

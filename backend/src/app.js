@@ -7,6 +7,10 @@ const contratosRoutes = require('./modules/contratos/contratos.routes');
 const usuariosRoutes = require('./modules/usuarios/usuarios.routes');
 const ticketsRoutes = require('./modules/tickets/tickets.routes');
 const supervisoresRoutes = require('./modules/supervisores/supervisores.routes');
+const feriadosRoutes = require('./modules/feriados/feriados.routes');
+const notificacionesRoutes = require('./modules/notificaciones/notificaciones.routes');
+const consultaRoutes = require('./modules/consulta/consulta.routes');
+const reportesRoutes = require('./modules/reportes/reportes.routes');
 const authRoutes = require('./modules/auth/auth.routes');
 const exigirSesion = require('./modules/auth/autenticacion.middleware');
 const autorizar = require('./modules/auth/autorizacion.middleware');
@@ -19,8 +23,10 @@ app.use(express.json({ limit: '10mb' })); // fotos en base64 pueden pesar
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 
-// Login y registro son públicos. Desde aquí, todo /api exige token de sesión.
+// Login es público, y también la consulta externa por enlace (sólo lectura).
+// Desde aquí, todo /api exige token de sesión.
 app.use('/api/auth', authRoutes);
+app.get('/api/consulta/publica/:token', consultaRoutes.consultarPublica);
 app.use('/api', exigirSesion);
 
 // Gestión de cuentas y supervisores: sólo administrador (todas las operaciones).
@@ -33,6 +39,10 @@ app.use('/api/contratos', contratosRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/tickets', ticketsRoutes);
 app.use('/api/supervisores', supervisoresRoutes);
+app.use('/api/feriados', feriadosRoutes);
+app.use('/api/notificaciones', notificacionesRoutes);
+app.use('/api/consulta', consultaRoutes.router);
+app.use('/api/reportes', reportesRoutes);
 
 app.use((req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
 app.use(errorHandler);

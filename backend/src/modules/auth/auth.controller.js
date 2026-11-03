@@ -3,9 +3,9 @@ const { verificarPassword } = require('../../core/utils/passwords');
 const { esEmailValido } = require('../../core/utils/validaciones');
 const { crearSesion, cerrarSesion } = require('./sesiones');
 
-// Roles que pueden entrar a la app. Las cuentas de supervisor de empresa
-// existen en la base, pero no tienen acceso a este sistema.
-const ROLES_CON_ACCESO = ['admin', 'director'];
+// Roles que pueden entrar a la app. El supervisor de empresa entra, pero sólo
+// ve y responde los tickets de su empresa (ver modules/tickets/ticketAcceso.js).
+const ROLES_CON_ACCESO = ['admin', 'director', 'supervisor_empresa'];
 
 // Las cuentas no se crean desde la app: el administrador las registra en la
 // base de datos (usuario + rol_usuario). Aquí sólo se verifican.
@@ -39,6 +39,10 @@ async function login(req, res, next) {
     }
     if (!ROLES_CON_ACCESO.includes(usuario.rol)) {
       return res.status(403).json({ error: 'Tu rol no tiene acceso a esta aplicación.' });
+    }
+    // Un supervisor sin empresa asociada no vería ningún ticket: no se le deja entrar.
+    if (usuario.rol === 'supervisor_empresa' && !usuario.id_empresa) {
+      return res.status(403).json({ error: 'Tu cuenta no está asociada a una empresa. Contacta al administrador.' });
     }
 
     const sesion = await crearSesion(usuario.id_usuario);

@@ -1,15 +1,12 @@
 /**
  * ticketStateMachine.js
  *
- * Valida y aplica las transiciones de estado del ticket.
- *
- * Nota: el esquema actual (basado en el diagrama revisado por el
- * supervisor) no tiene una tabla de historial/auditoría separada —
- * solo existen `ticket.estado` y la tabla `respuesta` para las
- * respuestas del supervisor de empresa. Si más adelante necesitan
- * guardar quién hizo cada cambio de estado y cuándo, se puede agregar
- * una tabla `cambio_estado` sin tocar esta lógica.
+ * Valida y aplica las transiciones de estado del ticket. Cada transición
+ * se registra en el historial (ticket_actuacion) dentro de la misma
+ * transacción, así no puede cambiar el estado sin dejar constancia.
  */
+
+const { registrarActuacion, TIPOS_ACTUACION } = require('./actuaciones');
 
 const ESTADOS = Object.freeze({
   ABIERTO: 'ABIERTO',
@@ -29,6 +26,10 @@ const TRANSICIONES_PERMITIDAS = {
   [ESTADOS.CERRADO]: [ESTADOS.ABIERTO], // reapertura
 };
 
+// Estados que sólo se alcanzan con su acción propia (conformidad, cierre,
+// reapertura o solicitud de subsanación): el cambio genérico no los acepta.
+const ESTADOS_RESERVADOS = Object.freeze([ESTADOS.SUBSANADO_CONFORME, ESTADOS.CERRADO]);
+
 class TransicionInvalidaError extends Error {
   constructor(estadoActual, estadoNuevo) {
     super(`No se puede pasar de "${estadoActual}" a "${estadoNuevo}".`);
@@ -42,38 +43,53 @@ function esTransicionValida(estadoActual, estadoNuevo) {
 }
 
 /**
- * Cambia el estado de un ticket, validando la transición.
- * @param {import('pg').Pool} pool
- * @param {number} ticketId
- * @param {string} estadoNuevo
+ * Aplica una transición dentro de una transacción ya abierta por el llamador.
+ * Bloquea la fila del ticket, valida la transición, actualiza el estado y
+ * registra la actuación.
  */
-async function cambiarEstadoTicket(pool, ticketId, estadoNuevo) {
+async function transicionar(client, ticketId, estadoNuevo, {
+  idUsuario = null,
+  tipo = TIPOS_ACTUACION.CAMBIO_ESTADO,
+  comentario = null,
+} = {}) {
+  const { rows } = await client.query(
+    'SELECT estado FROM ticket WHERE id_ticket = $1 FOR UPDATE',
+    [ticketId]
+  );
+  if (rows.length === 0) {
+    const err = new Error(`Ticket ${ticketId} no existe.`);
+    err.status = 404;
+    throw err;
+  }
+  const estadoActual = rows[0].estado;
+
+  if (!esTransicionValida(estadoActual, estadoNuevo)) {
+    throw new TransicionInvalidaError(estadoActual, estadoNuevo);
+  }
+
+  await client.query('UPDATE ticket SET estado = $1 WHERE id_ticket = $2', [estadoNuevo, ticketId]);
+
+  await registrarActuacion(client, {
+    idTicket: ticketId,
+    tipo,
+    idUsuario,
+    descripcion: comentario,
+    datos: { estado_anterior: estadoActual, estado_nuevo: estadoNuevo },
+  });
+
+  return { id_ticket: ticketId, estado_anterior: estadoActual, estado_nuevo: estadoNuevo };
+}
+
+/**
+ * Cambia el estado de un ticket en su propia transacción.
+ */
+async function cambiarEstadoTicket(pool, ticketId, estadoNuevo, opciones) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-
-    const { rows } = await client.query(
-      'SELECT estado FROM ticket WHERE id_ticket = $1 FOR UPDATE',
-      [ticketId]
-    );
-    if (rows.length === 0) {
-      const err = new Error(`Ticket ${ticketId} no existe.`);
-      err.status = 404;
-      throw err;
-    }
-    const estadoActual = rows[0].estado;
-
-    if (!esTransicionValida(estadoActual, estadoNuevo)) {
-      throw new TransicionInvalidaError(estadoActual, estadoNuevo);
-    }
-
-    await client.query('UPDATE ticket SET estado = $1 WHERE id_ticket = $2', [
-      estadoNuevo,
-      ticketId,
-    ]);
-
+    const resultado = await transicionar(client, ticketId, estadoNuevo, opciones);
     await client.query('COMMIT');
-    return { id_ticket: ticketId, estado_anterior: estadoActual, estado_nuevo: estadoNuevo };
+    return resultado;
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
@@ -84,28 +100,33 @@ async function cambiarEstadoTicket(pool, ticketId, estadoNuevo) {
 
 /**
  * Marca VENCIDO todo ticket cuyo plazo pasó y sigue en ABIERTO o
- * REQUIERE_NUEVA_SUBSANACION. Pensado para correr con un cron
- * (ej. node-cron, una vez al día).
+ * REQUIERE_NUEVA_SUBSANACION. Lo ejecuta el mantenimiento diario
+ * (modules/notificaciones/mantenimiento.js).
  */
-async function marcarTicketsVencidos(pool) {
+async function marcarTicketsVencidos(pool, hoyISO) {
   const { rows } = await pool.query(
     `SELECT id_ticket FROM ticket
-     WHERE estado IN ($1, $2) AND fecha_vencimiento < CURRENT_DATE`,
-    [ESTADOS.ABIERTO, ESTADOS.REQUIERE_NUEVA_SUBSANACION]
+     WHERE estado IN ($1, $2) AND fecha_vencimiento < $3`,
+    [ESTADOS.ABIERTO, ESTADOS.REQUIERE_NUEVA_SUBSANACION, hoyISO]
   );
 
   const resultados = [];
   for (const { id_ticket } of rows) {
-    resultados.push(await cambiarEstadoTicket(pool, id_ticket, ESTADOS.VENCIDO));
+    resultados.push(await cambiarEstadoTicket(pool, id_ticket, ESTADOS.VENCIDO, {
+      tipo: TIPOS_ACTUACION.VENCIMIENTO,
+      comentario: 'Plazo de subsanación vencido.',
+    }));
   }
   return resultados;
 }
 
 module.exports = {
   ESTADOS,
+  ESTADOS_RESERVADOS,
   TRANSICIONES_PERMITIDAS,
   TransicionInvalidaError,
   esTransicionValida,
+  transicionar,
   cambiarEstadoTicket,
   marcarTicketsVencidos,
 };

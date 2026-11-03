@@ -115,10 +115,18 @@ async function obtener(req, res, next) {
       [id]
     );
 
+    // Tickets de fiscalización asociados al contrato (pendiente del informe, sección 22).
+    const tickets = await pool.query(
+      `SELECT id_ticket, numero, estado, fecha_hora_creacion, fecha_vencimiento, fecha_cierre
+       FROM ticket WHERE id_contrato = $1 ORDER BY fecha_hora_creacion DESC`,
+      [id]
+    );
+
     res.json({
       ...contrato.rows[0],
       ordenes_compra: ordenes.rows,
       prioridades: prioridades.rows,
+      tickets: tickets.rows,
     });
   } catch (err) {
     next(err);

@@ -15,7 +15,7 @@ Guía para el equipo: cómo funciona el inicio de sesión, qué puede hacer cada
 |---|---|---|
 | `admin` | Sí | Todo: usuarios, supervisores, empresas, áreas, contratos y tickets. |
 | `director` | Sí | Consultar todo, crear y dar seguimiento a tickets, cambiar estados. No gestiona usuarios, supervisores, empresas, áreas ni contratos. |
-| `supervisor_empresa` | **No** | Existe en la base para asignarlo a contratos y empresas. El login lo rechaza con 403. |
+| `supervisor_empresa` | Sí, acotado | Entra a la app y ve sólo los tickets de su empresa. Puede responder y adjuntar fotos. No cambia estados, no da conformidad, no cierra ni reabre, y no ve reportes ni administración. Si la cuenta no tiene empresa asociada, el login responde 403. |
 
 Detalle de permisos en el backend:
 
@@ -89,7 +89,8 @@ Reinicia Expo después de cambiarla.
 | "No se pudo conectar con el servidor" | El backend no está corriendo, o la URL de la API no es la correcta. |
 | "Correo o contraseña incorrectos" | Correo mal escrito (recuerda: minúsculas), o contraseña distinta a la usada al generar el hash. |
 | "Tu cuenta no tiene un rol asignado" | Falta la fila en `rol_usuario`. Ejecuta el segundo `INSERT` del paso 2. |
-| "Tu rol no tiene acceso a esta aplicación" | La cuenta es `supervisor_empresa`. Por diseño no puede entrar. |
+| "Tu rol no tiene acceso a esta aplicación" | El rol de la cuenta no es `admin`, `director` ni `supervisor_empresa`. |
+| "Tu cuenta no está asociada a una empresa" | Es un `supervisor_empresa` sin `usuario.id_empresa`. Asígnale la empresa en la base. |
 | "Tu sesión venció" | Pasaron más de 8 horas. Vuelve a iniciar sesión. |
 
 ## Archivos principales
