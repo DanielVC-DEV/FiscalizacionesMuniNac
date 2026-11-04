@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { avisar } from '../../core/ui/avisos';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../auth/components/SesionHeader';
@@ -42,7 +43,7 @@ export default function AreasScreen({ navigation }: any) {
       await areasApi.crear({ nombre: nombre.trim() });
       setNombre('');
       await cargarAreas();
-      Alert.alert('Área creada', 'El área quedó guardada en el servidor.');
+      avisar('Área creada', 'El área quedó guardada en el servidor.');
     } catch (err) {
       setError((err as Error).message);
     } finally {

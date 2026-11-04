@@ -1,8 +1,8 @@
-import { Image, ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../auth/components/SesionHeader';
 import { COLORS, RADIOS, SOMBRA } from '../../core/theme/colors';
-import { esAdministrador, useSesion } from '../auth/store';
+import { esAdministrador, esMunicipal, useSesion } from '../auth/store';
 import { IconoBarras, IconoTicket, IconoDocumento, IconoEdificio } from './components/IconosMenu';
 
 // Destinos del menú principal. "destino" es el nombre de la ruta registrada
@@ -48,11 +48,20 @@ const OPCIONES = [
 
 // Destinos que sólo ve el administrador (ver auth/store.ts).
 const DESTINOS_ADMIN: string[] = ['Empresas', 'Areas', 'Supervisores'];
+// Destinos de usuarios municipales: el supervisor de empresa sólo ve "Resumen".
+const DESTINOS_MUNICIPALES: string[] = ['CrearTicket', 'Contratos'];
 
 export default function MenuScreen({ navigation }: any) {
   const sesion = useSesion();
   const esAdmin = esAdministrador(sesion?.usuario);
-  const opcionesVisibles = OPCIONES.filter((opcion) => esAdmin || !DESTINOS_ADMIN.includes(opcion.destino));
+  const municipal = esMunicipal(sesion?.usuario);
+  const opcionesVisibles = OPCIONES.filter((opcion) => {
+    if (DESTINOS_ADMIN.includes(opcion.destino)) return esAdmin;
+    if (DESTINOS_MUNICIPALES.includes(opcion.destino)) return municipal;
+    return true;
+  });
+  // En pantallas anchas (navegador, tablet) caben tres tarjetas por fila.
+  const anchoTile = useWindowDimensions().width >= 600 ? '31.5%' : '47%';
 
   return (
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
@@ -73,7 +82,7 @@ export default function MenuScreen({ navigation }: any) {
           {opcionesVisibles.map((opcion) => (
             <TouchableOpacity
               key={opcion.destino}
-              style={styles.tile}
+              style={[styles.tile, { width: anchoTile }]}
               activeOpacity={0.75}
               onPress={() => navigation.navigate(opcion.destino)}
             >

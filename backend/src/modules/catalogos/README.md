@@ -1,6 +1,6 @@
 # modules/catalogos — catálogos (áreas y roles)
 
-Lectura y alta de áreas, y lectura de roles.
+Lectura y alta de áreas, y lectura de roles. La lectura es sólo para admin y director; el alta, sólo para admin.
 
 ## Archivos
 

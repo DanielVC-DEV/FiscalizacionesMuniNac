@@ -5,3 +5,6 @@ frontend/.env
 frontend/web-build/
 # Archivos subidos (fotografías)
 backend/uploads/
+
+# Build web de empresas (npx expo export --platform web)
+frontend/dist/

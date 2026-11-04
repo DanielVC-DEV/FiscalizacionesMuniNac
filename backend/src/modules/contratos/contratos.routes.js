@@ -13,12 +13,14 @@ const ordenesCtrl = require('./ordenesCompra.controller');
 const prioridadesCtrl = require('./prioridades.controller');
 const autorizar = require('../auth/autorizacion.middleware');
 
-// Los contratos se consultan con cualquier rol; crear, editar y eliminar es sólo del administrador.
+// Los contratos se consultan sólo por usuarios municipales (el supervisor de empresa no debe ver los de otras
+// empresas); crear, editar y eliminar es sólo del administrador.
 const soloAdmin = autorizar('admin');
+const soloMunicipal = autorizar('admin', 'director');
 
 // CRUD básico de contratos
-router.get('/', ctrl.listar);                      // GET    /api/contratos
-router.get('/:id', ctrl.obtener);                  // GET    /api/contratos/5
+router.get('/', soloMunicipal, ctrl.listar);                      // GET    /api/contratos
+router.get('/:id', soloMunicipal, ctrl.obtener);                  // GET    /api/contratos/5
 router.post('/', soloAdmin, ctrl.crear);           // POST   /api/contratos
 router.put('/:id', soloAdmin, ctrl.actualizar);    // PUT    /api/contratos/5
 router.delete('/:id', soloAdmin, ctrl.eliminar);   // DELETE /api/contratos/5

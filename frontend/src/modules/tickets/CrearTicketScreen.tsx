@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { avisar } from '../../core/ui/avisos';
 import * as Location from 'expo-location';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../auth/components/SesionHeader';
@@ -22,6 +15,13 @@ import { ticketsApi } from './api';
 import { cargarContratos, useContratos, contratoLabel } from '../contratos/store';
 import { cargarTickets } from './store';
 import FotosField, { Foto } from './components/FotosField';
+
+// "lat, lon" (como se muestra en pantalla) a números; vacío si no hay coordenadas válidas.
+function coordenadasNumericas(texto: string): { latitud?: number; longitud?: number } {
+  if (!texto.includes(',')) return {};
+  const [latitud, longitud] = texto.split(',').map((valor) => Number(valor.trim()));
+  return Number.isFinite(latitud) && Number.isFinite(longitud) ? { latitud, longitud } : {};
+}
 
 export default function CrearTicketScreen({ navigation }: any) {
   // Contratos y supervisores cargados desde el backend.
@@ -115,7 +115,6 @@ export default function CrearTicketScreen({ navigation }: any) {
     setGuardando(true);
     try {
       // Combina los campos de ubicación, ya que el esquema los almacena en una sola columna.
-      const fechaVencimiento = plazoInfo!.vencimiento;
       const ubicacion = [direccion, sector, referencia, coordenadas].map((item) => item.trim()).filter(Boolean).join(', ');
       const prioridadSeleccionada = prioridadesContrato.find((item) => item.nombre_prioridad === prioridad);
       if (!prioridadSeleccionada) throw new Error('El contrato no tiene esa prioridad configurada.');
@@ -125,18 +124,18 @@ export default function CrearTicketScreen({ navigation }: any) {
         id_prioridad: prioridadSeleccionada.id_prioridad_contrato,
         descripcion: descripcion.trim(),
         ubicacion: ubicacion || null,
-        plazo_subsanar: plazoInfo!.dias,
-        fecha_vencimiento: `${fechaVencimiento.getFullYear()}-${String(fechaVencimiento.getMonth() + 1).padStart(2, '0')}-${String(fechaVencimiento.getDate()).padStart(2, '0')}`,
+        direccion: direccion.trim() || null,
+        sector: sector.trim() || null,
+        referencia: referencia.trim() || null,
+        ...coordenadasNumericas(coordenadas),
+        fotos: fotos.map((foto) => foto.dataUrl),
       });
       // Refresca el resumen desde el servidor después de confirmar la creación.
       await cargarTickets();
-      const mensaje = fotos.length
-        ? 'El ticket quedó guardado. Las fotos no se enviaron porque el servidor aún no admite carga de archivos.'
-        : 'El ticket quedó guardado en el servidor.';
-      Alert.alert('Ticket creado', mensaje);
+      avisar('Ticket creado', 'El ticket quedó guardado en el servidor.');
       navigation.goBack();
     } catch (error) {
-      Alert.alert('No se pudo crear el ticket', (error as Error).message);
+      avisar('No se pudo crear el ticket', (error as Error).message);
     } finally {
       setGuardando(false);
     }

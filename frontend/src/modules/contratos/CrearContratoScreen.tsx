@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { avisar } from '../../core/ui/avisos';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../auth/components/SesionHeader';
 import TopBar from '../../core/ui/TopBar';
@@ -173,10 +174,10 @@ export default function CrearContratoScreen({ navigation }: any) {
 
   // Recarga el listado para mostrar el registro persistido, no una copia temporal.
       await cargarContratos();
-      Alert.alert('Contrato creado', 'El contrato quedó guardado en el servidor.');
+      avisar('Contrato creado', 'El contrato quedó guardado en el servidor.');
       navigation.goBack();
     } catch (error) {
-      Alert.alert('No se pudo crear el contrato', (error as Error).message);
+      avisar('No se pudo crear el contrato', (error as Error).message);
     } finally {
       setGuardando(false);
     }

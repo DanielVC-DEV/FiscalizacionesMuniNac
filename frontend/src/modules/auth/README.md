@@ -7,7 +7,7 @@ Pantalla de inicio de sesión y la sesión activa en memoria. Es lo primero que 
 - [LoginScreen.tsx](LoginScreen.tsx): correo y contraseña. Llama a `authApi.login` y, si funciona, inicia la sesión.
 - [api.ts](api.ts): endpoints `login` y `logout`, y el tipo `AuthApi` de la respuesta.
 - [types.ts](types.ts): tipo `Usuario` de la sesión.
-- [store.ts](store.ts): sesión en memoria. `iniciarSesion`, `cerrarSesion`, el hook `useSesion()` y `esAdministrador(usuario)`, que decide qué opciones de administración se muestran. El token se pasa a [core/api/client.ts](../../core/api/README.md) y no se guarda en el teléfono: al cerrar la app hay que volver a iniciar sesión.
+- [store.ts](store.ts): sesión en memoria. `iniciarSesion`, `cerrarSesion`, el hook `useSesion()` `esAdministrador(usuario)`, que decide qué opciones de administración se muestran, y `esMunicipal(usuario)` (admin o director), que separa al personal municipal del supervisor de empresa. En la web la sesión se guarda en `sessionStorage` (se borra al cerrar la pestaña). El token se pasa a [core/api/client.ts](../../core/api/README.md) y no se guarda en el teléfono: al cerrar la app hay que volver a iniciar sesión.
 - [components/](components/README.md): `PantallaAcceso` (marco común) y `CampoTexto` (campo con mostrar/ocultar contraseña).
 
 ## Depende de

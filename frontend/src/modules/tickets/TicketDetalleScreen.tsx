@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { avisar, confirmar } from '../../core/ui/avisos';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../auth/components/SesionHeader';
 import { useSesion } from '../auth/store';
@@ -8,8 +9,26 @@ import Card from '../../core/ui/Card';
 import EstadoBadge from '../../core/ui/EstadoBadge';
 import TopBar from '../../core/ui/TopBar';
 import { COLORS, RADIOS } from '../../core/theme/colors';
+import { fechaDesdeApi } from '../../core/utils/fechas';
 import { cargarTickets } from './store';
 import { ticketsApi, TicketDetalleApi } from './api';
+import FotosField, { Foto } from './components/FotosField';
+
+// Nombre legible de cada tipo de actuación del historial, para las que no traen descripción.
+const ETIQUETA_ACTUACION: Record<string, string> = {
+  CREACION: 'Ticket creado',
+  RESPUESTA: 'Respuesta de la empresa',
+  OBSERVACION: 'Observación',
+  SOLICITUD_SUBSANACION: 'Solicitud de nueva subsanación',
+  CAMBIO_ESTADO: 'Cambio de estado',
+  NOTIFICACION: 'Notificación enviada',
+  RECORDATORIO: 'Recordatorio enviado',
+  VENCIMIENTO: 'Plazo vencido',
+  CONFORMIDAD: 'Conformidad',
+  CIERRE: 'Ticket cerrado',
+  REAPERTURA: 'Ticket reabierto',
+  ENLACE_CONSULTA: 'Enlace de consulta externa generado',
+};
 
 export default function TicketDetalleScreen({ navigation, route }: any) {
   const { idTicket } = route.params;
@@ -19,6 +38,7 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
   const esMunicipal = esAdmin || rol === 'director';
   const [ticket, setTicket] = useState<TicketDetalleApi | null>(null);
   const [comentario, setComentario] = useState('');
+  const [fotos, setFotos] = useState<Foto[]>([]);
   const [comentarioRevision, setComentarioRevision] = useState('');
   const [mostrarSolicitud, setMostrarSolicitud] = useState(false);
   const [cargando, setCargando] = useState(true);
@@ -62,13 +82,14 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
       const resultado = await accion();
       await Promise.all([cargarDetalle(), cargarTickets()]);
       setComentario('');
+      setFotos([]);
       setComentarioRevision('');
       setMostrarSolicitud(false);
       const aviso = resultado && typeof resultado === 'object' && 'aviso' in resultado &&
         typeof resultado.aviso === 'string' ? resultado.aviso : null;
-      Alert.alert(aviso ? 'Respuesta registrada con aviso' : 'Ticket actualizado', aviso || mensaje);
+      avisar(aviso ? 'Respuesta registrada con aviso' : 'Ticket actualizado', aviso || mensaje);
     } catch (e) {
-      Alert.alert('No se pudo actualizar el ticket', (e as Error).message);
+      avisar('No se pudo actualizar el ticket', (e as Error).message);
     } finally {
       setGuardando(false);
     }
@@ -77,15 +98,15 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
   function enviarRespuesta() {
     const texto = comentario.trim();
     if (!texto) {
-      Alert.alert('Respuesta requerida', 'Describe las acciones realizadas para subsanar la observación.');
+      avisar('Respuesta requerida', 'Describe las acciones realizadas para subsanar la observación.');
       return;
     }
     if (texto.length > 5000) {
-      Alert.alert('Respuesta demasiado larga', 'La respuesta no puede superar los 5000 caracteres.');
+      avisar('Respuesta demasiado larga', 'La respuesta no puede superar los 5000 caracteres.');
       return;
     }
     return completarAccion(
-      () => ticketsApi.responder(idTicket, texto),
+      () => ticketsApi.responder(idTicket, texto, fotos.map((foto) => foto.dataUrl)),
       'La respuesta quedó registrada y se inició el envío de la notificación por correo.',
     );
   }
@@ -93,7 +114,7 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
   function solicitarNuevaSubsanacion() {
     const texto = comentarioRevision.trim();
     if (!texto) {
-      Alert.alert('Indica qué falta', 'Describe los aspectos que la empresa debe corregir.');
+      avisar('Indica qué falta', 'Describe los aspectos que la empresa debe corregir.');
       return;
     }
     return completarAccion(
@@ -102,17 +123,32 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
     );
   }
 
-  function darConformidad() {
+  async function darConformidad() {
+    if (!(await confirmar('Dar conformidad', 'La respuesta quedará marcada como subsanada conforme.'))) return;
     return completarAccion(
       () => ticketsApi.darConformidad(idTicket, comentarioRevision.trim() || undefined),
       'La respuesta quedó marcada como subsanada conforme.',
     );
   }
 
-  function cerrarTicket() {
+  async function cerrarTicket() {
+    if (!(await confirmar('Cerrar ticket', 'El ticket quedará cerrado. Podrás reabrirlo si es necesario.'))) return;
     return completarAccion(
       () => ticketsApi.cerrar(idTicket, comentarioRevision.trim() || undefined),
       'El ticket quedó cerrado.',
+    );
+  }
+
+  async function reabrirTicket() {
+    const texto = comentarioRevision.trim();
+    if (!texto) {
+      avisar('Motivo requerido', 'Indica el motivo de la reapertura.');
+      return;
+    }
+    if (!(await confirmar('Reabrir ticket', 'El ticket volverá al estado Abierto y se conserva todo su historial.'))) return;
+    return completarAccion(
+      () => ticketsApi.reabrir(idTicket, texto),
+      'El ticket fue reabierto.',
     );
   }
 
@@ -146,7 +182,7 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
               <Text style={styles.etiqueta}>Empresa</Text>
               <Text style={styles.texto}>{ticket.empresa_nombre}</Text>
               <Text style={styles.etiqueta}>Vencimiento de subsanación</Text>
-              <Text style={styles.texto}>{ticket.fecha_vencimiento}</Text>
+              <Text style={styles.texto}>{fechaDesdeApi(ticket.fecha_vencimiento)}</Text>
               {!!ticket.ubicacion && (
                 <>
                   <Text style={styles.etiqueta}>Ubicación</Text>
@@ -188,6 +224,7 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
                   maxLength={5000}
                   textAlignVertical="top"
                 />
+                <FotosField fotos={fotos} onChange={setFotos} />
                 <Button
                   label="Enviar respuesta"
                   onPress={enviarRespuesta}
@@ -273,6 +310,30 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
               </Card>
             )}
 
+            {esMunicipal && ticket.estado === 'CERRADO' && (
+              <Card style={styles.tarjeta}>
+                <Text style={styles.seccion}>Reabrir ticket</Text>
+                <TextInput
+                  accessibilityLabel="Motivo de reapertura"
+                  style={[styles.campo, styles.campoCorto]}
+                  value={comentarioRevision}
+                  onChangeText={setComentarioRevision}
+                  placeholder="Motivo de la reapertura"
+                  placeholderTextColor={COLORS.textoTenue}
+                  multiline
+                  maxLength={5000}
+                  textAlignVertical="top"
+                />
+                <Button
+                  label="Reabrir ticket"
+                  variante="secundario"
+                  onPress={reabrirTicket}
+                  cargando={guardando}
+                  disabled={!comentarioRevision.trim()}
+                />
+              </Card>
+            )}
+
             <Card style={styles.tarjeta}>
               <Text style={styles.seccion}>Historial</Text>
               {ticket.historial.length === 0 ? (
@@ -280,7 +341,10 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
               ) : (
                 ticket.historial.map((actuacion) => (
                   <View key={actuacion.id_actuacion} style={styles.itemHistorial}>
-                    <Text style={styles.texto}>{actuacion.descripcion || actuacion.tipo}</Text>
+                    <Text style={styles.texto}>{actuacion.descripcion || ETIQUETA_ACTUACION[actuacion.tipo] || actuacion.tipo}</Text>
+                    {!!actuacion.archivos?.length && (
+                      <Text style={styles.secundario}>{actuacion.archivos.length} foto(s) adjunta(s)</Text>
+                    )}
                     <Text style={styles.secundario}>
                       {actuacion.usuario_nombre || 'Sistema'} · {new Date(actuacion.fecha).toLocaleString('es-CL')}
                     </Text>

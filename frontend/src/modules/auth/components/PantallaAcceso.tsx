@@ -34,7 +34,7 @@ export default function PantallaAcceso({ titulo, subtitulo, children }: Props) {
           </View>
 
           <Text style={styles.pie}>
-            Acceso exclusivo para personal municipal autorizado. Las acciones quedan registradas.
+            Acceso para personal municipal y empresas contratistas autorizadas. Las acciones quedan registradas.
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -51,6 +51,9 @@ const styles = StyleSheet.create({
   logo: { width: 210, height: 84 },
   sistema: { color: COLORS.textoSecundario, fontSize: 13, fontWeight: '600', textAlign: 'center' },
   tarjeta: {
+    width: '100%',
+    maxWidth: 440,
+    alignSelf: 'center',
     backgroundColor: COLORS.superficie,
     borderRadius: RADIOS.xl,
     borderWidth: 1,

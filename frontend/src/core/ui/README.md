@@ -10,6 +10,8 @@ Componentes visuales compartidos. Son genéricos: reciben datos y callbacks por 
 | [Card.tsx](Card.tsx) | Contenedor blanco con borde suave. |
 | [DateField.tsx](DateField.tsx) | Selector de fecha en tres partes (día, mes, año) que devuelve `dd/mm/aaaa`. |
 | [EstadoBadge.tsx](EstadoBadge.tsx) | Insignia de color por estado de ticket. |
+| [avisos.ts](avisos.ts) | `avisar(titulo, mensaje)` y `confirmar(titulo, mensaje)`: avisos y confirmaciones que funcionan en celular (`Alert`) y en navegador (`window.alert/confirm`), donde `Alert.alert` no hace nada. Todas las pantallas usan estos en vez de `Alert`. |
+| [MarcoWeb.tsx](MarcoWeb.tsx) | Sólo en navegador: centra la app en un panel de ancho máximo (`ANCHO_MAXIMO_WEB`) sobre un fondo de página. En el celular no hace nada. Se usa en [App.tsx](../../../App.tsx). |
 | [Header.tsx](Header.tsx) | Barra de marca con logo y nombre de la municipalidad. Acepta `derecha` (contenido opcional a la derecha). La sesión la arma [SesionHeader](../../modules/auth/components/SesionHeader.tsx). |
 | [SeccionLabel.tsx](SeccionLabel.tsx) | Título de subsección con marca azul. |
 | [SelectField.tsx](SelectField.tsx) | Campo de selección que abre una hoja con opciones. |

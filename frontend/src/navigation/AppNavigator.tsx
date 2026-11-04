@@ -10,7 +10,7 @@ import EmpresasScreen from '../modules/empresas/EmpresasScreen';
 import AreasScreen from '../modules/areas/AreasScreen';
 import SupervisoresScreen from '../modules/supervisores/SupervisoresScreen';
 import LoginScreen from '../modules/auth/LoginScreen';
-import { esAdministrador, useSesion } from '../modules/auth/store';
+import { esAdministrador, esMunicipal, useSesion } from '../modules/auth/store';
 
 // Único lugar donde se registran las pantallas. Los nombres de ruta
 // ("Menu", "Resumen", ...) son los que usan navigation.navigate(...).
@@ -22,6 +22,7 @@ const Stack = createNativeStackNavigator();
 export default function AppNavigator() {
   const sesion = useSesion();
   const esAdmin = esAdministrador(sesion?.usuario);
+  const municipal = esMunicipal(sesion?.usuario);
 
   return (
     <Stack.Navigator>
@@ -29,16 +30,21 @@ export default function AppNavigator() {
         <Stack.Group screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Menu" component={MenuScreen} />
           <Stack.Screen name="Resumen" component={ResumenScreen} />
-          <Stack.Screen name="CrearTicket" component={CrearTicketScreen} />
           <Stack.Screen name="TicketDetalle" component={TicketDetalleScreen} />
-          <Stack.Screen name="Contratos" component={ContratosScreen} />
-          <Stack.Screen name="ContratoDetalle" component={ContratoDetalleScreen} />
         </Stack.Group>
       ) : (
         <Stack.Group screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={LoginScreen} />
         </Stack.Group>
       )}
+
+      {sesion && municipal ? (
+        <Stack.Group screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="CrearTicket" component={CrearTicketScreen} />
+          <Stack.Screen name="Contratos" component={ContratosScreen} />
+          <Stack.Screen name="ContratoDetalle" component={ContratoDetalleScreen} />
+        </Stack.Group>
+      ) : null}
 
       {sesion && esAdmin ? (
         <Stack.Group screenOptions={{ headerShown: false }}>

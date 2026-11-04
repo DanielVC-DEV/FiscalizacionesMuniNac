@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { avisar } from '../../core/ui/avisos';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../auth/components/SesionHeader';
@@ -62,7 +63,7 @@ export default function SupervisoresScreen({ navigation }: any) {
       setEmpresaOpcion(null);
       setMostrarFormulario(false);
       await cargarDatos();
-      Alert.alert('Supervisor creado', 'Ya aparece para asignarlo a contratos y tickets.');
+      avisar('Supervisor creado', 'Ya aparece para asignarlo a contratos y tickets.');
     } catch (error) {
       setErrorFormulario((error as Error).message);
     } finally {

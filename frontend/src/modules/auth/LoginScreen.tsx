@@ -34,7 +34,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <PantallaAcceso titulo="Iniciar sesión" subtitulo="Ingresa con tu cuenta institucional.">
+    <PantallaAcceso titulo="Iniciar sesión" subtitulo="Ingresa con tu cuenta.">
       {error && (
         <View style={styles.error} accessibilityRole="alert">
           <Text style={styles.errorTexto}>{error}</Text>
@@ -45,7 +45,7 @@ export default function LoginScreen() {
         label="Correo electrónico"
         value={email}
         onChangeText={setEmail}
-        placeholder="nombre@municipalidad.cl"
+        placeholder="tu correo electrónico"
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}

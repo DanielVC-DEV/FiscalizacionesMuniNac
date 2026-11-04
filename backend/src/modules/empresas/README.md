@@ -9,4 +9,6 @@
   - `listarSupervisores`: usuarios de la empresa con rol `supervisor_empresa`.
   - `asignarSupervisorContraparte`: sólo acepta un usuario de la misma empresa con ese rol.
 
+Acceso: consultar empresas y sus supervisores es sólo para admin y director; crear y asignar supervisor, sólo admin.
+
 Tablas: `empresas`, `area`, `usuario`, `rol_usuario`, `rol`.

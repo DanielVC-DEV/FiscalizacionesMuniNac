@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { avisar } from '../../core/ui/avisos';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../auth/components/SesionHeader';
@@ -72,7 +73,7 @@ export default function EmpresasScreen({ navigation }: any) {
       setAreaOpcion(null);
       setMostrarFormulario(false);
       await cargarDatos();
-      Alert.alert('Empresa creada', 'La empresa quedó guardada en el servidor.');
+      avisar('Empresa creada', 'La empresa quedó guardada en el servidor.');
     } catch (error) {
       setErrorFormulario((error as Error).message);
     } finally {

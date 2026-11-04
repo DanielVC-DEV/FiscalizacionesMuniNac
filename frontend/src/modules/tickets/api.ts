@@ -29,6 +29,7 @@ export interface ActuacionApi {
   fecha: string;
   descripcion: string | null;
   usuario_nombre: string | null;
+  archivos?: { id_archivo: number; tipo_mime: string }[];
 }
 
 export interface RespuestaCreadaApi {
@@ -47,10 +48,11 @@ export const ticketsApi = {
   crear: (body: Record<string, unknown>) =>
     request<Record<string, unknown>>('/tickets', { method: 'POST', body: JSON.stringify(body) }),
   obtener: (id: number) => request<TicketDetalleApi>(`/tickets/${id}`),
-  responder: (id: number, comentario: string) =>
+  // `fotos` son data URL en base64 (ver FotosField).
+  responder: (id: number, comentario: string, fotos: string[] = []) =>
     request<RespuestaCreadaApi>(`/tickets/${id}/respuestas`, {
       method: 'POST',
-      body: JSON.stringify({ comentario }),
+      body: JSON.stringify({ comentario, fotos }),
     }),
   solicitarSubsanacion: (id: number, comentario: string) =>
     request(`/tickets/${id}/solicitar-subsanacion`, {
@@ -64,6 +66,11 @@ export const ticketsApi = {
     }),
   cerrar: (id: number, comentario?: string) =>
     request(`/tickets/${id}/cerrar`, {
+      method: 'POST',
+      body: JSON.stringify({ comentario }),
+    }),
+  reabrir: (id: number, comentario: string) =>
+    request(`/tickets/${id}/reabrir`, {
       method: 'POST',
       body: JSON.stringify({ comentario }),
     }),
