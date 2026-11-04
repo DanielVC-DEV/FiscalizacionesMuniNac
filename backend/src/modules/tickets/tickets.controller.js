@@ -8,9 +8,11 @@ const { notificarTicket } = require('../notificaciones/notificaciones.service');
 const {
   ESTADOS, ESTADOS_RESERVADOS, transicionar, cambiarEstadoTicket,
 } = require('./ticketStateMachine');
-const { TIPOS_ACTUACION, registrarActuacion, obtenerHistorial } = require('./actuaciones');
+const {
+  TIPOS_ACTUACION, TIPOS_SOLO_MUNICIPALES, registrarActuacion, obtenerHistorial,
+} = require('./actuaciones');
 const { SELECT_TICKETS, construirFiltros } = require('./ticketFiltros');
-const { puedeVerTicket } = require('./ticketAcceso');
+const { puedeVerTicket, esMunicipal } = require('./ticketAcceso');
 const { validarFotos, registrarFotos } = require('./fotos');
 
 function responderError(res, next, err) {
@@ -84,7 +86,9 @@ async function obtener(req, res, next) {
       [req.params.id]
     );
 
-    const historial = await obtenerHistorial(pool, req.params.id);
+    // La empresa no ve las actuaciones internas (avisos con correos de destinatarios).
+    const historial = (await obtenerHistorial(pool, req.params.id))
+      .filter(({ tipo }) => esMunicipal(req.usuario) || !TIPOS_SOLO_MUNICIPALES.includes(tipo));
 
     res.json({
       ...ticket,

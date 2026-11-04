@@ -12,6 +12,12 @@ export function setTokenSesion(token: string | null) {
   tokenSesion = token;
 }
 
+// Cabecera de autorización de la sesión activa, para pedir recursos que no pasan por
+// `request` (por ejemplo, imágenes protegidas). Vacía si no hay sesión.
+export function cabeceraAutorizacion(): Record<string, string> {
+  return tokenSesion ? { Authorization: `Bearer ${tokenSesion}` } : {};
+}
+
 export async function request<T>(path: string, init?: RequestInit): Promise<T> {
   // Todas las llamadas comparten la misma URL base, encabezados JSON y el token de sesión.
   const response = await fetch(`${API_BASE_URL}${path}`, {

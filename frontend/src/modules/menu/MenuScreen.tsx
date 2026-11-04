@@ -15,6 +15,12 @@ const OPCIONES = [
     glifo: <IconoBarras />,
   },
   {
+    titulo: 'Indicadores',
+    descripcion: 'Métricas y reporte PDF',
+    destino: 'Indicadores',
+    glifo: <IconoBarras />,
+  },
+  {
     titulo: 'Tickets',
     descripcion: 'Crear una fiscalización',
     destino: 'CrearTicket',
@@ -39,6 +45,12 @@ const OPCIONES = [
     glifo: <IconoDocumento />,
   },
   {
+    titulo: 'Notificaciones',
+    descripcion: 'Correos que reciben avisos',
+    destino: 'Destinatarios',
+    glifo: <IconoDocumento />,
+  },
+  {
     titulo: 'Supervisores',
     descripcion: 'Crear supervisores de empresa',
     destino: 'Supervisores',
@@ -47,9 +59,9 @@ const OPCIONES = [
 ] as const;
 
 // Destinos que sólo ve el administrador (ver auth/store.ts).
-const DESTINOS_ADMIN: string[] = ['Empresas', 'Areas', 'Supervisores'];
+const DESTINOS_ADMIN: string[] = ['Empresas', 'Areas', 'Supervisores', 'Destinatarios'];
 // Destinos de usuarios municipales: el supervisor de empresa sólo ve "Resumen".
-const DESTINOS_MUNICIPALES: string[] = ['CrearTicket', 'Contratos'];
+const DESTINOS_MUNICIPALES: string[] = ['CrearTicket', 'Contratos', 'Indicadores'];
 
 export default function MenuScreen({ navigation }: any) {
   const sesion = useSesion();

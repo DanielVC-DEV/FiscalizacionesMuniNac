@@ -46,6 +46,9 @@ Arquitectura por capas dentro de `src/`:
 | `modules/contratos` | Contratos, detalle y alta. Subcarpeta `components/`. | [contratos](frontend/src/modules/contratos/README.md), [components](frontend/src/modules/contratos/components/README.md) |
 | `modules/empresas` | Empresas contratistas. | [empresas](frontend/src/modules/empresas/README.md) |
 | `modules/areas` | Áreas municipales. | [areas](frontend/src/modules/areas/README.md) |
+| `modules/reportes` | Indicadores y reporte PDF (admin y director). | [reportes](frontend/src/modules/reportes/README.md) |
+| `modules/consulta` | Página pública de consulta por enlace (sólo lectura). | [consulta](frontend/src/modules/consulta/README.md) |
+| `modules/notificaciones` | Destinatarios de avisos por correo (admin). | [notificaciones](frontend/src/modules/notificaciones/README.md) |
 | `modules/auth` | Inicio de sesión y sesión activa (primera pantalla de la app). Subcarpeta `components/`. | [auth](frontend/src/modules/auth/README.md), [components](frontend/src/modules/auth/components/README.md) |
 
 Cada módulo sigue la misma forma:
@@ -128,9 +131,9 @@ npm run dev    # con --watch
 - **Expo Router**: `frontend/AGENTS.md` pide Expo Router con rutas en `src/app/`. La navegación actual usa React Navigation (`src/navigation/`). La migración no se ha hecho.
 - **Secretos**: `backend/.env` está en el control de versiones. Debe sacarse del repositorio y rotar sus credenciales.
 - **node_modules en Git**: el índice contiene `frontend/node_modules` (~25 000 archivos). Revisar `.gitignore` y ejecutar `git rm -r --cached`.
-- **Fotos**: la app y la web envían las fotos en base64 (`FotosField`) y el servidor las guarda en `backend/uploads/`. Falta una vista que las muestre en el historial (hoy sólo se cuenta cuántas hay, porque la descarga exige token) y probar cámara y ubicación en navegador con un dispositivo real.
+- **Fotos**: la app y la web envían las fotos en base64 y el historial las muestra con la sesión. Falta probar cámara y ubicación en navegador con un dispositivo real.
 - **Feriados**: el servidor descuenta los feriados de la tabla `feriado` (se cargan con `POST /api/feriados`), pero la lista está vacía y falta confirmar el calendario con la Municipalidad. `frontend/src/core/utils/businessDays.ts` todavía no los descuenta; el vencimiento lo recalcula el servidor.
 - **Estados**: la máquina usa `RESPONDIDO` como "respuesta pendiente de revisión", pero el informe describe `ABIERTO` así y `RESPONDIDO` como "revisada con pendientes". Confirmar con la Municipalidad antes de cambiar la máquina.
-- **Consulta externa**: la vista pública no muestra fotos. Si la Municipalidad las quiere, hay que agregar un enlace de descarga firmado.
-- **Pantallas pendientes**: la app ya permite responder (con fotos), revisar, dar conformidad, cerrar y reabrir tickets. Faltan pantallas para indicadores, PDF, enlaces de consulta externa y administración de destinatarios.
+- **Consulta externa**: el enlace abre una página pública en `/empresa/consulta/<token>`. No muestra fotos; si la Municipalidad las quiere, hay que agregar un enlace de descarga firmado.
+- **Pantallas**: la app cubre responder (con fotos), revisar, conformidad, cierre, reapertura, indicadores, enlaces de consulta externa y destinatarios. El PDF sólo se descarga desde la web.
 - **Web de empresas**: el mismo frontend se exporta con `npx expo export --platform web` (en `frontend/`) y el backend lo sirve en `/empresa` desde `frontend/dist`. El supervisor de empresa sólo ve `Resumen` y `TicketDetalle`; contratos, empresas y catálogos son sólo para admin y director (también en el backend). Para publicarla falta lo de infraestructura: dominio, HTTPS con proxy inverso, Node como servicio, respaldos de la base y de `backend/uploads/`, sacar `backend/.env` del repositorio y definir `TRUST_PROXY=1` detrás del proxy.

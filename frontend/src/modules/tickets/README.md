@@ -21,5 +21,4 @@ Ver también [components/README.md](components/README.md).
 
 ## Pendiente conocido
 
-- Las fotos del historial se muestran sólo como conteo; falta una vista que las descargue con la sesión (`GET /api/tickets/archivos/:id` exige token).
 - La cámara y la ubicación en navegador dependen de `expo-image-picker` y `expo-location` y requieren HTTPS (o localhost); no se probaron con dispositivo real.

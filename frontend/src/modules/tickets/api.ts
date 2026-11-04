@@ -1,4 +1,4 @@
-import { request } from '../../core/api/client';
+import { API_BASE_URL, cabeceraAutorizacion, request } from '../../core/api/client';
 
 export interface TicketApi {
   id_ticket: number;
@@ -75,3 +75,11 @@ export const ticketsApi = {
       body: JSON.stringify({ comentario }),
     }),
 };
+
+// Origen de una foto del historial: la descarga exige la sesión, por eso lleva cabecera.
+export function origenArchivo(idArchivo: number) {
+  return {
+    uri: `${API_BASE_URL}/tickets/archivos/${idArchivo}`,
+    headers: cabeceraAutorizacion(),
+  };
+}

@@ -17,6 +17,14 @@ const TIPOS_ACTUACION = Object.freeze({
   ENLACE_CONSULTA: 'ENLACE_CONSULTA',
 });
 
+// Actuaciones internas: sus descripciones incluyen correos de destinatarios o gestión municipal.
+// No se muestran a empresas ni a quien consulta por enlace.
+const TIPOS_SOLO_MUNICIPALES = Object.freeze([
+  TIPOS_ACTUACION.NOTIFICACION,
+  TIPOS_ACTUACION.RECORDATORIO,
+  TIPOS_ACTUACION.ENLACE_CONSULTA,
+]);
+
 // `client` debe ser una conexión dentro de una transacción, para que la
 // actuación quede guardada junto con el cambio que describe.
 async function registrarActuacion(client, { idTicket, tipo, idUsuario = null, descripcion = null, datos = null }) {
@@ -47,4 +55,4 @@ async function obtenerHistorial(pool, idTicket) {
   return rows;
 }
 
-module.exports = { TIPOS_ACTUACION, registrarActuacion, obtenerHistorial };
+module.exports = { TIPOS_ACTUACION, TIPOS_SOLO_MUNICIPALES, registrarActuacion, obtenerHistorial };

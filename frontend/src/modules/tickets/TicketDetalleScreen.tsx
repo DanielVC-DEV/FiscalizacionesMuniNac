@@ -13,6 +13,8 @@ import { fechaDesdeApi } from '../../core/utils/fechas';
 import { cargarTickets } from './store';
 import { ticketsApi, TicketDetalleApi } from './api';
 import FotosField, { Foto } from './components/FotosField';
+import FotosHistorial from './components/FotosHistorial';
+import EnlacesConsulta from './components/EnlacesConsulta';
 
 // Nombre legible de cada tipo de actuación del historial, para las que no traen descripción.
 const ETIQUETA_ACTUACION: Record<string, string> = {
@@ -334,6 +336,8 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
               </Card>
             )}
 
+            {esMunicipal && <EnlacesConsulta idTicket={idTicket} />}
+
             <Card style={styles.tarjeta}>
               <Text style={styles.seccion}>Historial</Text>
               {ticket.historial.length === 0 ? (
@@ -342,9 +346,7 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
                 ticket.historial.map((actuacion) => (
                   <View key={actuacion.id_actuacion} style={styles.itemHistorial}>
                     <Text style={styles.texto}>{actuacion.descripcion || ETIQUETA_ACTUACION[actuacion.tipo] || actuacion.tipo}</Text>
-                    {!!actuacion.archivos?.length && (
-                      <Text style={styles.secundario}>{actuacion.archivos.length} foto(s) adjunta(s)</Text>
-                    )}
+                    {!!actuacion.archivos?.length && <FotosHistorial archivos={actuacion.archivos} />}
                     <Text style={styles.secundario}>
                       {actuacion.usuario_nombre || 'Sistema'} · {new Date(actuacion.fecha).toLocaleString('es-CL')}
                     </Text>

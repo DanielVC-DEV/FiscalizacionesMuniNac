@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MenuScreen from '../modules/menu/MenuScreen';
 import ResumenScreen from '../modules/resumen/ResumenScreen';
+import IndicadoresScreen from '../modules/reportes/IndicadoresScreen';
 import CrearTicketScreen from '../modules/tickets/CrearTicketScreen';
 import TicketDetalleScreen from '../modules/tickets/TicketDetalleScreen';
 import ContratosScreen from '../modules/contratos/ContratosScreen';
@@ -8,6 +9,7 @@ import ContratoDetalleScreen from '../modules/contratos/ContratoDetalleScreen';
 import CrearContratoScreen from '../modules/contratos/CrearContratoScreen';
 import EmpresasScreen from '../modules/empresas/EmpresasScreen';
 import AreasScreen from '../modules/areas/AreasScreen';
+import DestinatariosScreen from '../modules/notificaciones/DestinatariosScreen';
 import SupervisoresScreen from '../modules/supervisores/SupervisoresScreen';
 import LoginScreen from '../modules/auth/LoginScreen';
 import { esAdministrador, esMunicipal, useSesion } from '../modules/auth/store';
@@ -41,6 +43,7 @@ export default function AppNavigator() {
       {sesion && municipal ? (
         <Stack.Group screenOptions={{ headerShown: false }}>
           <Stack.Screen name="CrearTicket" component={CrearTicketScreen} />
+          <Stack.Screen name="Indicadores" component={IndicadoresScreen} />
           <Stack.Screen name="Contratos" component={ContratosScreen} />
           <Stack.Screen name="ContratoDetalle" component={ContratoDetalleScreen} />
         </Stack.Group>
@@ -52,6 +55,7 @@ export default function AppNavigator() {
           <Stack.Screen name="Empresas" component={EmpresasScreen} />
           <Stack.Screen name="Areas" component={AreasScreen} />
           <Stack.Screen name="Supervisores" component={SupervisoresScreen} />
+          <Stack.Screen name="Destinatarios" component={DestinatariosScreen} />
         </Stack.Group>
       ) : null}
     </Stack.Navigator>

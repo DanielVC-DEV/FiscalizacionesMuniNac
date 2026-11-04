@@ -12,6 +12,9 @@ Cada carpeta es un módulo independiente. Un módulo contiene sus pantallas, su 
 | [contratos](contratos/README.md) | Listado, detalle y alta de contratos y órdenes de compra. | [contratos/README.md](contratos/README.md) |
 | [empresas](empresas/README.md) | Listado y alta de empresas contratistas. | [empresas/README.md](empresas/README.md) |
 | [areas](areas/README.md) | Listado y alta de áreas. | [areas/README.md](areas/README.md) |
+| [reportes](reportes/README.md) | Indicadores de gestión y descarga del reporte PDF (admin y director). | [reportes/README.md](reportes/README.md) |
+| [consulta](consulta/README.md) | Página pública de consulta de un ticket por enlace (sólo lectura). | [consulta/README.md](consulta/README.md) |
+| [notificaciones](notificaciones/README.md) | Destinatarios de los avisos por correo (admin). | [notificaciones/README.md](notificaciones/README.md) |
 | [supervisores](supervisores/README.md) | Listado y alta de supervisores de empresa. | [supervisores/README.md](supervisores/README.md) |
 | [auth](auth/README.md) | Inicio de sesión, registro y sesión activa. Es la primera pantalla de la app. | [auth/README.md](auth/README.md) |
 

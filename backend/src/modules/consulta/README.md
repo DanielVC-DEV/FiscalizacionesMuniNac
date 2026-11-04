@@ -13,7 +13,7 @@ Permite compartir la consulta de un ticket con personas que no tienen cuenta. El
 
 ## Qué se muestra
 
-Número, estado, prioridad, empresa, área, contrato, fechas, observación, ubicación, respuestas (comentario y fecha, sin nombre del usuario interno) e historial (tipo, fecha y descripción). No se muestran fotografías ni datos de usuarios internos.
+Número, estado, prioridad, empresa, área, contrato, fechas, observación, ubicación, respuestas (comentario y fecha, sin nombre del usuario interno) e historial (tipo, fecha y descripción, sin las actuaciones internas de avisos, recordatorios y enlaces). No se muestran fotografías ni datos de usuarios internos.
 
 ## Archivos
 

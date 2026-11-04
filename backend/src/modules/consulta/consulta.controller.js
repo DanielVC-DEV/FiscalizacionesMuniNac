@@ -6,7 +6,9 @@
 const crypto = require('crypto');
 const pool = require('../../core/config/db');
 const { esIdValido } = require('../../core/utils/validaciones');
-const { registrarActuacion, obtenerHistorial, TIPOS_ACTUACION } = require('../tickets/actuaciones');
+const {
+  registrarActuacion, obtenerHistorial, TIPOS_ACTUACION, TIPOS_SOLO_MUNICIPALES,
+} = require('../tickets/actuaciones');
 const { SELECT_TICKETS } = require('../tickets/ticketFiltros');
 
 const DIAS_VIGENCIA_POR_DEFECTO = 30;
@@ -105,12 +107,13 @@ async function consultarPublica(req, res, next) {
     const ticket = rows[0];
 
     const respuestas = await pool.query(
-      `SELECT r.comentario, r.fecha, u.nombre AS usuario_nombre
-       FROM respuesta r JOIN usuario u ON u.id_usuario = r.id_usuario
+      `SELECT r.comentario, r.fecha
+       FROM respuesta r
        WHERE r.id_ticket = $1 ORDER BY r.fecha`,
       [ticket.id_ticket]
     );
     const historial = (await obtenerHistorial(pool, ticket.id_ticket))
+      .filter(({ tipo }) => !TIPOS_SOLO_MUNICIPALES.includes(tipo))
       .map(({ tipo, fecha, descripcion }) => ({ tipo, fecha, descripcion }));
 
     res.set('Cache-Control', 'no-store');

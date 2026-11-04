@@ -6,7 +6,7 @@
 |---|---|---|
 | `GET /api/tickets` | todos (alcance por rol) | Listado con filtros: número, empresa, área, supervisor, creador, estado (CSV), prioridad, rangos de creación, vencimiento y cierre. |
 | `POST /api/tickets` | admin, director | Crea observación y ticket en una transacción. Plazo y vencimiento se calculan en el servidor. |
-| `GET /api/tickets/:id` | todos (alcance por rol) | Detalle: ticket, contrato con órdenes de compra, respuestas e historial completo. |
+| `GET /api/tickets/:id` | todos (alcance por rol) | Detalle: ticket, contrato con órdenes de compra, respuestas e historial. El supervisor de empresa no ve las actuaciones internas (`NOTIFICACION`, `RECORDATORIO`, `ENLACE_CONSULTA`), porque incluyen correos de destinatarios. |
 | `PATCH /api/tickets/:id/estado` | admin, director | Cambio genérico de estado. No acepta `SUBSANADO_CONFORME` ni `CERRADO`. |
 | `POST /api/tickets/:id/solicitar-subsanacion` | admin, director | Ticket `RESPONDIDO` → `REQUIERE_NUEVA_SUBSANACION` con comentario obligatorio. Notifica. |
 | `POST /api/tickets/:id/conformidad` | admin, director | `RESPONDIDO` → `SUBSANADO_CONFORME`. Registra quién dio la conformidad, cuándo y comentario. |
@@ -26,7 +26,7 @@ El alcance por rol está en [ticketAcceso.js](ticketAcceso.js): el supervisor de
 - [respuestas.controller.js](respuestas.controller.js): la respuesta, su actuación y el paso a `RESPONDIDO` van en una sola transacción. Si el ticket no puede pasar a `RESPONDIDO`, la respuesta queda guardada y se devuelve un `aviso`; después se notifica por correo al creador municipal y a los destinatarios configurados.
 - [archivos.controller.js](archivos.controller.js): entrega el archivo sólo si el usuario puede ver el ticket.
 - [ticketStateMachine.js](ticketStateMachine.js): `ESTADOS`, `TRANSICIONES_PERMITIDAS`, `transicionar` (dentro de una transacción ya abierta), `cambiarEstadoTicket` (abre su propia transacción) y `marcarTicketsVencidos` (lo usa el mantenimiento diario). Cada transición escribe su actuación.
-- [actuaciones.js](actuaciones.js): `registrarActuacion` e `obtenerHistorial`. El historial (`ticket_actuacion`) es append-only: un trigger en la base impide editarlo o borrarlo.
+- [actuaciones.js](actuaciones.js): `registrarActuacion`, `obtenerHistorial` y `TIPOS_SOLO_MUNICIPALES` (actuaciones que no se muestran a empresas ni en la consulta externa). El historial (`ticket_actuacion`) es append-only: un trigger en la base impide editarlo o borrarlo.
 - [fotos.js](fotos.js): `validarFotos` y `registrarFotos`. Cada foto se guarda en disco y queda en `archivo` ligada a su actuación.
 - [ticketFiltros.js](ticketFiltros.js): `SELECT_TICKETS` (consulta base compartida con reportes y notificaciones) y `construirFiltros` (filtros parametrizados).
 - [ticketAcceso.js](ticketAcceso.js): `puedeVerTicket`, `esMunicipal` y `ROLES_GESTION`.
