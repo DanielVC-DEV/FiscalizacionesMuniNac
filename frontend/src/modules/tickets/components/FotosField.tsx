@@ -29,11 +29,12 @@ function aFoto(asset: ImagePicker.ImagePickerAsset): Foto | null {
 interface Props {
   fotos: Foto[];
   onChange: (fotos: Foto[]) => void;
+  titulo?: string;
 }
 
 // Captura o selección de fotografías para la observación de un ticket,
 // con miniaturas y botón para quitar cada una.
-export default function FotosField({ fotos, onChange }: Props) {
+export default function FotosField({ fotos, onChange, titulo = 'Fotografías' }: Props) {
   function agregar(resultado: ImagePicker.ImagePickerResult) {
     if (resultado.canceled) return;
     const foto = aFoto(resultado.assets[0]);
@@ -76,7 +77,7 @@ export default function FotosField({ fotos, onChange }: Props) {
 
   return (
     <>
-      <Text style={[styles.label, { marginTop: 10 }]}>Fotografías</Text>
+      <Text style={[styles.label, { marginTop: 10 }]}>{titulo}</Text>
       <View style={styles.fila}>
         <Button label="Tomar foto" variante="suave" onPress={tomarFoto} style={{ flex: 1 }} />
         <Button label="Elegir desde el dispositivo" variante="suave" onPress={elegirImagen} style={{ flex: 1 }} />

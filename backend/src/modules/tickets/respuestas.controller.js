@@ -41,6 +41,10 @@ async function crear(req, res, next) {
   if (!textoValido(comentario, 5000)) {
     return res.status(400).json({ error: 'El comentario es obligatorio (máximo 5000 caracteres)' });
   }
+  // La evidencia fotográfica es obligatoria al subsanar.
+  if (!Array.isArray(fotos) || fotos.length === 0) {
+    return res.status(400).json({ error: 'Debes adjuntar al menos una foto como evidencia de la subsanación' });
+  }
   const errorFotos = validarFotos(fotos);
   if (errorFotos) return res.status(400).json({ error: errorFotos });
 

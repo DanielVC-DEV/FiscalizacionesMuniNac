@@ -107,6 +107,10 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
       avisar('Respuesta demasiado larga', 'La respuesta no puede superar los 5000 caracteres.');
       return;
     }
+    if (fotos.length === 0) {
+      avisar('Evidencia requerida', 'Toma o elige al menos una foto como evidencia de la subsanación.');
+      return;
+    }
     return completarAccion(
       () => ticketsApi.responder(idTicket, texto, fotos.map((foto) => foto.dataUrl)),
       'La respuesta quedó registrada y se inició el envío de la notificación por correo.',
@@ -196,7 +200,7 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
             {ticket.respuestas.length > 0 && (
               <Card style={styles.tarjeta}>
                 <Text style={styles.seccion}>Respuestas de la empresa</Text>
-                {ticket.respuestas.map((respuesta) => (
+                {[...ticket.respuestas].reverse().map((respuesta) => (
                   <View key={respuesta.id_respuesta} style={styles.itemHistorial}>
                     <Text style={styles.texto}>{respuesta.comentario}</Text>
                     <Text style={styles.secundario}>
@@ -226,12 +230,16 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
                   maxLength={5000}
                   textAlignVertical="top"
                 />
-                <FotosField fotos={fotos} onChange={setFotos} />
+                <FotosField
+                  fotos={fotos}
+                  onChange={setFotos}
+                  titulo="Evidencia fotográfica (obligatoria)"
+                />
                 <Button
                   label="Enviar respuesta"
                   onPress={enviarRespuesta}
                   cargando={guardando}
-                  disabled={!comentario.trim()}
+                  disabled={!comentario.trim() || fotos.length === 0}
                 />
               </Card>
             )}
@@ -343,7 +351,7 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
               {ticket.historial.length === 0 ? (
                 <Text style={styles.secundario}>No hay actuaciones registradas.</Text>
               ) : (
-                ticket.historial.map((actuacion) => (
+                [...ticket.historial].reverse().map((actuacion) => (
                   <View key={actuacion.id_actuacion} style={styles.itemHistorial}>
                     <Text style={styles.texto}>{actuacion.descripcion || ETIQUETA_ACTUACION[actuacion.tipo] || actuacion.tipo}</Text>
                     {!!actuacion.archivos?.length && <FotosHistorial archivos={actuacion.archivos} />}
