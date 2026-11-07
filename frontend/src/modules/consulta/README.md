@@ -5,7 +5,7 @@ Página pública de sólo lectura: quien recibe un enlace generado por un usuari
 ## Archivos
 
 - [ConsultaPublicaScreen.tsx](ConsultaPublicaScreen.tsx): la página pública. No muestra fotos ni nombres de usuarios internos (el backend ya los excluye).
-- [api.ts](api.ts): `consultaApi` (`crearEnlace`, `listarEnlaces`, `revocarEnlace`, `consultarPublica`), `urlConsultaPublica(token)` y los tipos `EnlaceApi`, `EnlaceCreadoApi` y `ConsultaPublicaApi`.
+- [api.ts](api.ts): `consultaApi` (`crearEnlace`, `listarEnlaces`, `revocarEnlace`, `consultarPublica`), `urlConsultaPublica(token)` (usa `EXPO_PUBLIC_APP_URL`, el origen web actual o el origen de la API) y los tipos `EnlaceApi`, `EnlaceCreadoApi` y `ConsultaPublicaApi`. `EXPO_PUBLIC_APP_URL` debe apuntar a una dirección accesible para quien recibe el enlace; en producción, el backend debe servir el build web en `/empresa`.
 
 La gestión de enlaces (generar y revocar) está en el detalle del ticket: [tickets/components/EnlacesConsulta.tsx](../tickets/components/EnlacesConsulta.tsx). El token se muestra una sola vez al generarlo; en la base sólo se guarda su hash.
 

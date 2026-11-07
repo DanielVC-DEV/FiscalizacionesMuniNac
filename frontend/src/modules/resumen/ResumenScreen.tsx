@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Header from '../auth/components/SesionHeader';
@@ -67,7 +67,7 @@ export default function ResumenScreen({ navigation }: any) {
       <Header />
       <TopBar title="Resumen de tickets" onBack={() => navigation.goBack()} />
 
-      <View style={styles.contenido}>
+      <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
         <View style={styles.filaAtencion}>
           <Text style={styles.tituloSeccion}>Requiere atención</Text>
           <TouchableOpacity style={styles.periodo} onPress={siguientePeriodo}>
@@ -116,7 +116,7 @@ export default function ResumenScreen({ navigation }: any) {
         <FilaEstado etiqueta="Subsanados" estadoClave="SUBSANADO_CONFORME" tickets={porEstado('SUBSANADO_CONFORME')} onSeleccionar={(t) => navigation.navigate('TicketDetalle', { idTicket: t.idTicket })} />
         <FilaEstado etiqueta="Cerrados" estadoClave="CERRADO" tickets={porEstado('CERRADO')} onSeleccionar={(t) => navigation.navigate('TicketDetalle', { idTicket: t.idTicket })} />
         <FilaEstado etiqueta="Total" tickets={filtrados} onSeleccionar={(t) => navigation.navigate('TicketDetalle', { idTicket: t.idTicket })} />
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

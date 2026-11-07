@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import { Linking, Platform, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import Button from '../../../core/ui/Button';
 import Card from '../../../core/ui/Card';
 import { avisar, confirmar } from '../../../core/ui/avisos';
@@ -21,6 +22,8 @@ function estadoDelEnlace(enlace: EnlaceApi): 'Revocado' | 'Vencido' | 'Vigente' 
 export default function EnlacesConsulta({ idTicket }: Props) {
   const [enlaces, setEnlaces] = useState<EnlaceApi[]>([]);
   const [urlNueva, setUrlNueva] = useState<string | null>(null);
+  const [enlaceCopiado, setEnlaceCopiado] = useState(false);
+  const [errorPortapapeles, setErrorPortapapeles] = useState(false);
   const [trabajando, setTrabajando] = useState(false);
 
   const cargar = useCallback(async () => {
@@ -31,9 +34,11 @@ export default function EnlacesConsulta({ idTicket }: Props) {
     }
   }, [idTicket]);
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     cargar();
-  }, [cargar]);
+    }, [cargar]),
+  );
 
   async function generar() {
     setTrabajando(true);
@@ -41,12 +46,31 @@ export default function EnlacesConsulta({ idTicket }: Props) {
       const creado = await consultaApi.crearEnlace(idTicket);
       const url = urlConsultaPublica(creado.token);
       setUrlNueva(url);
-      if (Platform.OS === 'web') await navigator.clipboard?.writeText(url).catch(() => undefined);
+      setEnlaceCopiado(false);
+      setErrorPortapapeles(false);
+      if (Platform.OS === 'web') {
+        try {
+          if (!navigator.clipboard) throw new Error('Portapapeles no disponible');
+          await navigator.clipboard.writeText(url);
+          setEnlaceCopiado(true);
+        } catch {
+          setErrorPortapapeles(true);
+        }
+      }
       await cargar();
     } catch (err) {
       avisar('No se pudo generar el enlace', (err as Error).message);
     } finally {
       setTrabajando(false);
+    }
+  }
+
+  async function abrirEnlace() {
+    if (!urlNueva) return;
+    try {
+      await Linking.openURL(urlNueva);
+    } catch (err) {
+      avisar('No se pudo abrir el enlace', (err as Error).message);
     }
   }
 
@@ -71,11 +95,15 @@ export default function EnlacesConsulta({ idTicket }: Props) {
       {urlNueva && (
         <View style={styles.nuevo}>
           <Text style={styles.etiqueta}>
-            Enlace nuevo{Platform.OS === 'web' ? ' (copiado al portapapeles)' : ''}. No se vuelve a mostrar:
+            Enlace nuevo{enlaceCopiado ? ' (copiado al portapapeles)' : ''}. No se vuelve a mostrar:
           </Text>
           <Text style={styles.url} selectable>
             {urlNueva}
           </Text>
+          {errorPortapapeles && (
+            <Text style={styles.secundario}>No se pudo copiar automáticamente. Puedes abrir el enlace o seleccionarlo.</Text>
+          )}
+          <Button label="Abrir enlace" variante="secundario" onPress={abrirEnlace} />
         </View>
       )}
 

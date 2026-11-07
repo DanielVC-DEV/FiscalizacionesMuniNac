@@ -4,7 +4,7 @@ Registro y subsanación de tickets de fiscalización: formulario inicial, seguim
 
 ## Archivos
 
-- [CrearTicketScreen.tsx](CrearTicketScreen.tsx): pantalla del formulario, validaciones, ubicación GPS y envío.
+- [CrearTicketScreen.tsx](CrearTicketScreen.tsx): pantalla del formulario, validaciones, ubicación GPS y envío; incluye acceso a “Ver tickets” para abrir el resumen de tickets y sus estados.
 - [TicketDetalleScreen.tsx](TicketDetalleScreen.tsx): detalle e historial del ticket; permite responder (con fotos), solicitar nueva subsanación, dar conformidad, cerrar y reabrir según el rol y estado; conformidad, cierre y reapertura piden confirmación. Admin y director pueden enviar una respuesta para probar el flujo; la respuesta operativa corresponde al supervisor de empresa.
 - [api.ts](api.ts): `ticketsApi` para listar, crear, consultar detalle, responder, revisar y cerrar; tipos de respuestas e historial.
 - [store.ts](store.ts): store en memoria de tickets (`cargarTickets`, `useTickets`, `addTicket`).

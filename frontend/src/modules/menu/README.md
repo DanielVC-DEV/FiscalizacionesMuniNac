@@ -4,7 +4,7 @@ Pantalla de inicio con una grilla de accesos a los demás módulos.
 
 ## Archivos
 
-- [MenuScreen.tsx](MenuScreen.tsx): pantalla principal. Define `OPCIONES` (título, descripción y ruta destino), el logo de bienvenida. El encabezado (usuario y Cerrar sesión) viene de [auth/components/SesionHeader](../auth/components/SesionHeader.tsx). Oculta Empresas, Áreas y Supervisores si el rol no es `admin` (`DESTINOS_ADMIN`).
+- [MenuScreen.tsx](MenuScreen.tsx): pantalla principal. Define los accesos principales y el menú desplegable “Creación y administración”, que agrupa Tickets, Áreas, Empresas y Contratos (en ese orden y dos columnas) según los permisos del rol. El encabezado (usuario y Cerrar sesión) viene de [auth/components/SesionHeader](../auth/components/SesionHeader.tsx). La gestión de notificaciones y supervisores no tiene acceso desde este menú.
 - [components/IconosMenu.tsx](components/IconosMenu.tsx): glifos hechos con `View` (`IconoBarras`, `IconoTicket`, `IconoDocumento`, `IconoEdificio`). Ver [components/README.md](components/README.md).
 
 ## Depende de

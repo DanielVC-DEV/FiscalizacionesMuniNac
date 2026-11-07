@@ -46,5 +46,17 @@ export const consultaApi = {
 
 // Dirección que se entrega a quien debe consultar: la página pública de la web.
 export function urlConsultaPublica(token: string): string {
-  return `${API_BASE_URL.replace(/\/api$/, '')}/empresa/consulta/${token}`;
+  const ruta = `/consulta/${encodeURIComponent(token)}`;
+  const appConfigurada = process.env.EXPO_PUBLIC_APP_URL?.replace(/\/+$/, '');
+  if (appConfigurada) {
+    const baseApp = appConfigurada.endsWith('/empresa') ? appConfigurada : `${appConfigurada}/empresa`;
+    return `${baseApp}${ruta}`;
+  }
+
+  if (typeof window !== 'undefined') {
+    const prefijoWeb = window.location.pathname.startsWith('/empresa') ? '/empresa' : '';
+    return `${window.location.origin}${prefijoWeb}${ruta}`;
+  }
+
+  return `${API_BASE_URL.replace(/\/api$/, '')}/empresa${ruta}`;
 }

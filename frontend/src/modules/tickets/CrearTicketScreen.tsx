@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { avisar } from '../../core/ui/avisos';
 import * as Location from 'expo-location';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -145,6 +145,12 @@ export default function CrearTicketScreen({ navigation }: any) {
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
       <Header />
       <TopBar title="Nuevo ticket" onBack={() => navigation.goBack()} />
+      <Button
+        label="Ver tickets"
+        variante="secundario"
+        onPress={() => navigation.navigate('Resumen')}
+        style={styles.botonVerTickets}
+      />
 
       <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
         <Text style={styles.seccion}>DATOS</Text>
@@ -318,6 +324,7 @@ const styles = StyleSheet.create({
   },
   autoTexto: { fontSize: 11, color: COLORS.azulOscuro, lineHeight: 16, textAlign: 'center' },
   botonUbicacion: { marginTop: 6, marginBottom: 4 },
+  botonVerTickets: { marginHorizontal: 16, marginTop: 8 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4, marginBottom: 8 },
   chip: {
     borderRadius: RADIOS.pill,

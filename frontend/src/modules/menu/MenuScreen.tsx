@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../auth/components/SesionHeader';
@@ -20,6 +21,9 @@ const OPCIONES = [
     destino: 'Indicadores',
     glifo: <IconoBarras />,
   },
+] as const;
+
+const OPCIONES_GESTION = [
   {
     titulo: 'Tickets',
     descripcion: 'Crear una fiscalización',
@@ -27,9 +31,9 @@ const OPCIONES = [
     glifo: <IconoTicket />,
   },
   {
-    titulo: 'Contratos',
-    descripcion: 'Ver y crear contratos',
-    destino: 'Contratos',
+    titulo: 'Áreas',
+    descripcion: 'Administrar áreas',
+    destino: 'Areas',
     glifo: <IconoDocumento />,
   },
   {
@@ -39,32 +43,21 @@ const OPCIONES = [
     glifo: <IconoEdificio />,
   },
   {
-    titulo: 'Áreas',
-    descripcion: 'Administrar áreas',
-    destino: 'Areas',
-    glifo: <IconoDocumento />,
-  },
-  {
-    titulo: 'Notificaciones',
-    descripcion: 'Correos que reciben avisos',
-    destino: 'Destinatarios',
-    glifo: <IconoDocumento />,
-  },
-  {
-    titulo: 'Supervisores',
-    descripcion: 'Crear supervisores de empresa',
-    destino: 'Supervisores',
+    titulo: 'Contratos',
+    descripcion: 'Ver y crear contratos',
+    destino: 'Contratos',
     glifo: <IconoDocumento />,
   },
 ] as const;
 
 // Destinos que sólo ve el administrador (ver auth/store.ts).
-const DESTINOS_ADMIN: string[] = ['Empresas', 'Areas', 'Supervisores', 'Destinatarios'];
+const DESTINOS_ADMIN: string[] = ['Empresas', 'Areas'];
 // Destinos de usuarios municipales: el supervisor de empresa sólo ve "Resumen".
 const DESTINOS_MUNICIPALES: string[] = ['CrearTicket', 'Contratos', 'Indicadores'];
 
 export default function MenuScreen({ navigation }: any) {
   const sesion = useSesion();
+  const [gestionAbierta, setGestionAbierta] = useState(false);
   const esAdmin = esAdministrador(sesion?.usuario);
   const municipal = esMunicipal(sesion?.usuario);
   const opcionesVisibles = OPCIONES.filter((opcion) => {
@@ -72,7 +65,12 @@ export default function MenuScreen({ navigation }: any) {
     if (DESTINOS_MUNICIPALES.includes(opcion.destino)) return municipal;
     return true;
   });
-  // En pantallas anchas (navegador, tablet) caben tres tarjetas por fila.
+  const gestionVisible = OPCIONES_GESTION.filter((opcion) => {
+    if (DESTINOS_ADMIN.includes(opcion.destino)) return esAdmin;
+    if (DESTINOS_MUNICIPALES.includes(opcion.destino)) return municipal;
+    return true;
+  });
+  // El menú principal admite tres tarjetas en pantallas anchas.
   const anchoTile = useWindowDimensions().width >= 600 ? '31.5%' : '47%';
 
   return (
@@ -104,6 +102,44 @@ export default function MenuScreen({ navigation }: any) {
             </TouchableOpacity>
           ))}
         </View>
+
+        {gestionVisible.length > 0 && (
+          <View style={styles.gestion}>
+            <TouchableOpacity
+              style={styles.gestionEncabezado}
+              activeOpacity={0.75}
+              onPress={() => setGestionAbierta((abierta) => !abierta)}
+              accessibilityRole="button"
+              accessibilityState={{ expanded: gestionAbierta }}
+            >
+              <View style={styles.gestionTexto}>
+                <Text style={styles.gestionTitulo}>Creación y administración</Text>
+                <Text style={styles.gestionDescripcion}>Tickets, contratos, empresas y áreas</Text>
+              </View>
+              <Text style={styles.gestionChevron}>{gestionAbierta ? '▴' : '▾'}</Text>
+            </TouchableOpacity>
+            {gestionAbierta && (
+              <View style={styles.gestionGrilla}>
+                {Array.from({ length: Math.ceil(gestionVisible.length / 2) }, (_, indiceFila) => (
+                  <View key={indiceFila} style={styles.gestionFila}>
+                    {gestionVisible.slice(indiceFila * 2, indiceFila * 2 + 2).map((opcion) => (
+                      <TouchableOpacity
+                        key={opcion.destino}
+                        style={[styles.tile, styles.gestionTile]}
+                        activeOpacity={0.75}
+                        onPress={() => navigation.navigate(opcion.destino)}
+                      >
+                        <View style={styles.tileIcono}>{opcion.glifo}</View>
+                        <Text style={styles.tileTitulo}>{opcion.titulo}</Text>
+                        <Text style={styles.tileDescripcion}>{opcion.descripcion}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -131,8 +167,36 @@ const styles = StyleSheet.create({
     paddingTop: 6,
     paddingBottom: 16,
   },
+  gestion: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    backgroundColor: COLORS.superficie,
+    borderRadius: RADIOS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.bordeSuave,
+    ...SOMBRA,
+  },
+  gestionEncabezado: {
+    minHeight: 62,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  gestionTexto: { flex: 1 },
+  gestionTitulo: { color: COLORS.textoPrimario, fontSize: 14, fontWeight: '700' },
+  gestionDescripcion: { color: COLORS.textoSecundario, fontSize: 11, marginTop: 3 },
+  gestionChevron: { color: COLORS.azul, fontSize: 18, marginLeft: 12 },
+  gestionGrilla: {
+    gap: 10,
+    paddingHorizontal: 12,
+    paddingTop: 4,
+    paddingBottom: 12,
+  },
+  gestionFila: { flexDirection: 'row', gap: 10 },
+  gestionTile: { flex: 1 },
   tile: {
-    width: '47%',
     aspectRatio: 1.35,
     backgroundColor: COLORS.superficie,
     borderRadius: RADIOS.lg,
