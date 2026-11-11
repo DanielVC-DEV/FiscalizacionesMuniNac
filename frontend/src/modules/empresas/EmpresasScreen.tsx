@@ -12,7 +12,7 @@ import SelectField from '../../core/ui/SelectField';
 import { COLORS, RADIOS } from '../../core/theme/colors';
 import { empresasApi, EmpresaApi } from './api';
 import { areasApi, AreaApi } from '../areas/api';
-import { normalizarRut } from '../../core/utils/rut';
+import { formatearRutMientrasEscribe, normalizarRut } from '../../core/utils/rut';
 import { CONTENIDO_WEB } from '../../core/ui/anchoWeb';
 
 export default function EmpresasScreen({ navigation }: any) {
@@ -119,15 +119,12 @@ export default function EmpresasScreen({ navigation }: any) {
             <TextInput
               style={styles.input}
               value={rut}
-              onChangeText={setRut}
-              onBlur={() => {
-                // Si el RUT es válido, lo deja con formato 12.345.678-5 al salir del campo.
-                const formateado = normalizarRut(rut);
-                if (formateado) setRut(formateado);
-              }}
+              // Pone los puntos y el guion solos mientras se escribe (12345678K → 12.345.678-K).
+              onChangeText={(texto) => setRut(formatearRutMientrasEscribe(texto))}
               placeholder="Ej: 12.345.678-5"
               placeholderTextColor={COLORS.textoTenue}
               autoCapitalize="characters"
+              maxLength={12}
             />
             </View>
             </FilaCampos>

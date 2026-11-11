@@ -19,6 +19,21 @@ function calcularDigitoVerificador(cuerpo: string): string {
   return String(resto);
 }
 
+// Da formato 12.345.678-5 mientras la persona escribe, sin validar el dígito
+// verificador. Acepta con o sin puntos y guion; descarta lo que no sea número
+// (la K sólo vale como último carácter) y corta en 8 dígitos más el verificador.
+export function formatearRutMientrasEscribe(valor: string): string {
+  const limpio = limpiarRut(valor).replace(/[^0-9K]/g, '');
+  // Una K antes del final no puede ser parte del número: se descarta.
+  const normal = limpio.replace(/K(?=.)/g, '').slice(0, 9);
+  if (normal.length <= 1) return normal;
+
+  const cuerpo = normal.slice(0, -1);
+  const dv = normal.slice(-1);
+  const conPuntos = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return `${conPuntos}-${dv}`;
+}
+
 // Devuelve el RUT en formato 12.345.678-5, o null si no es válido.
 export function normalizarRut(valor: string): string | null {
   const coincidencia = /^(\d{7,8})([0-9K])$/.exec(limpiarRut(valor));

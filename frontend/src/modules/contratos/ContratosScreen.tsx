@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Header from '../auth/components/SesionHeader';
@@ -9,6 +9,7 @@ import Button from '../../core/ui/Button';
 import { COLORS, RADIOS } from '../../core/theme/colors';
 import { esAdministrador, useSesion } from '../auth/store';
 import { cargarContratos, useContratos } from './store';
+import { CONTENIDO_WEB } from '../../core/ui/anchoWeb';
 
 export default function ContratosScreen({ navigation }: any) {
   const CONTRATOS = useContratos();
@@ -38,7 +39,7 @@ export default function ContratosScreen({ navigation }: any) {
       <Header />
       <TopBar title="Contratos" onBack={() => navigation.goBack()} />
 
-      <View style={styles.contenido}>
+      <ScrollView contentContainerStyle={[styles.contenido, CONTENIDO_WEB]} keyboardShouldPersistTaps="handled">
         {esAdmin && (
           <Button
             label="+ Nuevo contrato"
@@ -69,6 +70,7 @@ export default function ContratosScreen({ navigation }: any) {
               <TouchableOpacity
                 key={c.id}
                 activeOpacity={0.75}
+                style={styles.item}
                 onPress={() => navigation.navigate('ContratoDetalle', { contrato: c })}
               >
                 <Card style={styles.card}>
@@ -88,15 +90,15 @@ export default function ContratosScreen({ navigation }: any) {
             ))}
           </View>
         )}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   pantalla: { flex: 1, backgroundColor: COLORS.fondo },
-  contenido: { padding: 16, flex: 1 },
-  botonNuevo: { marginBottom: 14 },
+  contenido: { padding: 20, paddingBottom: 24 },
+  botonNuevo: { alignSelf: 'flex-end', minWidth: 200, marginBottom: 12 },
   buscador: {
     height: 44,
     borderRadius: RADIOS.md,
@@ -115,8 +117,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
-  lista: { gap: 10 },
-  card: { marginBottom: 10 },
+  lista: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  item: { flexGrow: 1, flexBasis: 280 },
+  card: { flexGrow: 1 },
   cardNombre: { fontSize: 13.5, fontWeight: '700', color: COLORS.textoPrimario, marginBottom: 4 },
   cardEmpresa: { fontSize: 12, color: COLORS.textoSecundario, marginBottom: 6 },
   cardFila: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
