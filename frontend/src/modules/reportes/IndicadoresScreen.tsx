@@ -10,6 +10,7 @@ import SeccionLabel from '../../core/ui/SeccionLabel';
 import { avisar } from '../../core/ui/avisos';
 import { COLORS, COLOR_ESTADO, RADIOS } from '../../core/theme/colors';
 import { reportesApi, IndicadoresApi, FiltrosReporte } from './api';
+import { CONTENIDO_WEB } from '../../core/ui/anchoWeb';
 
 type Periodo = 'mes' | 'trimestre' | 'todo';
 
@@ -89,7 +90,7 @@ export default function IndicadoresScreen({ navigation }: any) {
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
       <Header />
       <TopBar title="Indicadores" onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={styles.contenido}>
+      <ScrollView contentContainerStyle={[styles.contenido, CONTENIDO_WEB]}>
         <View style={styles.periodos}>
           {OPCIONES_PERIODO.map((opcion) => (
             <TouchableOpacity

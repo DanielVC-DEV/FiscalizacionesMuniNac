@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import { avisar } from '../../core/ui/avisos';
 import * as Location from 'expo-location';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +7,7 @@ import Header from '../auth/components/SesionHeader';
 import TopBar from '../../core/ui/TopBar';
 import SelectField from '../../core/ui/SelectField';
 import Button from '../../core/ui/Button';
+import TarjetaSeccion, { FilaCampos } from '../../core/ui/TarjetaSeccion';
 import { COLORS, RADIOS } from '../../core/theme/colors';
 import { Prioridad } from './types';
 import { sumarDiasHabiles, formatearFecha } from '../../core/utils/businessDays';
@@ -15,6 +16,7 @@ import { ticketsApi } from './api';
 import { cargarContratos, useContratos, contratoLabel } from '../contratos/store';
 import { cargarTickets } from './store';
 import FotosField, { Foto } from './components/FotosField';
+import { CONTENIDO_WEB } from '../../core/ui/anchoWeb';
 
 // "lat, lon" (como se muestra en pantalla) a números; vacío si no hay coordenadas válidas.
 function coordenadasNumericas(texto: string): { latitud?: number; longitud?: number } {
@@ -144,132 +146,154 @@ export default function CrearTicketScreen({ navigation }: any) {
   return (
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
       <Header />
-      <TopBar title="Nuevo ticket" onBack={() => navigation.goBack()} />
-      <Button
-        label="Ver tickets"
-        variante="secundario"
-        onPress={() => navigation.navigate('Resumen')}
-        style={styles.botonVerTickets}
+      <TopBar
+        title="Nuevo ticket"
+        onBack={() => navigation.goBack()}
+        right={
+          <TouchableOpacity onPress={() => navigation.navigate('Resumen')} accessibilityRole="button">
+            <Text style={styles.verTickets}>Ver tickets</Text>
+          </TouchableOpacity>
+        }
       />
 
-      <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
-        <Text style={styles.seccion}>DATOS</Text>
+      <ScrollView contentContainerStyle={[styles.contenido, CONTENIDO_WEB]} keyboardShouldPersistTaps="handled">
+        <TarjetaSeccion titulo="Datos del ticket" descripcion="Contrato, supervisor y prioridad de la observación.">
+          <FilaCampos>
+            <SelectField
+              label="Contrato"
+              requerido
+              placeholder="Seleccionar contrato"
+              value={contrato}
+              options={opcionesContrato}
+              onChange={seleccionarContrato}
+              mensajeVacio="Aún no hay contratos cargados."
+              error={errores.contrato}
+            />
+            <View>
+              <Text style={styles.label}>Supervisor asignado al contrato</Text>
+              <View style={[styles.input, styles.supervisorLectura]}>
+                <Text style={contratoSeleccionado?.supervisorNombre ? styles.textoSupervisor : styles.textoSupervisorVacio}>
+                  {contratoSeleccionado?.supervisorNombre ?? 'Se muestra al seleccionar un contrato'}
+                </Text>
+              </View>
+              {!!errores.supervisor && <Text style={styles.error}>{errores.supervisor}</Text>}
+            </View>
+          </FilaCampos>
+          {!!errorCarga && <Text style={styles.error}>{errorCarga}</Text>}
 
-        <SelectField
-          label="Contrato"
-          requerido
-          placeholder="Seleccionar contrato"
-          value={contrato}
-          options={opcionesContrato}
-          onChange={seleccionarContrato}
-          mensajeVacio="Aún no hay contratos cargados."
-          error={errores.contrato}
-        />
+          <FilaCampos>
+            <SelectField
+              label="Prioridad"
+              requerido
+              placeholder="Seleccionar prioridad"
+              value={prioridad}
+              options={prioridadesContrato.map((item) => item.nombre_prioridad)}
+              onChange={(v) => setPrioridad(v as Prioridad)}
+              mensajeVacio="El contrato no tiene prioridades configuradas."
+              error={errores.prioridad}
+            />
+            <View>
+              <Text style={styles.label}>Plazo de subsanación</Text>
+              <View style={[styles.input, styles.supervisorLectura]}>
+                <Text style={plazoInfo ? styles.textoSupervisor : styles.textoSupervisorVacio}>
+                  {plazoInfo
+                    ? `${plazoInfo.dias} día(s) hábil(es) · vence el ${formatearFecha(plazoInfo.vencimiento)}`
+                    : 'Se calcula al elegir la prioridad'}
+                </Text>
+              </View>
+            </View>
+          </FilaCampos>
+        </TarjetaSeccion>
 
-        <Text style={styles.label}>Supervisor asignado al contrato</Text>
-        <View style={[styles.input, styles.supervisorLectura]}>
-          <Text style={contratoSeleccionado?.supervisorNombre ? styles.textoSupervisor : styles.textoSupervisorVacio}>
-            {contratoSeleccionado?.supervisorNombre ?? 'Se muestra al seleccionar un contrato'}
+        <TarjetaSeccion titulo="Observación" descripcion="Describe lo observado y adjunta fotografías de respaldo.">
+          <Text style={styles.label}>
+            Descripción de la observación<Text style={styles.req}> *</Text>
           </Text>
-        </View>
-        {!!errores.supervisor && <Text style={styles.error}>{errores.supervisor}</Text>}
-        {!!errorCarga && <Text style={styles.error}>{errorCarga}</Text>}
+          <TextInput
+            style={styles.textarea}
+            placeholder="Describe lo observado…"
+            placeholderTextColor={COLORS.textoTenue}
+            multiline
+            numberOfLines={4}
+            value={descripcion}
+            onChangeText={setDescripcion}
+          />
+          {!!errores.descripcion && <Text style={styles.error}>{errores.descripcion}</Text>}
 
-        <SelectField
-          label="Prioridad"
-          requerido
-          placeholder="Seleccionar prioridad"
-          value={prioridad}
-          options={prioridadesContrato.map((item) => item.nombre_prioridad)}
-          onChange={(v) => setPrioridad(v as Prioridad)}
-          mensajeVacio="El contrato no tiene prioridades configuradas."
-          error={errores.prioridad}
-        />
-        {plazoInfo && (
-          <View style={styles.auto}>
-            <Text style={styles.autoTexto}>Plazo: {plazoInfo.dias} día(s) hábil(es)</Text>
-            <Text style={styles.autoTexto}>Vence: {formatearFecha(plazoInfo.vencimiento)}</Text>
-          </View>
-        )}
+          <FotosField fotos={fotos} onChange={setFotos} />
+        </TarjetaSeccion>
 
-        <Text style={styles.seccion}>OBSERVACIÓN</Text>
+        <TarjetaSeccion titulo="Ubicación" descripcion="Usa la ubicación del dispositivo o ingrésala a mano.">
+          <Button
+            label={buscandoUbicacion ? 'Buscando ubicación…' : 'Usar mi ubicación actual'}
+            variante="suave"
+            onPress={usarUbicacionActual}
+            disabled={buscandoUbicacion}
+            cargando={buscandoUbicacion}
+            style={styles.botonUbicacion}
+          />
+          {!!ubicacionError && <Text style={styles.error}>{ubicacionError}</Text>}
 
-        <Text style={styles.label}>
-          Descripción de la observación<Text style={styles.req}> *</Text>
-        </Text>
-        <TextInput
-          style={styles.textarea}
-          placeholder="Describe lo observado…"
-          placeholderTextColor={COLORS.textoTenue}
-          multiline
-          numberOfLines={4}
-          value={descripcion}
-          onChangeText={setDescripcion}
-        />
-        {!!errores.descripcion && <Text style={styles.error}>{errores.descripcion}</Text>}
-
-        <FotosField fotos={fotos} onChange={setFotos} />
-
-        <Text style={styles.seccion}>UBICACIÓN (GEOLOCALIZACIÓN)</Text>
-        <Button
-          label={buscandoUbicacion ? 'Buscando ubicación…' : 'Ubicación actual'}
-          variante="primario"
-          onPress={usarUbicacionActual}
-          disabled={buscandoUbicacion}
-          cargando={buscandoUbicacion}
-          style={styles.botonUbicacion}
-        />
-        {!!ubicacionError && <Text style={styles.error}>{ubicacionError}</Text>}
-
-        <Text style={styles.seccion}>UBICACIÓN MANUAL</Text>
-        <Text style={styles.label}>Dirección</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Seleccionar dirección"
-          placeholderTextColor={COLORS.textoTenue}
-          value={direccion}
-          onChangeText={setDireccion}
-        />
-        <Text style={styles.label}>Sector o lugar</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="sector, plaza, recinto…"
-          placeholderTextColor={COLORS.textoTenue}
-          value={sector}
-          onChangeText={setSector}
-        />
-        <Text style={styles.label}>Referencia de ubicación</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej: frente de un negocio"
-          placeholderTextColor={COLORS.textoTenue}
-          value={referencia}
-          onChangeText={setReferencia}
-        />
-        <Text style={styles.label}>Coordenadas</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Se completa con la ubicación"
-          placeholderTextColor={COLORS.textoTenue}
-          value={coordenadas}
-          onChangeText={setCoordenadas}
-        />
+          <FilaCampos>
+            <View>
+              <Text style={styles.label}>Dirección</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Calle y número"
+                placeholderTextColor={COLORS.textoTenue}
+                value={direccion}
+                onChangeText={setDireccion}
+              />
+            </View>
+            <View>
+              <Text style={styles.label}>Sector o lugar</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Sector, plaza, recinto…"
+                placeholderTextColor={COLORS.textoTenue}
+                value={sector}
+                onChangeText={setSector}
+              />
+            </View>
+          </FilaCampos>
+          <FilaCampos>
+            <View>
+              <Text style={styles.label}>Referencia de ubicación</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ej: frente de un negocio"
+                placeholderTextColor={COLORS.textoTenue}
+                value={referencia}
+                onChangeText={setReferencia}
+              />
+            </View>
+            <View>
+              <Text style={styles.label}>Coordenadas</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Se completa con la ubicación"
+                placeholderTextColor={COLORS.textoTenue}
+                value={coordenadas}
+                onChangeText={setCoordenadas}
+              />
+            </View>
+          </FilaCampos>
+        </TarjetaSeccion>
 
         <View style={styles.auto}>
-          <Text style={styles.autoTexto}>Información del creador del ticket: fecha y hora</Text>
-          <Text style={styles.autoTexto}>La ID se genera automáticamente</Text>
+          <Text style={styles.autoTexto}>La fecha, la hora, el creador y el número del ticket se registran automáticamente.</Text>
         </View>
       </ScrollView>
 
-      <View style={styles.barraInferior}>
-        <Button label="Cancelar" variante="secundario" onPress={() => navigation.goBack()} style={{ flex: 1 }} />
+      <View style={[styles.barraInferior, CONTENIDO_WEB]}>
+        <Button label="Cancelar" variante="secundario" onPress={() => navigation.goBack()} style={styles.botonAccion} />
         <Button
           label={guardando ? 'Guardando…' : 'Crear'}
           variante="primario"
           onPress={crear}
           disabled={guardando}
           cargando={guardando}
-          style={{ flex: 1 }}
+          style={styles.botonAccion}
         />
       </View>
     </SafeAreaView>
@@ -278,7 +302,7 @@ export default function CrearTicketScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   pantalla: { flex: 1, backgroundColor: COLORS.fondo },
-  contenido: { padding: 16, paddingBottom: 24 },
+  contenido: { padding: 20, paddingBottom: 24 },
   seccion: {
     fontSize: 12,
     fontWeight: '700',
@@ -323,8 +347,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   autoTexto: { fontSize: 11, color: COLORS.azulOscuro, lineHeight: 16, textAlign: 'center' },
-  botonUbicacion: { marginTop: 6, marginBottom: 4 },
-  botonVerTickets: { marginHorizontal: 16, marginTop: 8 },
+  botonUbicacion: { marginBottom: 8 },
+  verTickets: { color: COLORS.textoClaro, fontSize: 12.5, fontWeight: '700', paddingHorizontal: 8 },
+  botonAccion: { flex: 1, maxWidth: 220 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4, marginBottom: 8 },
   chip: {
     borderRadius: RADIOS.pill,
@@ -339,6 +364,7 @@ const styles = StyleSheet.create({
   chipTextoActivo: { color: COLORS.textoClaro, fontWeight: '600' },
   barraInferior: {
     flexDirection: 'row',
+    justifyContent: 'flex-end',
     gap: 10,
     padding: 16,
     borderTopWidth: 1,

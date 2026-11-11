@@ -1,13 +1,10 @@
 import { ReactNode } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
-import { COLORS, SOMBRA } from '../theme/colors';
+import { COLORS } from '../theme/colors';
 
-// Ancho máximo del panel de la app en navegador. Pensado para que las
-// pantallas, diseñadas para celular, se lean bien en un monitor.
-export const ANCHO_MAXIMO_WEB = 760;
-
-// En la web centra toda la app en un panel de ancho acotado sobre un fondo de
-// página; en el celular no hace nada y devuelve los hijos tal cual.
+// En la web la app ocupa toda la ventana, como una página; las pantallas
+// reordenan sus piezas en columnas según el ancho. En el celular no hace
+// nada y devuelve los hijos tal cual.
 export default function MarcoWeb({ children }: { children: ReactNode }) {
   if (Platform.OS !== 'web') return <>{children}</>;
   return (
@@ -19,15 +16,5 @@ export default function MarcoWeb({ children }: { children: ReactNode }) {
 
 const styles = StyleSheet.create({
   pagina: { flex: 1, backgroundColor: COLORS.borde },
-  panel: {
-    flex: 1,
-    width: '100%',
-    maxWidth: ANCHO_MAXIMO_WEB,
-    alignSelf: 'center',
-    backgroundColor: COLORS.fondo,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderColor: COLORS.borde,
-    ...SOMBRA,
-  },
+  panel: { flex: 1, width: '100%', backgroundColor: COLORS.fondo },
 });

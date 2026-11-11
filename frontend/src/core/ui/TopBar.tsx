@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { COLORS, RADIOS } from '../theme/colors';
 
 interface Props {
@@ -13,9 +13,13 @@ interface Props {
 // entender para cualquier funcionario municipal, sin importar en qué
 // pantalla esté.
 export default function TopBar({ title, onBack, right }: Props) {
+  // En la web ancha el menú lateral ya permite moverse entre pantallas
+  // (ver navigation/ShellWeb.tsx), así que no se muestra la flecha de volver.
+  const ancho = useWindowDimensions().width;
+  const conMenuLateral = Platform.OS === 'web' && ancho >= 900;
   return (
     <View style={styles.container}>
-      {onBack ? (
+      {conMenuLateral ? null : onBack ? (
         <TouchableOpacity style={styles.volver} onPress={onBack} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <Text style={styles.volverTexto}>‹</Text>
         </TouchableOpacity>

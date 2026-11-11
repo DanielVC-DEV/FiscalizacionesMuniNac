@@ -6,10 +6,12 @@ import Header from '../auth/components/SesionHeader';
 import TopBar from '../../core/ui/TopBar';
 import Card from '../../core/ui/Card';
 import Button from '../../core/ui/Button';
+import TarjetaSeccion, { FilaCampos } from '../../core/ui/TarjetaSeccion';
 import SeccionLabel from '../../core/ui/SeccionLabel';
 import { avisar, confirmar } from '../../core/ui/avisos';
 import { COLORS, RADIOS } from '../../core/theme/colors';
 import { notificacionesApi, DestinatarioApi } from './api';
+import { CONTENIDO_WEB } from '../../core/ui/anchoWeb';
 
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -79,12 +81,12 @@ export default function DestinatariosScreen({ navigation }: any) {
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
       <Header />
       <TopBar title="Notificaciones" onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
-        <Card style={styles.formulario}>
-          <Text style={styles.titulo}>Agregar destinatario</Text>
-          <Text style={styles.secundario}>
-            Recibe los avisos por correo de todos los tickets, además del supervisor responsable de cada uno.
-          </Text>
+      <ScrollView contentContainerStyle={[styles.contenido, CONTENIDO_WEB]} keyboardShouldPersistTaps="handled">
+        <TarjetaSeccion
+          titulo="Agregar destinatario"
+          descripcion="Recibe los avisos por correo de todos los tickets, además del supervisor responsable de cada uno."
+        >
+          <FilaCampos>
           <TextInput
             style={styles.campo}
             value={email}
@@ -102,9 +104,10 @@ export default function DestinatariosScreen({ navigation }: any) {
             placeholder="Nombre (opcional)"
             placeholderTextColor={COLORS.textoTenue}
           />
+          </FilaCampos>
           {!!error && <Text style={styles.error}>{error}</Text>}
-          <Button label="Agregar" onPress={agregar} cargando={guardando} disabled={!email.trim()} />
-        </Card>
+          <Button label="Agregar" onPress={agregar} cargando={guardando} disabled={!email.trim()} style={styles.botonGuardar} />
+        </TarjetaSeccion>
 
         <SeccionLabel texto="Destinatarios" />
         {destinatarios.length === 0 ? (
@@ -137,8 +140,8 @@ export default function DestinatariosScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   pantalla: { flex: 1, backgroundColor: COLORS.fondo },
-  contenido: { padding: 16, paddingBottom: 28, gap: 12 },
-  formulario: { gap: 8 },
+  contenido: { padding: 20, paddingBottom: 28, gap: 12 },
+  botonGuardar: { alignSelf: 'flex-end', minWidth: 200, marginTop: 8 },
   titulo: { fontSize: 14, fontWeight: '700', color: COLORS.azul },
   campo: {
     minHeight: 44,

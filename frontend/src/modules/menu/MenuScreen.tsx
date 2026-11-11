@@ -1,77 +1,36 @@
 import { useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, View, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { Image, Platform, ScrollView, StyleSheet, Text, View, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../auth/components/SesionHeader';
 import { COLORS, RADIOS, SOMBRA } from '../../core/theme/colors';
-import { esAdministrador, esMunicipal, useSesion } from '../auth/store';
-import { IconoBarras, IconoTicket, IconoDocumento, IconoEdificio } from './components/IconosMenu';
+import { useSesion } from '../auth/store';
+import { useOpcionesMenu } from './opciones';
 
-// Destinos del menú principal. "destino" es el nombre de la ruta registrada
-// en navigation/AppNavigator.tsx.
-const OPCIONES = [
-  {
-    titulo: 'Resúmenes',
-    descripcion: 'Estado de los tickets',
-    destino: 'Resumen',
-    glifo: <IconoBarras />,
-  },
-  {
-    titulo: 'Indicadores',
-    descripcion: 'Métricas y reporte PDF',
-    destino: 'Indicadores',
-    glifo: <IconoBarras />,
-  },
-] as const;
-
-const OPCIONES_GESTION = [
-  {
-    titulo: 'Tickets',
-    descripcion: 'Crear una fiscalización',
-    destino: 'CrearTicket',
-    glifo: <IconoTicket />,
-  },
-  {
-    titulo: 'Áreas',
-    descripcion: 'Administrar áreas',
-    destino: 'Areas',
-    glifo: <IconoDocumento />,
-  },
-  {
-    titulo: 'Empresas',
-    descripcion: 'Empresas contratistas',
-    destino: 'Empresas',
-    glifo: <IconoEdificio />,
-  },
-  {
-    titulo: 'Contratos',
-    descripcion: 'Ver y crear contratos',
-    destino: 'Contratos',
-    glifo: <IconoDocumento />,
-  },
-] as const;
-
-// Destinos que sólo ve el administrador (ver auth/store.ts).
-const DESTINOS_ADMIN: string[] = ['Empresas', 'Areas'];
-// Destinos de usuarios municipales: el supervisor de empresa sólo ve "Resumen".
-const DESTINOS_MUNICIPALES: string[] = ['CrearTicket', 'Contratos', 'Indicadores'];
-
-export default function MenuScreen({ navigation }: any) {
+// "panel" es el contenido de inicio de la vista web (el resumen de tickets);
+// lo inyecta navigation/AppNavigator.tsx para no importar otro módulo.
+export default function MenuScreen({ navigation, panel }: any) {
   const sesion = useSesion();
   const [gestionAbierta, setGestionAbierta] = useState(false);
-  const esAdmin = esAdministrador(sesion?.usuario);
-  const municipal = esMunicipal(sesion?.usuario);
-  const opcionesVisibles = OPCIONES.filter((opcion) => {
-    if (DESTINOS_ADMIN.includes(opcion.destino)) return esAdmin;
-    if (DESTINOS_MUNICIPALES.includes(opcion.destino)) return municipal;
-    return true;
-  });
-  const gestionVisible = OPCIONES_GESTION.filter((opcion) => {
-    if (DESTINOS_ADMIN.includes(opcion.destino)) return esAdmin;
-    if (DESTINOS_MUNICIPALES.includes(opcion.destino)) return municipal;
-    return true;
-  });
-  // El menú principal admite tres tarjetas en pantallas anchas.
-  const anchoTile = useWindowDimensions().width >= 600 ? '31.5%' : '47%';
+  const { principales: opcionesVisibles, gestion: gestionVisible } = useOpcionesMenu();
+  // Celular y tablet: 2 o 3 tarjetas por fila. Desde 900 px se usa la vista web con menú lateral.
+  const ancho = useWindowDimensions().width;
+  const horizontal = Platform.OS === 'web' && ancho >= 900;
+  const anchoTile = ancho >= 600 ? '31.5%' : '47%';
+  const porFilaGestion = 2;
+
+  // Vista web ancha: el menú lateral lo pone navigation/ShellWeb; aquí va el
+  // panel de inicio (el resumen de tickets).
+  if (horizontal) {
+    return (
+      <View style={styles.webPrincipal}>
+        <View style={styles.webEncabezado}>
+          <Text style={styles.webTitulo}>Resumen de tickets</Text>
+          <Text style={styles.webSubtitulo}>Hola, {sesion?.usuario.nombre}. Este es el estado actual de las fiscalizaciones.</Text>
+        </View>
+        {panel}
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
@@ -104,7 +63,7 @@ export default function MenuScreen({ navigation }: any) {
         </View>
 
         {gestionVisible.length > 0 && (
-          <View style={styles.gestion}>
+          <View style={[styles.gestion, horizontal && styles.gestionAncha]}>
             <TouchableOpacity
               style={styles.gestionEncabezado}
               activeOpacity={0.75}
@@ -120,9 +79,9 @@ export default function MenuScreen({ navigation }: any) {
             </TouchableOpacity>
             {gestionAbierta && (
               <View style={styles.gestionGrilla}>
-                {Array.from({ length: Math.ceil(gestionVisible.length / 2) }, (_, indiceFila) => (
+                {Array.from({ length: Math.ceil(gestionVisible.length / porFilaGestion) }, (_, indiceFila) => (
                   <View key={indiceFila} style={styles.gestionFila}>
-                    {gestionVisible.slice(indiceFila * 2, indiceFila * 2 + 2).map((opcion) => (
+                    {gestionVisible.slice(indiceFila * porFilaGestion, (indiceFila + 1) * porFilaGestion).map((opcion) => (
                       <TouchableOpacity
                         key={opcion.destino}
                         style={[styles.tile, styles.gestionTile]}
@@ -150,6 +109,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.fondo,
   },
+  webPrincipal: { flex: 1 },
+  webEncabezado: { paddingHorizontal: 40, paddingTop: 32 },
+  webTitulo: { fontSize: 26, fontWeight: '800', color: COLORS.azulOscuro },
+  webSubtitulo: { fontSize: 14, color: COLORS.textoSecundario, marginTop: 6 },
   contenido: { paddingBottom: 16 },
   encabezado: { alignItems: 'center', paddingHorizontal: 20, paddingTop: 10, paddingBottom: 2 },
   // Ancho y alto fijos (no "aspectRatio"): esta imagen es un rectángulo
@@ -176,6 +139,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.bordeSuave,
     ...SOMBRA,
   },
+  gestionAncha: { marginHorizontal: 16 },
   gestionEncabezado: {
     minHeight: 62,
     paddingHorizontal: 16,

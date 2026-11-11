@@ -8,6 +8,7 @@ import { COLORS, RADIOS } from '../../core/theme/colors';
 import { Contrato } from './types';
 import { formatearMonto } from '../../core/utils/formato';
 import DatoFila from './components/DatoFila';
+import { CONTENIDO_WEB } from '../../core/ui/anchoWeb';
 
 export default function ContratoDetalleScreen({ navigation, route }: any) {
   const contrato: Contrato | undefined = route?.params?.contrato;
@@ -29,7 +30,7 @@ export default function ContratoDetalleScreen({ navigation, route }: any) {
       <Header />
       <TopBar title={contrato.nombre} onBack={() => navigation.goBack()} />
 
-      <ScrollView contentContainerStyle={styles.contenido}>
+      <ScrollView contentContainerStyle={[styles.contenido, CONTENIDO_WEB]}>
         <SeccionLabel texto="Datos generales" />
         <Card style={styles.datosBox}>
           <DatoFila label="Nombre del contrato" valor={contrato.nombre} />

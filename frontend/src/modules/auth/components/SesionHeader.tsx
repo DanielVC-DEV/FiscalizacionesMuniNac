@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import Header from '../../../core/ui/Header';
 import { COLORS, RADIOS } from '../../../core/theme/colors';
 import { cerrarSesion, useSesion } from '../store';
@@ -7,7 +7,11 @@ import { cerrarSesion, useSesion } from '../store';
 // administrador, U en los demás roles) y el botón para cerrar sesión.
 export default function SesionHeader() {
   const sesion = useSesion();
+  const ancho = useWindowDimensions().width;
   const inicial = sesion?.usuario.rol === 'admin' ? 'A' : 'U';
+
+  // En la web ancha la marca y la sesión van en el menú lateral (navigation/ShellWeb).
+  if (Platform.OS === 'web' && ancho >= 900) return null;
 
   return (
     <Header

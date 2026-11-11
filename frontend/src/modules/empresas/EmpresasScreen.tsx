@@ -7,11 +7,13 @@ import Header from '../auth/components/SesionHeader';
 import TopBar from '../../core/ui/TopBar';
 import Card from '../../core/ui/Card';
 import Button from '../../core/ui/Button';
+import TarjetaSeccion, { FilaCampos } from '../../core/ui/TarjetaSeccion';
 import SelectField from '../../core/ui/SelectField';
 import { COLORS, RADIOS } from '../../core/theme/colors';
 import { empresasApi, EmpresaApi } from './api';
 import { areasApi, AreaApi } from '../areas/api';
 import { normalizarRut } from '../../core/utils/rut';
+import { CONTENIDO_WEB } from '../../core/ui/anchoWeb';
 
 export default function EmpresasScreen({ navigation }: any) {
   const [empresas, setEmpresas] = useState<EmpresaApi[]>([]);
@@ -86,7 +88,7 @@ export default function EmpresasScreen({ navigation }: any) {
       <Header />
       <TopBar title="Empresas" onBack={() => navigation.goBack()} />
 
-      <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[styles.contenido, CONTENIDO_WEB]} keyboardShouldPersistTaps="handled">
         {!!errorCarga && <Text style={styles.nota}>No se pudo cargar el servidor: {errorCarga}</Text>}
 
         <Button
@@ -100,8 +102,9 @@ export default function EmpresasScreen({ navigation }: any) {
         />
 
         {mostrarFormulario && (
-          <Card style={styles.formulario}>
-            <Text style={styles.tituloFormulario}>Nueva empresa</Text>
+          <TarjetaSeccion titulo="Nueva empresa" descripcion="Datos de la empresa contratista.">
+            <FilaCampos>
+            <View>
             <Text style={styles.label}>Razón social *</Text>
             <TextInput
               style={styles.input}
@@ -110,6 +113,8 @@ export default function EmpresasScreen({ navigation }: any) {
               placeholder="Nombre de la empresa"
               placeholderTextColor={COLORS.textoTenue}
             />
+            </View>
+            <View>
             <Text style={styles.label}>RUT *</Text>
             <TextInput
               style={styles.input}
@@ -124,6 +129,8 @@ export default function EmpresasScreen({ navigation }: any) {
               placeholderTextColor={COLORS.textoTenue}
               autoCapitalize="characters"
             />
+            </View>
+            </FilaCampos>
             <SelectField
               label="Área"
               requerido
@@ -142,8 +149,8 @@ export default function EmpresasScreen({ navigation }: any) {
               />
             )}
             {!!errorFormulario && <Text style={styles.error}>{errorFormulario}</Text>}
-            <Button label="Guardar empresa" onPress={crearEmpresa} cargando={guardando} />
-          </Card>
+            <Button label="Guardar empresa" onPress={crearEmpresa} cargando={guardando} style={styles.botonGuardar} />
+          </TarjetaSeccion>
         )}
 
         <View style={styles.lista}>
@@ -163,11 +170,11 @@ export default function EmpresasScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   pantalla: { flex: 1, backgroundColor: COLORS.fondo },
-  contenido: { padding: 16, paddingBottom: 24 },
+  contenido: { padding: 20, paddingBottom: 24 },
   nota: { color: COLORS.textoSecundario, fontSize: 11, fontStyle: 'italic', marginBottom: 16 },
-  lista: { gap: 10 },
-  card: { marginBottom: 10 },
-  formulario: { marginVertical: 12 },
+  lista: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  card: { flexGrow: 1, flexBasis: 280 },
+  botonGuardar: { alignSelf: 'flex-end', minWidth: 200 },
   tituloFormulario: { fontSize: 14, fontWeight: '700', color: COLORS.textoPrimario, marginBottom: 8 },
   label: { fontSize: 12, color: COLORS.textoPrimario, marginBottom: 4, fontWeight: '600' },
   input: {
@@ -182,7 +189,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   error: { color: COLORS.rojo, fontSize: 11, marginBottom: 8 },
-  botonAlta: { marginBottom: 4 },
+  botonAlta: { alignSelf: 'flex-end', minWidth: 200, marginBottom: 12 },
   botonAreas: { marginBottom: 10 },
   cardNombre: { fontSize: 13.5, fontWeight: '700', color: COLORS.textoPrimario, marginBottom: 4 },
   cardRut: { fontSize: 12, color: COLORS.textoSecundario, marginTop: 2 },

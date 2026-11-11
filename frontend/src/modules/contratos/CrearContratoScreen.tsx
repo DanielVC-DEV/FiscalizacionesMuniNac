@@ -8,6 +8,7 @@ import SelectField from '../../core/ui/SelectField';
 import DateField from '../../core/ui/DateField';
 import Card from '../../core/ui/Card';
 import Button from '../../core/ui/Button';
+import TarjetaSeccion, { FilaCampos } from '../../core/ui/TarjetaSeccion';
 import { COLORS, RADIOS } from '../../core/theme/colors';
 import { OrdenCompra } from './types';
 import { empresasApi, EmpresaApi } from '../empresas/api';
@@ -15,6 +16,7 @@ import { contratosApi } from './api';
 import { cargarContratos } from './store';
 import { parsearFecha, diferenciaEnDias, hoyComoTexto } from '../../core/utils/fechas';
 import OrdenCompraBloque from './components/OrdenCompraBloque';
+import { CONTENIDO_WEB } from '../../core/ui/anchoWeb';
 
 export default function CrearContratoScreen({ navigation }: any) {
   const [nombreContrato, setNombreContrato] = useState('');
@@ -188,9 +190,8 @@ export default function CrearContratoScreen({ navigation }: any) {
       <Header />
       <TopBar title="Nuevo contrato" onBack={() => navigation.goBack()} />
 
-      <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
-        <Text style={styles.seccion}>DATOS DEL CONTRATO</Text>
-
+      <ScrollView contentContainerStyle={[styles.contenido, CONTENIDO_WEB]} keyboardShouldPersistTaps="handled">
+        <TarjetaSeccion titulo="Datos del contrato" descripcion="Nombre, empresa contratista y supervisor responsable.">
         <Text style={styles.label}>
           Nombre del contrato
           <Text style={styles.req}> *</Text>
@@ -204,6 +205,7 @@ export default function CrearContratoScreen({ navigation }: any) {
         />
         {!!errores.nombreContrato && <Text style={styles.error}>{errores.nombreContrato}</Text>}
 
+        <FilaCampos>
         <SelectField
           label="Empresa"
           requerido
@@ -214,6 +216,17 @@ export default function CrearContratoScreen({ navigation }: any) {
           mensajeVacio="Aún no hay empresas registradas."
           error={errores.empresa}
         />
+
+        <View>
+        <Text style={styles.label}>RUT de la empresa</Text>
+        <View style={[styles.input, styles.inputDeshabilitado]}>
+          <Text style={empresaSeleccionada ? styles.valorTexto : styles.placeholderTexto}>
+            {empresaSeleccionada ? empresaSeleccionada.rut : 'Se completa al elegir la empresa'}
+          </Text>
+        </View>
+
+        </View>
+        </FilaCampos>
 
         <SelectField
           label="Supervisor del contrato"
@@ -226,13 +239,11 @@ export default function CrearContratoScreen({ navigation }: any) {
           error={errores.supervisor}
         />
 
-        <Text style={styles.label}>RUT de la empresa</Text>
-        <View style={[styles.input, styles.inputDeshabilitado]}>
-          <Text style={empresaSeleccionada ? styles.valorTexto : styles.placeholderTexto}>
-            {empresaSeleccionada ? empresaSeleccionada.rut : 'Se completa al elegir la empresa'}
-          </Text>
-        </View>
+        </TarjetaSeccion>
 
+        <TarjetaSeccion titulo="Vigencia y plazos" descripcion="Fechas del contrato y días hábiles para responder un ticket.">
+        <FilaCampos>
+        <View>
         <DateField
           key={`fecha-inicio-${fechaInicioResetId}`}
           label="Fecha de inicio"
@@ -247,7 +258,7 @@ export default function CrearContratoScreen({ navigation }: any) {
           onPress={usarFechaActual}
           style={styles.botonFechaActual}
         />
-
+        </View>
         <DateField
           label="Fecha de término"
           requerido
@@ -255,6 +266,7 @@ export default function CrearContratoScreen({ navigation }: any) {
           onChange={manejarFechaTermino}
           error={errores.fechaTermino}
         />
+        </FilaCampos>
 
         <Text style={styles.label}>
           Día de respuesta a ticket
@@ -272,8 +284,9 @@ export default function CrearContratoScreen({ navigation }: any) {
         {!!errores.diasRespuesta && <Text style={styles.error}>{errores.diasRespuesta}</Text>}
 
         {!!errorCarga && <Text style={styles.error}>{errorCarga}</Text>}
+        </TarjetaSeccion>
 
-        <Text style={styles.seccion}>ÓRDENES DE COMPRA (OPCIONAL)</Text>
+        <TarjetaSeccion titulo="Órdenes de compra" descripcion="Opcional. Puedes agregar una o más.">
 
         {ordenesCompra.map((oc, i) => (
           <OrdenCompraBloque
@@ -288,17 +301,18 @@ export default function CrearContratoScreen({ navigation }: any) {
         ))}
 
         <Button label="+ Agregar orden de compra" variante="punteado" onPress={agregarOrdenCompra} style={styles.botonAgregar} />
+        </TarjetaSeccion>
       </ScrollView>
 
-      <View style={styles.barraInferior}>
-        <Button label="Cancelar" variante="secundario" onPress={() => navigation.goBack()} style={{ flex: 1 }} />
+      <View style={[styles.barraInferior, CONTENIDO_WEB]}>
+        <Button label="Cancelar" variante="secundario" onPress={() => navigation.goBack()} style={styles.botonAccion} />
         <Button
           label={guardando ? 'Guardando…' : 'Crear contrato'}
           variante="primario"
           onPress={crear}
           disabled={guardando}
           cargando={guardando}
-          style={{ flex: 1 }}
+          style={styles.botonAccion}
         />
       </View>
     </SafeAreaView>
@@ -307,7 +321,7 @@ export default function CrearContratoScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   pantalla: { flex: 1, backgroundColor: COLORS.fondo },
-  contenido: { padding: 16, paddingBottom: 24 },
+  contenido: { padding: 20, paddingBottom: 24 },
   seccion: {
     fontSize: 12,
     fontWeight: '700',
@@ -337,8 +351,10 @@ const styles = StyleSheet.create({
   ayuda: { color: COLORS.textoSecundario, fontSize: 11, marginTop: -2, marginBottom: 6, fontStyle: 'italic' },
   botonFechaActual: { alignSelf: 'flex-start', minHeight: 36, paddingHorizontal: 12, marginTop: -4, marginBottom: 10 },
   botonAgregar: { marginBottom: 6 },
+  botonAccion: { flex: 1, maxWidth: 220 },
   barraInferior: {
     flexDirection: 'row',
+    justifyContent: 'flex-end',
     gap: 10,
     padding: 16,
     borderTopWidth: 1,

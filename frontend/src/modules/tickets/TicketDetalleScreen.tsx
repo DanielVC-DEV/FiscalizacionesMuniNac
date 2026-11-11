@@ -15,6 +15,7 @@ import { ticketsApi, TicketDetalleApi } from './api';
 import FotosField, { Foto } from './components/FotosField';
 import FotosHistorial from './components/FotosHistorial';
 import EnlacesConsulta from './components/EnlacesConsulta';
+import { CONTENIDO_WEB } from '../../core/ui/anchoWeb';
 
 // Nombre legible de cada tipo de actuación del historial, para las que no traen descripción.
 const ETIQUETA_ACTUACION: Record<string, string> = {
@@ -165,7 +166,7 @@ export default function TicketDetalleScreen({ navigation, route }: any) {
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
       <Header />
       <TopBar title={ticket?.numero ?? 'Detalle del ticket'} onBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={styles.contenido} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[styles.contenido, CONTENIDO_WEB]} keyboardShouldPersistTaps="handled">
         {cargando && <Text style={styles.secundario}>Cargando ticket...</Text>}
         {!!error && (
           <Card>
