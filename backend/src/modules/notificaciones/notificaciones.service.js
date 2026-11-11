@@ -33,6 +33,13 @@ async function destinatariosDelTicket(pool, idTicket, tipo) {
   });
 }
 
+// La columna es DATE: pg la entrega como Date a medianoche local; se muestra sólo el día.
+function formatearFecha(fecha) {
+  if (!fecha) return 'No registrada';
+  const valor = fecha instanceof Date ? fecha : new Date(fecha);
+  return Number.isNaN(valor.getTime()) ? String(fecha) : valor.toLocaleDateString('es-CL');
+}
+
 function construirAviso(ticket, tipo, comentario) {
   const etiquetas = {
     CREACION: 'Nuevo ticket de fiscalización',
@@ -50,7 +57,7 @@ function construirAviso(ticket, tipo, comentario) {
     `Contrato: ${ticket.contrato_nombre}`,
     `Prioridad: ${ticket.prioridad} (${ticket.plazo_subsanar} día(s) hábiles)`,
     `Fecha de creación: ${new Date(ticket.fecha_hora_creacion).toLocaleString('es-CL')}`,
-    `Fecha de vencimiento: ${ticket.fecha_vencimiento}`,
+    `Fecha de vencimiento: ${formatearFecha(ticket.fecha_vencimiento)}`,
     `Estado: ${ticket.estado}`,
     `Ubicación: ${[ticket.direccion, ticket.sector, ticket.ubicacion].filter(Boolean).join(' - ') || 'No registrada'}`,
     '',
