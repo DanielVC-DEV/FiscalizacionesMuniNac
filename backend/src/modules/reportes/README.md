@@ -6,8 +6,8 @@ Indicadores de gestión y reporte PDF de los tickets, con los mismos filtros del
 
 | Método y ruta | Qué devuelve |
 |---|---|
-| `GET /api/reportes/indicadores` | Totales por estado, pendientes de revisión, tiempo promedio de respuesta y de cierre (en días). |
-| `GET /api/reportes/pdf` | PDF con periodo y filtros, indicadores, listado de tickets y detalle de cada uno con su historial. |
+| `GET /api/reportes/indicadores` | Totales por estado, pendientes de revisión, tiempo promedio de respuesta y de cierre (en días), reparto por empresa, área y prioridad (top 8), tickets creados/cerrados por mes (últimos 6) y respuestas dentro del plazo. |
+| `GET /api/reportes/pdf` | PDF con periodo y filtros, tarjetas y gráficos de barras (estados, mes, empresa, área, prioridad), listado de tickets y detalle de cada uno con su historial. |
 
 Filtros (query string): `numero`, `id_empresa`, `id_area`, `id_supervisor`, `id_creador`, `estado` (CSV), `prioridad`, `creada_desde`, `creada_hasta`, `vence_desde`, `vence_hasta`, `cerrada_desde`, `cerrada_hasta`.
 
@@ -15,6 +15,7 @@ Filtros (query string): `numero`, `id_empresa`, `id_area`, `id_supervisor`, `id_
 
 - **Pendientes de revisión**: tickets en `RESPONDIDO` (respuesta recibida, falta la revisión municipal).
 - **Tiempo promedio de respuesta**: desde la creación hasta la primera actuación de tipo `RESPUESTA`.
+- **Respuesta en plazo**: primera respuesta hasta el día de vencimiento (inclusive), sobre los tickets que ya tienen respuesta.
 - **Tiempo promedio de cierre**: desde la creación hasta `fecha_cierre`, sólo para tickets cerrados.
 
 ## Archivos

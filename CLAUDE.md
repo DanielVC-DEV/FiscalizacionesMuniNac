@@ -46,7 +46,7 @@ Arquitectura por capas dentro de `src/`:
 | `modules/contratos` | Contratos, detalle y alta. Subcarpeta `components/`. | [contratos](frontend/src/modules/contratos/README.md), [components](frontend/src/modules/contratos/components/README.md) |
 | `modules/empresas` | Empresas contratistas. | [empresas](frontend/src/modules/empresas/README.md) |
 | `modules/areas` | Áreas municipales. | [areas](frontend/src/modules/areas/README.md) |
-| `modules/reportes` | Indicadores y reporte PDF (admin y director). | [reportes](frontend/src/modules/reportes/README.md) |
+| `modules/reportes` | Indicadores con gráficos y reporte PDF (admin y director). Subcarpeta `components/`. | [reportes](frontend/src/modules/reportes/README.md), [components](frontend/src/modules/reportes/components/README.md) |
 | `modules/consulta` | Página pública de consulta por enlace (sólo lectura). | [consulta](frontend/src/modules/consulta/README.md) |
 | `modules/notificaciones` | Destinatarios de avisos por correo (admin). | [notificaciones](frontend/src/modules/notificaciones/README.md) |
 | `modules/auth` | Inicio de sesión y sesión activa (primera pantalla de la app). Subcarpeta `components/`. | [auth](frontend/src/modules/auth/README.md), [components](frontend/src/modules/auth/components/README.md) |

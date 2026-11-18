@@ -4,8 +4,10 @@ Pantalla de indicadores de gestión (sólo admin y director) y descarga del repo
 
 ## Archivos
 
-- [IndicadoresScreen.tsx](IndicadoresScreen.tsx): tarjetas por estado, tiempos promedio de respuesta y de cierre, y el botón de PDF. El PDF sólo se descarga desde la web; en el celular se avisa dónde obtenerlo.
+- [IndicadoresScreen.tsx](IndicadoresScreen.tsx): cifras principales, barra de estados, evolución mensual, tiempos promedio, reparto por empresa, área y prioridad (los mismos gráficos del PDF) y el botón de PDF. El PDF sólo se descarga desde la web; en el celular se avisa dónde obtenerlo.
 - [api.ts](api.ts): `reportesApi.indicadores(filtros)` y `reportesApi.descargarPdf(filtros)` (pide el PDF con la sesión y lo entrega como archivo del navegador), más los tipos `IndicadoresApi` y `FiltrosReporte`.
+
+- [components/](components/README.md): gráficos (barras, barra de estados, columnas por mes).
 
 ## Depende de
 

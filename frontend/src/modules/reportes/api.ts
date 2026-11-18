@@ -13,6 +13,27 @@ export interface IndicadoresApi {
   cerrados: number;
   tiempo_promedio_respuesta_dias: string | null;
   tiempo_promedio_cierre_dias: string | null;
+  por_empresa: RepartoApi[];
+  por_area: RepartoApi[];
+  por_prioridad: RepartoApi[];
+  por_mes: MesApi[];
+  respuestas_con_dato: number;
+  respuestas_en_plazo: number;
+}
+
+// Reparto de tickets por empresa, área o prioridad (máximo 8, de mayor a menor).
+export interface RepartoApi {
+  nombre: string;
+  total: number;
+  resueltos: number;
+  vencidos: number;
+}
+
+// Tickets creados en el mes (aaaa-mm) y cuántos de ellos ya tienen cierre.
+export interface MesApi {
+  mes: string;
+  creados: number;
+  cerrados: number;
 }
 
 // Filtros por fecha de creación (aaaa-mm-dd). Vacío = sin filtro.

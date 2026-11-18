@@ -11,6 +11,9 @@ import { avisar } from '../../core/ui/avisos';
 import { COLORS, COLOR_ESTADO, RADIOS } from '../../core/theme/colors';
 import { reportesApi, IndicadoresApi, FiltrosReporte } from './api';
 import { CONTENIDO_WEB } from '../../core/ui/anchoWeb';
+import GraficoBarras from './components/GraficoBarras';
+import BarraEstados from './components/BarraEstados';
+import GraficoMensual from './components/GraficoMensual';
 
 type Periodo = 'mes' | 'trimestre' | 'todo';
 
@@ -74,17 +77,39 @@ export default function IndicadoresScreen({ navigation }: any) {
     }
   }
 
-  const tarjetas: { etiqueta: string; numero: number; estado?: string }[] = datos
+  const porcentaje = (parte: number, todo: number) => (todo ? `${Math.round((parte / todo) * 100)}%` : '-');
+
+  // Cifras principales: se muestran grandes arriba, como en la portada del PDF.
+  const principales = datos
     ? [
-        { etiqueta: 'Total de tickets', numero: datos.total },
-        { etiqueta: 'Abiertos', numero: datos.abiertos, estado: 'ABIERTO' },
-        { etiqueta: 'Pendientes de revisión', numero: datos.pendientes_revision, estado: 'RESPONDIDO' },
-        { etiqueta: 'Nueva subsanación', numero: datos.requieren_nueva_subsanacion, estado: 'REQUIERE_NUEVA_SUBSANACION' },
-        { etiqueta: 'Vencidos', numero: datos.vencidos, estado: 'VENCIDO' },
-        { etiqueta: 'Subsanados conforme', numero: datos.subsanados_conforme, estado: 'SUBSANADO_CONFORME' },
-        { etiqueta: 'Cerrados', numero: datos.cerrados, estado: 'CERRADO' },
+        { etiqueta: 'Total de tickets', valor: String(datos.total), color: COLORS.azul },
+        { etiqueta: 'Pendientes de revisión', valor: String(datos.pendientes_revision), color: COLORS.amarillo },
+        { etiqueta: 'Vencidos', valor: String(datos.vencidos), color: COLORS.rojo },
+        {
+          etiqueta: 'Respuestas en plazo',
+          valor: porcentaje(datos.respuestas_en_plazo, datos.respuestas_con_dato),
+          color: COLORS.verde,
+        },
       ]
     : [];
+
+  const tramosEstado = datos
+    ? [
+        { etiqueta: 'Abiertos', valor: datos.abiertos, color: COLOR_ESTADO.ABIERTO.color },
+        { etiqueta: 'Pendientes de revisión', valor: datos.pendientes_revision, color: COLOR_ESTADO.RESPONDIDO.color },
+        { etiqueta: 'Nueva subsanación', valor: datos.requieren_nueva_subsanacion, color: '#c25b00' },
+        { etiqueta: 'Vencidos', valor: datos.vencidos, color: COLOR_ESTADO.VENCIDO.color },
+        { etiqueta: 'Subsanados conforme', valor: datos.subsanados_conforme, color: COLOR_ESTADO.SUBSANADO_CONFORME.color },
+        { etiqueta: 'Cerrados', valor: datos.cerrados, color: COLOR_ESTADO.CERRADO.color },
+      ]
+    : [];
+
+  const filasReparto = (lista: IndicadoresApi['por_empresa']) =>
+    lista.map((f) => ({
+      etiqueta: f.nombre,
+      valor: f.total,
+      detalle: `${f.resueltos} resueltos · ${f.vencidos} vencidos`,
+    }));
 
   return (
     <SafeAreaView style={styles.pantalla} edges={['top', 'bottom']}>
@@ -111,19 +136,23 @@ export default function IndicadoresScreen({ navigation }: any) {
         {datos && (
           <>
             <View style={styles.grilla}>
-              {tarjetas.map((tarjeta) => {
-                const color = tarjeta.estado ? COLOR_ESTADO[tarjeta.estado] : null;
-                return (
-                  <View
-                    key={tarjeta.etiqueta}
-                    style={[styles.tarjeta, color && { backgroundColor: color.suave, borderColor: color.color }]}
-                  >
-                    <Text style={[styles.numero, color && { color: color.oscuro }]}>{tarjeta.numero}</Text>
-                    <Text style={[styles.etiqueta, color && { color: color.oscuro }]}>{tarjeta.etiqueta}</Text>
-                  </View>
-                );
-              })}
+              {principales.map((tarjeta) => (
+                <View key={tarjeta.etiqueta} style={[styles.tarjeta, { backgroundColor: tarjeta.color }]}>
+                  <Text style={styles.numero}>{tarjeta.valor}</Text>
+                  <Text style={styles.etiqueta}>{tarjeta.etiqueta}</Text>
+                </View>
+              ))}
             </View>
+
+            <SeccionLabel texto="Tickets por estado" />
+            <Card>
+              <BarraEstados tramos={tramosEstado} total={datos.total} />
+            </Card>
+
+            <SeccionLabel texto="Evolución mensual" />
+            <Card>
+              <GraficoMensual meses={datos.por_mes} />
+            </Card>
 
             <SeccionLabel texto="Tiempos promedio" />
             <Card style={styles.tiempos}>
@@ -131,6 +160,21 @@ export default function IndicadoresScreen({ navigation }: any) {
               <Text style={styles.tiempoValor}>{dias(datos.tiempo_promedio_respuesta_dias)}</Text>
               <Text style={[styles.tiempoEtiqueta, styles.separado]}>Hasta el cierre</Text>
               <Text style={styles.tiempoValor}>{dias(datos.tiempo_promedio_cierre_dias)}</Text>
+            </Card>
+
+            <SeccionLabel texto="Por empresa" />
+            <Card>
+              <GraficoBarras filas={filasReparto(datos.por_empresa)} />
+            </Card>
+
+            <SeccionLabel texto="Por área" />
+            <Card>
+              <GraficoBarras filas={filasReparto(datos.por_area)} />
+            </Card>
+
+            <SeccionLabel texto="Por prioridad" />
+            <Card>
+              <GraficoBarras filas={filasReparto(datos.por_prioridad)} />
             </Card>
 
             <SeccionLabel texto="Reporte" />
@@ -166,17 +210,14 @@ const styles = StyleSheet.create({
   grilla: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   tarjeta: {
     flexGrow: 1,
-    flexBasis: '30%',
-    minWidth: 100,
-    padding: 12,
+    flexBasis: '22%',
+    minWidth: 130,
+    padding: 14,
     borderRadius: RADIOS.md,
-    borderWidth: 1,
-    borderColor: COLORS.bordeSuave,
-    backgroundColor: COLORS.superficie,
     gap: 2,
   },
-  numero: { fontSize: 24, fontWeight: '800', color: COLORS.azul },
-  etiqueta: { fontSize: 11, fontWeight: '600', color: COLORS.textoSecundario },
+  numero: { fontSize: 28, fontWeight: '800', color: COLORS.textoClaro },
+  etiqueta: { fontSize: 11, fontWeight: '600', color: COLORS.textoClaro },
   tiempos: { gap: 2 },
   tiempoEtiqueta: { fontSize: 11, fontWeight: '700', color: COLORS.textoSecundario },
   tiempoValor: { fontSize: 16, fontWeight: '700', color: COLORS.textoPrimario },
