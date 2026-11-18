@@ -16,9 +16,9 @@ import { conShellWeb } from './ShellWeb';
 import LoginScreen from '../modules/auth/LoginScreen';
 import { esAdministrador, esMunicipal, useSesion } from '../modules/auth/store';
 
-// En la web, cada pantalla con sesión lleva el menú lateral a la izquierda (ver ShellWeb).
+// Cada pantalla con sesión lleva el menú lateral: fijo en la web ancha y deslizable en el celular (ver ShellWeb).
 const MenuWeb = conShellWeb((props: any) => (
-  <MenuScreen {...props} panel={<ResumenPanel navigation={props.navigation} relleno={40} />} />
+  <MenuScreen {...props} panel={(relleno: number) => <ResumenPanel navigation={props.navigation} relleno={relleno} />} />
 ));
 const ResumenWeb = conShellWeb(ResumenScreen);
 const TicketDetalleWeb = conShellWeb(TicketDetalleScreen);

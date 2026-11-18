@@ -9,7 +9,7 @@ Registro único de las pantallas y del stack de navegación (React Navigation, `
   - Con sesión (todos los roles): `Menu`, `Resumen` y `TicketDetalle`.
   - Sólo admin y director: `CrearTicket`, `Indicadores`, `Contratos` y `ContratoDetalle`. El supervisor de empresa no tiene esas rutas.
   - Sólo con rol `admin`: `CrearContrato`, `Empresas`, `Areas`, `Supervisores` y `Destinatarios`. Si el rol no es admin, esas rutas no existen para la navegación.
-- [ShellWeb.tsx](ShellWeb.tsx): marco de la web (ventanas de 900 px o más): menú lateral izquierdo en todas las pantallas con sesión y la pantalla a todo el ancho a la derecha. `conShellWeb(Pantalla)` envuelve cada pantalla en `AppNavigator`. En el celular no hace nada.
+- [ShellWeb.tsx](ShellWeb.tsx): marco de la web (ventanas de 900 px o más): menú lateral izquierdo en todas las pantallas con sesión y la pantalla a todo el ancho a la derecha. `conShellWeb(Pantalla)` envuelve cada pantalla en `AppNavigator`. En el celular y en ventanas angostas, la pantalla ocupa todo el ancho y el mismo menú es un panel deslizable (`MenuLateralMovil`), que abre el botón de tres barras del encabezado mediante `core/ui/menuMovil.ts`.
 
 ## Cómo agregar una pantalla
 

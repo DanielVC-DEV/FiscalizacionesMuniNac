@@ -3,6 +3,8 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { COLORS } from '../theme/colors';
 
 interface Props {
+  // Contenido opcional a la izquierda del logo (por ejemplo, el botón del menú).
+  izquierda?: ReactNode;
   // Contenido opcional a la derecha (por ejemplo, el usuario y cerrar sesión).
   derecha?: ReactNode;
 }
@@ -10,9 +12,10 @@ interface Props {
 // Barra de marca, presente en todas las pantallas: logo + nombre de la
 // plataforma + lo que se pase en "derecha". No conoce la sesión: eso lo
 // arma modules/auth/components/SesionHeader.tsx.
-export default function Header({ derecha }: Props) {
+export default function Header({ izquierda, derecha }: Props) {
   return (
     <View style={styles.container}>
+      {izquierda}
       <Image
         source={require('../../../assets/logo.png')}
         style={styles.logo}
