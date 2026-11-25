@@ -1,8 +1,43 @@
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
+
 // Cliente HTTP compartido por todos los módulos. Cada módulo define sus
 // propios endpoints (ver modules/<modulo>/api.ts) y usa esta función.
 
-// La URL se puede cambiar por entorno para usar localhost, un emulador o un teléfono físico.
-export const API_BASE_URL = (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api').replace(/\/$/, '');
+function apiUrlDesdeHost(host: string, permitirLoopback: boolean): string | null {
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return permitirLoopback ? `http://${host}:3000/api` : null;
+  }
+
+  const partes = host.split('.');
+  if (partes.length !== 4 || !partes.every((parte) => /^\d{1,3}$/.test(parte) && Number(parte) <= 255)) {
+    return null;
+  }
+
+  const [primero, segundo] = partes.map(Number);
+  const esIpPrivada =
+    primero === 10 ||
+    (primero === 172 && segundo >= 16 && segundo <= 31) ||
+    (primero === 192 && segundo === 168);
+
+  return esIpPrivada ? `http://${host}:3000/api` : null;
+}
+
+function apiUrlDesdeExpoLan(): string | null {
+  if (!__DEV__) return null;
+
+  if (Platform.OS === 'web') {
+    return typeof window === 'undefined' ? null : apiUrlDesdeHost(window.location.hostname, true);
+  }
+
+  const host = Constants.expoConfig?.hostUri?.split(':')[0];
+  return host ? apiUrlDesdeHost(host, false) : null;
+}
+
+// En desarrollo usa el host web o la IP LAN de Expo para llegar al backend local.
+export const API_BASE_URL = (
+  apiUrlDesdeExpoLan() || process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api'
+).replace(/\/$/, '');
 
 // Token de la sesión activa. Lo fija el módulo auth al iniciar o cerrar sesión;
 // el resto de los módulos no necesita saber de él.
